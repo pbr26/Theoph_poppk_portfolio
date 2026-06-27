@@ -39,7 +39,7 @@ website:
             href: reports/07_Simulation_Report.html
     tools:
       - icon: github
-        href: https://github.com/
+        href: https://github.com/pbr26/Theoph_poppk_portfolio
         text: "Source on GitHub"
   page-footer:
     center: "Population PK Portfolio · Theophylline · Built in R with nlmixr2, PKNCA & Quarto"
