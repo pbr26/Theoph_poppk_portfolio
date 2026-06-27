@@ -1,0 +1,71 @@
+project:
+  type: website
+  output-dir: docs
+  render:
+    - index.qmd
+    - reports/01_EDA_Report.qmd
+    - reports/02_NCA_Report.qmd
+    - reports/03_Base_Model_Report.qmd
+    - reports/04_IIV_Model_Report.qmd
+    - reports/05_Covariate_Model_Report.qmd
+    - reports/06_Model_Diagnostics.qmd
+    - reports/07_Simulation_Report.qmd
+
+website:
+  title: "PopPK Portfolio – Theophylline"
+  description: "End-to-end population pharmacokinetics analysis of the Theophylline dataset in R."
+  reader-mode: true
+  page-navigation: true
+  navbar:
+    background: primary
+    left:
+      - text: "Home"
+        href: index.html
+      - text: "Reports"
+        menu:
+          - text: "1. Exploratory Data Analysis"
+            href: reports/01_EDA_Report.html
+          - text: "2. Noncompartmental Analysis"
+            href: reports/02_NCA_Report.html
+          - text: "3. Base PopPK Model"
+            href: reports/03_Base_Model_Report.html
+          - text: "4. IIV Model"
+            href: reports/04_IIV_Model_Report.html
+          - text: "5. Covariate Model"
+            href: reports/05_Covariate_Model_Report.html
+          - text: "6. Model Diagnostics"
+            href: reports/06_Model_Diagnostics.html
+          - text: "7. Simulation"
+            href: reports/07_Simulation_Report.html
+    tools:
+      - icon: github
+        href: https://github.com/
+        text: "Source on GitHub"
+  page-footer:
+    center: "Population PK Portfolio · Theophylline · Built in R with nlmixr2, PKNCA & Quarto"
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    toc-title: "Contents"
+    number-sections: true
+    code-fold: true
+    code-tools: true
+    code-copy: true
+    highlight-style: github
+    fig-width: 8
+    fig-height: 6
+    fig-dpi: 300
+    embed-resources: true
+    self-contained: true
+
+execute:
+  echo: true
+  warning: false
+  message: false
+  cache: false
+  freeze: auto
+
+editor: visual

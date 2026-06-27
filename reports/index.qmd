@@ -1,0 +1,42 @@
+---
+title: "Population PK Portfolio: Theophylline"
+subtitle: "A complete end-to-end pharmacokinetics workflow in R"
+author: "Pramod BR"
+date: today
+---
+
+## Overview
+
+This portfolio demonstrates a complete Population Pharmacokinetics (PopPK) workflow using
+the classic **Theophylline** dataset. It was built to showcase practical skills in clinical
+pharmacology, DMPK, and pharmacometrics for roles in the pharmaceutical industry and CROs.
+
+## Analysis Phases
+
+| Phase | Report | Key Skills |
+|-------|--------|-----------|
+| 1 | [Exploratory Data Analysis](01_EDA_Report.html) | Data visualisation, PK study design |
+| 2 | [Noncompartmental Analysis](02_NCA_Report.html) | PKNCA, NCA parameters, AUC, half-life |
+| 3 | [Base PopPK Model](03_Base_Model_Report.html) | nlmixr2, 1-compartment model, FOCE |
+| 4 | [IIV Model](04_IIV_Model_Report.html) | Between-subject variability, random effects |
+| 5 | [Covariate Model](05_Covariate_Model_Report.html) | Body weight effects, model selection |
+| 6 | [Model Diagnostics](06_Model_Diagnostics.html) | GOF plots, VPC, CWRES |
+| 7 | [Clinical Simulation](07_Simulation_Report.html) | rxode2, dose individualisation |
+
+## Dataset
+
+The **Theoph** dataset (built-in to R) contains oral theophylline PK data from 12 subjects.
+It is a benchmark dataset used in PopPK methodology papers and textbooks worldwide.
+
+## Tools & Packages
+
+- **nlmixr2** – Population PK/PD modeling
+- **rxode2** – ODE-based simulation
+- **PKNCA** – Noncompartmental analysis
+- **ggplot2 / patchwork** – Publication-quality figures
+- **Quarto** – Reproducible reports
+- **renv** – Reproducible package environment
+
+---
+
+*Disclaimer: This project uses publicly available data for educational purposes only.*

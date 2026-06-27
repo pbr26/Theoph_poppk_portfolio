@@ -1,0 +1,378 @@
+---
+title: "Phase 1 – Exploratory Data Analysis"
+subtitle: "Theophylline Population PK Portfolio"
+author: "Pramod BR"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: true
+    code-tools: true
+    theme: cosmo
+    fig-width: 9
+    fig-height: 6
+    fig-dpi: 300
+    embed-resources: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+library(tidyverse)
+library(patchwork)
+library(viridis)
+library(scales)
+library(knitr)
+library(kableExtra)
+library(ggrepel)
+library(here)
+
+# Load helper functions
+source(here("R", "00_setup.R"))
+source(here("R", "01_eda.R"))
+
+# Prepare dataset
+theoph <- prepare_theoph()
+
+# Save raw data copy
+write_csv(theoph, here("data", "raw", "theoph_raw.csv"))
+```
+
+---
+
+## Scientific Background
+
+### Theophylline as a PK Model Drug
+
+**Theophylline** (1,3-dimethylxanthine) is a bronchodilator used in the management of
+asthma and chronic obstructive pulmonary disease (COPD). It acts as a non-selective
+phosphodiesterase inhibitor, increasing intracellular cAMP and causing smooth muscle relaxation
+in the airways.
+
+From a **pharmacokinetic perspective**, theophylline is an ideal model compound because:
+
+- It exhibits **linear (first-order) PK** at therapeutic doses
+- It is well-absorbed orally with nearly complete bioavailability
+- It follows **one-compartment** kinetics with reasonable approximation
+- It has a **narrow therapeutic index** (10–20 mg/L), making PK/PD relationships clinically relevant
+- It shows **significant between-subject variability** in clearance, driven by covariates like
+  body weight, age, smoking status, and hepatic function
+
+### Clinical Relevance
+
+The therapeutic range for theophylline is **10–20 mg/L**. Concentrations below 10 mg/L
+are sub-therapeutic; above 20 mg/L, toxicity (nausea, arrhythmias, seizures) becomes a
+serious concern. This makes individualized dosing — the goal of population PK — clinically critical.
+
+---
+
+## Dataset Description
+
+### Study Design
+
+```{r dataset-overview}
+glimpse(theoph)
+```
+
+The **Theoph** dataset (Boeckmann, Sheiner & Beal, 1992) is a classic single-dose oral PK
+study:
+
+- **12 healthy adult subjects** received oral theophylline
+- Dose was **weight-normalised**: 4.02–5.86 mg/kg (variable between subjects)
+- **11 blood samples** per subject collected over 0–25 hours post-dose
+- Plasma theophylline concentrations measured (mg/L)
+
+### Variable Dictionary
+
+```{r variable-table}
+tibble(
+  Variable = c("ID", "TIME", "DV", "AMT", "WT", "DOSE", "EVID", "MDV"),
+  Type     = c("Factor", "Numeric", "Numeric", "Numeric", "Numeric", "Numeric", "Integer", "Integer"),
+  Units    = c("—", "hours", "mg/L", "mg", "kg", "mg/kg", "0/1", "0/1"),
+  Description = c(
+    "Subject identifier (1–12)",
+    "Time after oral dose administration",
+    "Observed plasma theophylline concentration",
+    "Administered dose in absolute mg (DOSE × WT)",
+    "Body weight",
+    "Weight-normalised dose",
+    "Event ID: 1 = dosing record, 0 = observation",
+    "Missing DV flag: 1 = dose record (no concentration), 0 = observation"
+  )
+) |>
+  kbl(caption = "Variable dictionary for the Theoph PK dataset") |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE) |>
+  column_spec(1, bold = TRUE, color = "#2C3E50")
+```
+
+---
+
+## Data Quality Checks
+
+```{r dq-checks}
+dq <- run_dq_checks(theoph)
+
+tibble(
+  Check   = c("Subjects", "Total observations", "Time range (h)",
+               "Concentration range (mg/L)", "BLQ observations",
+               "Missing concentrations", "Missing times",
+               "Weight range (kg)", "Dose range (mg/kg)",
+               "Total dose range (mg)"),
+  Result  = c(
+    dq$n_subjects,
+    dq$n_obs_total,
+    paste(round(dq$time_range, 1), collapse = " – "),
+    paste(round(dq$conc_range, 2), collapse = " – "),
+    dq$n_below_lloq,
+    dq$n_missing_conc,
+    dq$n_missing_time,
+    paste(round(dq$weight_range, 1), collapse = " – "),
+    paste(round(dq$dose_range, 2), collapse = " – "),
+    paste(round(dq$dose_mg_range, 1), collapse = " – ")
+  )
+) |>
+  kbl(caption = "Data quality summary") |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE) |>
+  column_spec(1, bold = TRUE)
+```
+
+::: {.callout-note}
+**No missing values or BLQ observations detected.** The dataset is complete and clean —
+ideal for a portfolio demonstration. In a real clinical study, BLQ handling (e.g., M1/M2
+method) and imputation strategies would be pre-specified in the analysis plan.
+:::
+
+---
+
+## Subject Characteristics
+
+```{r subject-summary-table}
+ss <- subject_summary(theoph)
+
+ss |>
+  rename(
+    `Subject ID`  = ID,
+    `Weight (kg)` = WT,
+    `Dose (mg/kg)`= DOSE,
+    `Dose (mg)`   = AMT_mg,
+    `Cmax (mg/L)` = Cmax,
+    `Tmax (h)`    = Tmax,
+    `Clast (mg/L)`= Clast,
+    `Tlast (h)`   = Tlast,
+    `N obs`       = n_obs
+  ) |>
+  kbl(caption = "Subject-level PK summary (observed data)") |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE) |>
+  row_spec(0, bold = TRUE, background = "#2C3E50", color = "white")
+```
+
+```{r subject-chars-plot, fig.height=5}
+#| fig-cap: "Body weight and dose distribution across the 12 subjects"
+plot_weight_dist(theoph)
+```
+
+::: {.callout-tip title="Scientific Interpretation"}
+**Body weight** ranges from `r round(min(ss$WT), 1)` to `r round(max(ss$WT), 1)` kg
+(CV ≈ `r round(sd(ss$WT)/mean(ss$WT)*100, 0)`%). Because dosing was weight-normalised
+(mg/kg), the absolute dose (mg) varies proportionally with weight. This weight-based dosing
+strategy is intended to reduce between-subject variability in exposure — but as we will see
+in the covariate analysis (Phase 5), weight may still explain residual variability in
+clearance and volume of distribution.
+:::
+
+---
+
+## Concentration-Time Profiles
+
+### Individual Profiles (Linear Scale)
+
+```{r individual-linear, fig.height=8}
+#| fig-cap: "Individual theophylline concentration-time profiles (linear scale)"
+p_ind_lin <- plot_individual_linear(theoph)
+p_ind_lin
+save_fig(p_ind_lin, "01_individual_linear", w = 10, h = 8)
+```
+
+::: {.callout-tip title="Scientific Interpretation"}
+Key observations from individual profiles:
+
+- **Absorption phase** (0–2 h): rapid rise to Cmax visible in all subjects — consistent
+  with oral immediate-release formulation
+- **Peak concentrations (Cmax)**: range from
+  `r round(min(ss$Cmax), 1)` to `r round(max(ss$Cmax), 1)` mg/L, indicating substantial
+  between-subject variability despite weight-adjusted dosing
+- **Time to peak (Tmax)**: ranges from
+  `r round(min(ss$Tmax), 1)` to `r round(max(ss$Tmax), 1)` h, suggesting variability
+  in absorption rate (Ka) between subjects
+- **Elimination phase**: gradual, smooth decline after Cmax — consistent with first-order
+  monoexponential elimination
+- **Subject 1** shows notably higher exposure; **Subject 6** shows a relatively lower Cmax —
+  these differences motivate the formal PopPK model
+:::
+
+### Spaghetti Plot – All Subjects Overlaid
+
+```{r spaghetti, fig.height=5}
+#| fig-cap: "Spaghetti plot showing between-subject variability in theophylline PK"
+p_spag <- plot_spaghetti(theoph)
+p_spag
+save_fig(p_spag, "01_spaghetti", w = 9, h = 5)
+```
+
+::: {.callout-tip title="Scientific Interpretation"}
+The spaghetti plot makes **between-subject variability (BSV)** immediately visible:
+
+- Cmax varies ~2-fold across subjects
+- Tmax varies from ~1 to ~3 hours
+- The elimination slopes appear broadly parallel on linear scale, suggesting a **similar
+  elimination rate** (ke) across subjects — the variability is more in Cmax/Tmax than in
+  the terminal slope
+- This pattern is consistent with a **one-compartment oral model** where Ka and CL/V vary
+  between subjects — the target of our PopPK model in Phase 3
+:::
+
+### Mean ± SD Profile
+
+```{r mean-profile, fig.height=5}
+#| fig-cap: "Mean (±SD) concentration-time profile across all 12 subjects"
+p_mean <- plot_mean_profile(theoph)
+p_mean
+save_fig(p_mean, "01_mean_profile", w = 9, h = 5)
+```
+
+::: {.callout-tip title="Scientific Interpretation"}
+The mean profile reveals the **typical PK behaviour** of theophylline:
+
+- Mean Cmax ≈ `r round(mean(ss$Cmax), 1)` mg/L occurring at ≈ `r round(mean(ss$Tmax), 1)` h
+- The SD ribbon widens at Cmax, indicating this is where BSV is largest (driven by
+  variability in both Ka and CL)
+- The SD ribbon narrows in the terminal phase, suggesting the elimination rate is relatively
+  consistent — this will be reflected in lower IIV on CL compared to Ka
+- **Mean Cmax of `r round(mean(ss$Cmax), 1)` mg/L** sits within the therapeutic window
+  (10–20 mg/L) — a reassuring sign that the weight-based dosing strategy is appropriate
+  for the typical subject
+:::
+
+### Semi-Log Profiles (Terminal Phase Analysis)
+
+```{r semilog, fig.height=8}
+#| fig-cap: "Semi-log concentration-time profiles. Linear terminal phase confirms first-order elimination."
+p_semi <- plot_individual_semilog(theoph)
+p_semi
+save_fig(p_semi, "01_semilog_individual", w = 10, h = 8)
+```
+
+::: {.callout-tip title="Scientific Interpretation — Why Semi-Log Matters"}
+The semi-log transformation is a **fundamental PK diagnostic tool**:
+
+- On a semi-log scale, **first-order (monoexponential) elimination appears as a straight line**
+- All 12 subjects show approximately linear terminal phases — confirming **first-order
+  elimination kinetics** and validating the use of a one-compartment model
+- The **slope of the terminal line = −λz (elimination rate constant)**, from which
+  half-life is derived: t½ = ln(2)/λz ≈ 0.693/λz
+- Minor deviations from linearity (e.g., Subject 3, early time points) may reflect the
+  absorption phase not being fully resolved — this is the **flip-flop phenomenon** risk
+  when Ka ≈ Ke
+- A **two-compartment model** would show a biphasic profile (two distinct slopes) —
+  the absence of this here supports a one-compartment assumption
+:::
+
+---
+
+## Covariate Exploration
+
+```{r cmax-wt, fig.height=5}
+#| fig-cap: "Cmax vs body weight — preliminary covariate screening"
+p_cov <- plot_cmax_vs_wt(theoph)
+p_cov
+save_fig(p_cov, "01_cmax_vs_wt", w = 7, h = 5)
+```
+
+::: {.callout-tip title="Scientific Interpretation"}
+The scatter plot of **Cmax vs body weight** provides an early signal:
+
+- A **negative trend** is expected if heavier subjects have larger volume of distribution
+  (diluting the drug more) — this is consistent with allometric scaling principles
+- A **positive trend** could indicate inadequate weight-normalisation of dose
+- The regression line and confidence band here give a visual (informal) signal —
+  formal statistical testing of weight as a covariate on CL and V will be done in Phase 5
+- Point size encodes absolute dose: heavier subjects received more drug (mg) despite the
+  same mg/kg dose, helping distinguish dose effects from true weight effects
+:::
+
+---
+
+## Summary of EDA Findings
+
+```{r eda-summary-table}
+tibble(
+  Finding = c(
+    "Dataset completeness",
+    "Sample size",
+    "Dosing strategy",
+    "Cmax range",
+    "Tmax range",
+    "Elimination",
+    "Compartment structure",
+    "Between-subject variability",
+    "Covariate signal"
+  ),
+  Observation = c(
+    "No missing values, no BLQ concentrations",
+    "12 subjects × 11 time points = 132 observations",
+    "Weight-normalised (mg/kg) single oral dose",
+    paste0(round(min(ss$Cmax),1), "–", round(max(ss$Cmax),1), " mg/L"),
+    paste0(round(min(ss$Tmax),1), "–", round(max(ss$Tmax),1), " h"),
+    "First-order, confirmed by linear terminal semi-log profile",
+    "One-compartment model supported (no biphasic profile)",
+    "~2-fold variability in Cmax; variable Tmax suggests IIV on Ka",
+    "Body weight warrants formal evaluation as covariate on CL and V"
+  ),
+  `Modeling Implication` = c(
+    "No pre-processing required; proceed directly to NCA and modeling",
+    "Adequate for PopPK; limits covariate power (small N)",
+    "Include weight and dose as dataset variables; test WT on CL/V",
+    "Therapeutic window (10–20 mg/L) mostly achieved",
+    "IIV on Ka required in the base model",
+    "Use first-order absorption in ODE model",
+    "Start with 1-CMT; test 2-CMT if residuals suggest misspecification",
+    "Random effects on CL, V, Ka essential",
+    "Phase 5 will formally test WT → CL and WT → V"
+  )
+) |>
+  kbl(caption = "EDA findings and modeling implications") |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed")) |>
+  column_spec(1, bold = TRUE, color = "#2C3E50") |>
+  column_spec(3, italic = TRUE, color = "grey30")
+```
+
+---
+
+## Reproducibility
+
+```{r session-info}
+#| code-fold: true
+sessionInfo()
+```
+
+---
+
+## Git Commit Recommendation
+
+```bash
+git add reports/01_EDA_Report.qmd R/01_eda.R data/raw/theoph_raw.csv outputs/figures/01_*
+git commit -m "feat: Phase 1 – EDA report with concentration-time profiles and covariate screening"
+git push origin main
+```
+
+---
+
+*Next: [Phase 2 – Noncompartmental Analysis](02_NCA_Report.html)*

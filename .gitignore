@@ -1,0 +1,32 @@
+# --- R session artifacts ---
+.Rhistory
+.RData
+.Rproj.user/
+.Ruserdata
+
+# --- renv: keep the lockfile, ignore the local library/cache ---
+renv/library/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/sandbox/
+renv/staging/
+
+# --- Quarto build artifacts ---
+.quarto/
+*_files/
+*_cache/
+/.quarto/
+**/*.quarto_ipynb
+
+# --- Large model outputs (rendered HTML is published via docs/) ---
+outputs/models/*.rds
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+*.pkg
+
+# --- Local archive of the previous build ---
+_archive_20260621/
