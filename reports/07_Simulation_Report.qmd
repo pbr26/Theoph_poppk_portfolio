@@ -1,12 +1,120 @@
 ---
-title: "Phase 7 – Clinical Simulation"
+title: "Phase 7 — Clinical Simulation"
+subtitle: "Typical patient, weight subgroups, and population variability (rxode2)"
 author: "Pramod BR"
 date: today
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-tools: true
+    number-sections: true
+    fig-width: 8
+    fig-height: 6
+execute:
+  echo: true
+  warning: false
+  message: false
 ---
 
-```{r setup, include=FALSE}
-source(here::here("R", "00_setup.R"))
+```{r setup}
+#| include: false
+here::i_am("reports/07_Simulation_Report.qmd")
+source(here::here("R", "07_simulation.R"))
+library(kableExtra)
 ```
 
-> **Status:** This report will be built in the corresponding phase.
+## Objectives
 
+With a model that passed diagnostics (Phase 6), we can now **simulate** — predict
+concentration-time profiles for scenarios we never measured. This is where a
+population PK model earns its keep clinically. We simulate three things with
+`rxode2`: a typical patient, the effect of body weight, and the full population
+spread.
+
+```{r pars}
+pars <- get_typical_params()
+```
+
+The simulations use the typical parameters from the final model
+(`r pars$source`): CL ≈ `r round(pars$cl, 2)` L/h, V ≈ `r round(pars$v, 1)` L,
+Ka ≈ `r round(pars$ka, 2)` /h, with weight exponents
+θ_CL = `r round(pars$dWTCL, 2)`, θ_V = `r round(pars$dWTV, 2)`.
+
+## Typical patient
+
+Setting the random effects to zero gives the single population-average curve for a
+70 kg subject after a `r SIM_DOSE` mg oral dose.
+
+```{r typical}
+#| fig-cap: "Simulated typical-patient concentration-time profile."
+typ <- sim_typical(pars)
+sim_plot_typical(typ)
+```
+
+```{r typ-summary}
+#| include: false
+cmax <- round(max(typ$cp), 2)
+tmax <- round(typ$time[which.max(typ$cp)], 2)
+```
+
+Predicted **Cmax ≈ `r cmax` mg/L** at **Tmax ≈ `r tmax` h** — consistent with the
+observed data and the NCA, the expected internal coherence of a good model.
+
+## Effect of body weight
+
+Same `r SIM_DOSE` mg dose, three weights. Because clearance and volume scale
+allometrically with weight, heavier subjects show a different exposure profile —
+the visual rationale behind weight-based dosing decisions.
+
+```{r weight}
+#| fig-cap: "Typical profiles for 55, 70, and 85 kg subjects at a fixed dose."
+wts <- sim_weight_subgroups(pars)
+sim_plot_weight(wts)
+```
+
+```{r weight-table}
+wts |>
+  dplyr::group_by(WT) |>
+  dplyr::summarise(Cmax = round(max(cp), 2),
+                   Tmax = round(time[which.max(cp)], 2),
+                   .groups = "drop") |>
+  kbl(caption = "Simulated Cmax / Tmax by body weight (fixed dose)",
+      col.names = c("Weight (kg)", "Cmax (mg/L)", "Tmax (h)")) |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE)
+```
+
+## Population variability
+
+Drawing 500 virtual subjects' random effects from the estimated ω matrix shows the
+**spread** of real-world exposures, not just the average. For a narrow-therapeutic-
+index drug like theophylline, this band is what matters — it indicates how many
+patients might stray outside the therapeutic window on a given dose.
+
+```{r population}
+#| fig-cap: "Population simulation: median and 90% prediction interval (500 subjects)."
+pop <- sim_population(pars)
+if (!is.null(pop)) {
+  sim_plot_population(pop)
+} else {
+  cat("Population simulation requires an omega matrix (IIV/covariate model).")
+}
+```
+
+## Key takeaways
+
+- The qualified model reproduces a sensible **typical profile**
+  (Cmax ≈ `r cmax` mg/L), confirming internal consistency with the data.
+- **Body weight** measurably shifts exposure at a fixed dose — quantitative support
+  for individualised dosing.
+- The **population prediction interval** quantifies between-subject variability,
+  the critical output for dosing a narrow-therapeutic-index drug safely.
+- This completes the end-to-end workflow: data → NCA → structural model → IIV →
+  covariate → diagnostics → simulation.
+
+> The full analysis is published as a Quarto website under `docs/` and deployed via
+> GitHub Pages.
+```

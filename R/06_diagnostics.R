@@ -88,8 +88,17 @@ make_vpc <- function(fit, n = 500) {
             "Install with: renv::install('vpc')")
     return(NULL)
   }
+  # vpcPlot lives in nlmixr2plot (installed alongside nlmixr2)
+  vpc_fun <- tryCatch(
+    get("vpcPlot", envir = asNamespace("nlmixr2plot")),
+    error = function(e) NULL
+  )
+  if (is.null(vpc_fun)) {
+    message("• vpcPlot() not found in nlmixr2plot — skipping VPC.")
+    return(NULL)
+  }
   tryCatch(
-    nlmixr2::vpcPlot(fit, n = n, show = list(obs_dv = TRUE)) +
+    vpc_fun(fit, n = n, show = list(obs_dv = TRUE)) +
       ggplot2::labs(title = "Visual Predictive Check",
                     x = "Time (h)", y = "Concentration (mg/L)"),
     error = function(e) {

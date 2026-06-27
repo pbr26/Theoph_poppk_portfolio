@@ -373,9 +373,9 @@
   {
     "objectID": "reports/06_Model_Diagnostics.html",
     "href": "reports/06_Model_Diagnostics.html",
-    "title": "Phase 6 – Model Diagnostics",
+    "title": "Phase 6 — Model Diagnostics",
     "section": "",
-    "text": "Status: This report will be built in the corresponding phase."
+    "text": "A model that converges is not necessarily a model that fits. This phase stress-tests the selected model with the standard pharmacometric diagnostics: goodness-of-fit (GOF) scatter plots, conditional weighted residuals (CWRES), and a Visual Predictive Check (VPC).\n\n\nCode\nfit &lt;- load_final_fit()"
   },
   {
     "objectID": "reports/05_Covariate_Model_Report.html#objectives",
@@ -488,5 +488,61 @@
     "title": "Phase 5 — Covariate Model (Body Weight)",
     "section": "16 Key takeaways",
     "text": "16 Key takeaways\n\nBody weight was added allometrically on CL and V, with estimated exponents.\nOn the likelihood-ratio test the effect was r if (justified) \"supported\" else \"not clearly supported\" (ΔOFV = r round(dofv, 2)).\nWe reported the change in random CV% and the residual η–weight trend honestly — in a small, weight-dosed dataset like Theoph a strong weight signal is not guaranteed, and recognising that is part of sound covariate analysis.\n\n\nNext: Phase 6 — Model diagnostics: goodness-of-fit plots, CWRES vs TIME/PRED, and a visual predictive check (VPC) on the selected model.\n\n\n:::"
+  },
+  {
+    "objectID": "reports/06_Model_Diagnostics.html#objectives",
+    "href": "reports/06_Model_Diagnostics.html#objectives",
+    "title": "Phase 6 — Model Diagnostics",
+    "section": "",
+    "text": "A model that converges is not necessarily a model that fits. This phase stress-tests the selected model with the standard pharmacometric diagnostics: goodness-of-fit (GOF) scatter plots, conditional weighted residuals (CWRES), and a Visual Predictive Check (VPC).\n\n\nCode\nfit &lt;- load_final_fit()"
+  },
+  {
+    "objectID": "reports/06_Model_Diagnostics.html#goodness-of-fit-panel",
+    "href": "reports/06_Model_Diagnostics.html#goodness-of-fit-panel",
+    "title": "Phase 6 — Model Diagnostics",
+    "section": "2 Goodness-of-fit panel",
+    "text": "2 Goodness-of-fit panel\nFour plots, read together:\n\nObserved vs Population prediction (PRED) and vs Individual prediction (IPRED) — points should fall along the dashed line of identity. IPRED hugs the line more tightly because it uses each subject’s own random effects; that gap between PRED and IPRED is exactly what the IIV captures.\nCWRES vs TIME and CWRES vs PRED — conditional weighted residuals should scatter randomly in a flat horizontal band, mostly within ±2, with no trend or funnel shape. A slope or curve over time would signal a structural misspecification; fanning would signal a wrong residual-error model.\n\n\n\nCode\ngof_panel(fit)\n\n\n\n\n\nFour-panel goodness-of-fit diagnostics for the selected model."
+  },
+  {
+    "objectID": "reports/06_Model_Diagnostics.html#visual-predictive-check",
+    "href": "reports/06_Model_Diagnostics.html#visual-predictive-check",
+    "title": "Phase 6 — Model Diagnostics",
+    "section": "3 Visual Predictive Check",
+    "text": "3 Visual Predictive Check\nThe VPC simulates many virtual trials from the fitted model and overlays the observed data on the simulated prediction intervals. If the observed median and spread fall within the simulated bands across time, the model reproduces both the typical profile and the between-subject variability — the key qualification for using it to simulate (Phase 7).\n\n\nCode\nvpc &lt;- make_vpc(fit, n = 500)\nif (!is.null(vpc)) {\n  vpc\n} else {\n  cat(\"VPC requires the 'vpc' package. Install with renv::install('vpc'), then re-render.\")\n}\n\n\n\n\n\nVisual Predictive Check: observed data vs model-simulated prediction intervals."
+  },
+  {
+    "objectID": "reports/06_Model_Diagnostics.html#key-takeaways",
+    "href": "reports/06_Model_Diagnostics.html#key-takeaways",
+    "title": "Phase 6 — Model Diagnostics",
+    "section": "4 Key takeaways",
+    "text": "4 Key takeaways\n\nGOF: observed-vs-predicted should track the identity line, tighter for IPRED.\nCWRES: a flat, ±2 band with no time/PRED trend indicates the structural and error models are adequate.\nVPC: observed percentiles inside the simulated intervals confirm the model captures central tendency and variability.\nPassing these checks is what licenses the model for the clinical simulations in the next phase.\n\n\nNext: Phase 7 — Simulation: use the qualified model to simulate PK profiles for a typical patient and weight-based subgroups.\n\n\n\n\n\n:::{#quarto-navigation-envelope .hidden}\n[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1zaWRlYmFyLXRpdGxl\"}\n[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXItdGl0bGU=\"}\n[Home]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6SG9tZQ==\"}\n[/index.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L2luZGV4Lmh0bWw=\"}\n[Reports]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6UmVwb3J0cw==\"}\n[1. Exploratory Data Analysis]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6MS4gRXhwbG9yYXRvcnkgRGF0YSBBbmFseXNpcw==\"}\n[/reports/01_EDA_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDFfRURBX1JlcG9ydC5odG1s\"}\n[2. Noncompartmental Analysis]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6Mi4gTm9uY29tcGFydG1lbnRhbCBBbmFseXNpcw==\"}\n[/reports/02_NCA_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDJfTkNBX1JlcG9ydC5odG1s\"}\n[3. Base PopPK Model]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6My4gQmFzZSBQb3BQSyBNb2RlbA==\"}\n[/reports/03_Base_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDNfQmFzZV9Nb2RlbF9SZXBvcnQuaHRtbA==\"}\n[4. IIV Model]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6NC4gSUlWIE1vZGVs\"}\n[/reports/04_IIV_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDRfSUlWX01vZGVsX1JlcG9ydC5odG1s\"}\n[5. Covariate Model]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6NS4gQ292YXJpYXRlIE1vZGVs\"}\n[/reports/05_Covariate_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDVfQ292YXJpYXRlX01vZGVsX1JlcG9ydC5odG1s\"}\n[6. Model Diagnostics]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6Ni4gTW9kZWwgRGlhZ25vc3RpY3M=\"}\n[/reports/06_Model_Diagnostics.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDZfTW9kZWxfRGlhZ25vc3RpY3MuaHRtbA==\"}\n[7. Simulation]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6Ny4gU2ltdWxhdGlvbg==\"}\n[/reports/07_Simulation_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDdfU2ltdWxhdGlvbl9SZXBvcnQuaHRtbA==\"}\n[https://github.com/pbr26/Theoph_poppk_portfolio]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW5hdmJhci10b29sczpodHRwczovL2dpdGh1Yi5jb20vcGJyMjYvVGhlb3BoX3BvcHBrX3BvcnRmb2xpbw==\"}\n\n:::{.hidden .quarto-markdown-envelope-contents render-id=\"Zm9vdGVyLWNlbnRlcg==\"}\nPopulation PK Portfolio · Theophylline · Built in R with nlmixr2, PKNCA & Quarto\n:::\n\n:::\n\n\n\n:::{#quarto-meta-markdown .hidden}\n[Phase 6 — Model Diagnostics – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW1ldGF0aXRsZQ==\"}\n[Phase 6 — Model Diagnostics – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLXR3aXR0ZXJjYXJkdGl0bGU=\"}\n[Phase 6 — Model Diagnostics – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW9nY2FyZHRpdGxl\"}\n[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW1ldGFzaXRlbmFtZQ==\"}\n[Goodness-of-fit, CWRES, and Visual Predictive Check]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLXR3aXR0ZXJjYXJkZGVzYw==\"}\n[Goodness-of-fit, CWRES, and Visual Predictive Check]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW9nY2FyZGRkZXNj\"}\n[End-to-end population pharmacokinetics analysis of the Theophylline dataset in R.]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW1ldGFzaXRlZGVzYw==\"}\n:::\n\n\n\n\n&lt;!-- --&gt;\n\n::: {.quarto-embedded-source-code}\n```````````````````{.markdown shortcodes=\"false\"}\n---\ntitle: \"Phase 6 — Model Diagnostics\"\nsubtitle: \"Goodness-of-fit, CWRES, and Visual Predictive Check\"\nauthor: \"Pramod BR\"\ndate: today\nformat:\n  html:\n    theme: cosmo\n    toc: true\n    toc-depth: 3\n    code-fold: true\n    code-tools: true\n    number-sections: true\n    fig-width: 9\n    fig-height: 8\nexecute:\n  echo: true\n  warning: false\n  message: false\n---\n\n```{r setup}\n#| include: false\nhere::i_am(\"reports/06_Model_Diagnostics.qmd\")\nsource(here::here(\"R\", \"06_diagnostics.R\"))\nlibrary(kableExtra)"
+  },
+  {
+    "objectID": "reports/06_Model_Diagnostics.html#objectives-1",
+    "href": "reports/06_Model_Diagnostics.html#objectives-1",
+    "title": "Phase 6 — Model Diagnostics",
+    "section": "5 Objectives",
+    "text": "5 Objectives\nA model that converges is not necessarily a model that fits. This phase stress-tests the selected model with the standard pharmacometric diagnostics: goodness-of-fit (GOF) scatter plots, conditional weighted residuals (CWRES), and a Visual Predictive Check (VPC).\nfit &lt;- load_final_fit()"
+  },
+  {
+    "objectID": "reports/06_Model_Diagnostics.html#goodness-of-fit-panel-1",
+    "href": "reports/06_Model_Diagnostics.html#goodness-of-fit-panel-1",
+    "title": "Phase 6 — Model Diagnostics",
+    "section": "6 Goodness-of-fit panel",
+    "text": "6 Goodness-of-fit panel\nFour plots, read together:\n\nObserved vs Population prediction (PRED) and vs Individual prediction (IPRED) — points should fall along the dashed line of identity. IPRED hugs the line more tightly because it uses each subject’s own random effects; that gap between PRED and IPRED is exactly what the IIV captures.\nCWRES vs TIME and CWRES vs PRED — conditional weighted residuals should scatter randomly in a flat horizontal band, mostly within ±2, with no trend or funnel shape. A slope or curve over time would signal a structural misspecification; fanning would signal a wrong residual-error model.\n\n#| fig-cap: \"Four-panel goodness-of-fit diagnostics for the selected model.\"\ngof_panel(fit)"
+  },
+  {
+    "objectID": "reports/06_Model_Diagnostics.html#visual-predictive-check-1",
+    "href": "reports/06_Model_Diagnostics.html#visual-predictive-check-1",
+    "title": "Phase 6 — Model Diagnostics",
+    "section": "7 Visual Predictive Check",
+    "text": "7 Visual Predictive Check\nThe VPC simulates many virtual trials from the fitted model and overlays the observed data on the simulated prediction intervals. If the observed median and spread fall within the simulated bands across time, the model reproduces both the typical profile and the between-subject variability — the key qualification for using it to simulate (Phase 7).\n#| fig-cap: \"Visual Predictive Check: observed data vs model-simulated prediction intervals.\"\nvpc &lt;- make_vpc(fit, n = 500)\nif (!is.null(vpc)) {\n  vpc\n} else {\n  cat(\"VPC requires the 'vpc' package. Install with renv::install('vpc'), then re-render.\")\n}"
+  },
+  {
+    "objectID": "reports/06_Model_Diagnostics.html#key-takeaways-1",
+    "href": "reports/06_Model_Diagnostics.html#key-takeaways-1",
+    "title": "Phase 6 — Model Diagnostics",
+    "section": "8 Key takeaways",
+    "text": "8 Key takeaways\n\nGOF: observed-vs-predicted should track the identity line, tighter for IPRED.\nCWRES: a flat, ±2 band with no time/PRED trend indicates the structural and error models are adequate.\nVPC: observed percentiles inside the simulated intervals confirm the model captures central tendency and variability.\nPassing these checks is what licenses the model for the clinical simulations in the next phase.\n\n\nNext: Phase 7 — Simulation: use the qualified model to simulate PK profiles for a typical patient and weight-based subgroups.\n\n\n:::"
   }
 ]
