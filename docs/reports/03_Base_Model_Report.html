@@ -4842,17 +4842,17 @@ done</code></pre>
 <tr class="odd">
 <td>CL (L/h)</td>
 <td>~2.74</td>
-<td></td>
+<td>2.82</td>
 </tr>
 <tr class="even">
 <td>V (L)</td>
 <td>~31.6</td>
-<td></td>
+<td>34</td>
 </tr>
 <tr class="odd">
 <td>Ka (1/h)</td>
 <td>~1.5 (from Tmax)</td>
-<td></td>
+<td>1.97</td>
 </tr>
 </tbody>
 </table>
@@ -4893,7 +4893,7 @@ done</code></pre>
 <ul>
 <li>The data were re-expressed as a NONMEM <strong>event</strong> dataset (dose + observation rows).</li>
 <li>A <strong>one-compartment oral</strong> model with first-order absorption was fitted by <strong>FOCEi</strong>.</li>
-<li>Typical estimates (<strong>CL ≈ L/h</strong>, <strong>V ≈ L</strong>, <strong>Ka ≈ /h</strong>) agree with the NCA — the structural model holds.</li>
+<li>Typical estimates (<strong>CL ≈ 2.82 L/h</strong>, <strong>V ≈ 34 L</strong>, <strong>Ka ≈ 1.97 /h</strong>) agree with the NCA — the structural model holds.</li>
 <li>The base model includes IIV on <strong>CL</strong> only; the next phase adds variability on <strong>V and Ka</strong>.</li>
 </ul>
 <blockquote class="blockquote">
@@ -5015,14 +5015,10 @@ fit</code></pre>
   kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;),
                 full_width = FALSE)</code></pre>
 <pre class="{r compare-nca}"><code>#| include: false
-# Pull typical CL/V for comparison with NCA, robust to column naming
-est &lt;- fit$parFixed
-get_est &lt;- function(par) {
-  v &lt;- tryCatch(est[par, &quot;Back-transformed&quot;], error = function(e) NA)
-  if (is.null(v) || is.na(v)) v &lt;- tryCatch(est[par, &quot;Estimate&quot;], error = function(e) NA)
-  suppressWarnings(as.numeric(v))
-}
-cl_hat &lt;- get_est(&quot;tcl&quot;); v_hat &lt;- get_est(&quot;tv&quot;); ka_hat &lt;- get_est(&quot;tka&quot;)</code></pre>
+# Typical CL/V/Ka from the fixed effects (estimated on the log scale).
+th &lt;- tryCatch(fit$theta, error = function(e) nlmixr2::fixef(fit))
+gp &lt;- function(nm) if (nm %in% names(th)) as.numeric(th[[nm]]) else NA_real_
+cl_hat &lt;- exp(gp(&quot;tcl&quot;)); v_hat &lt;- exp(gp(&quot;tv&quot;)); ka_hat &lt;- exp(gp(&quot;tka&quot;))</code></pre>
 <section id="sanity-check-vs-nca-1" class="level3" data-number="12.1">
 <h3 data-number="12.1" class="anchored" data-anchor-id="sanity-check-vs-nca-1"><span class="header-section-number">12.1</span> Sanity check vs NCA</h3>
 <p>The population model and the model-free NCA should tell a consistent story:</p>

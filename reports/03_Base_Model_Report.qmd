@@ -96,14 +96,10 @@ base_param_table(fit) |>
 
 ```{r compare-nca}
 #| include: false
-# Pull typical CL/V for comparison with NCA, robust to column naming
-est <- fit$parFixed
-get_est <- function(par) {
-  v <- tryCatch(est[par, "Back-transformed"], error = function(e) NA)
-  if (is.null(v) || is.na(v)) v <- tryCatch(est[par, "Estimate"], error = function(e) NA)
-  suppressWarnings(as.numeric(v))
-}
-cl_hat <- get_est("tcl"); v_hat <- get_est("tv"); ka_hat <- get_est("tka")
+# Typical CL/V/Ka from the fixed effects (estimated on the log scale).
+th <- tryCatch(fit$theta, error = function(e) nlmixr2::fixef(fit))
+gp <- function(nm) if (nm %in% names(th)) as.numeric(th[[nm]]) else NA_real_
+cl_hat <- exp(gp("tcl")); v_hat <- exp(gp("tv")); ka_hat <- exp(gp("tka"))
 ```
 
 ### Sanity check vs NCA
