@@ -9,7 +9,6 @@ format:
     toc: true
     toc-depth: 3
     code-fold: true
-    code-tools: true
     number-sections: true
     fig-width: 8
     fig-height: 6
@@ -31,27 +30,29 @@ library(kableExtra)
 With a model that passed diagnostics (Phase 6), we can now **simulate** — predict
 concentration-time profiles for scenarios we never measured. This is where a
 population PK model earns its keep clinically. We simulate three things with
-`rxode2`: a typical patient, the effect of body weight, and the full population
-spread.
+`rxode2`: a typical patient, an illustrative weight effect, and the full
+population spread.
 
 ```{r pars}
 pars <- get_typical_params()
+dose <- rep_dose()
 ```
 
-The simulations use the typical parameters from the final model
-(`r pars$source`): CL ≈ `r round(pars$cl, 2)` L/h, V ≈ `r round(pars$v, 1)` L,
-Ka ≈ `r round(pars$ka, 2)` /h, with weight exponents
-θ_CL = `r round(pars$dWTCL, 2)`, θ_V = `r round(pars$dWTV, 2)`.
+The **selected model** is the **IIV model** from Phase 4 — Phase 5 found body weight
+was not statistically supported, so by parsimony the IIV model is the final model.
+Its typical parameters are CL ≈ `r round(pars$cl, 2)` L/h, V ≈ `r round(pars$v, 1)` L,
+Ka ≈ `r round(pars$ka, 2)` /h. Simulations use a representative
+**`r dose` mg** dose (the median actual dose in the dataset).
 
 ## Typical patient
 
 Setting the random effects to zero gives the single population-average curve for a
-70 kg subject after a `r SIM_DOSE` mg oral dose.
+70 kg subject.
 
 ```{r typical}
 #| fig-cap: "Simulated typical-patient concentration-time profile."
-typ <- sim_typical(pars)
-sim_plot_typical(typ)
+typ <- sim_typical(pars, dose = dose)
+sim_plot_typical(typ, dose)
 ```
 
 ```{r typ-summary}
@@ -60,19 +61,20 @@ cmax <- round(max(typ$cp), 2)
 tmax <- round(typ$time[which.max(typ$cp)], 2)
 ```
 
-Predicted **Cmax ≈ `r cmax` mg/L** at **Tmax ≈ `r tmax` h** — consistent with the
-observed data and the NCA, the expected internal coherence of a good model.
+Predicted **Cmax ≈ `r cmax` mg/L** at **Tmax ≈ `r tmax` h**, in line with the
+observed data and the NCA — the expected internal coherence of a sound model.
 
-## Effect of body weight
+## Effect of body weight (illustrative)
 
-Same `r SIM_DOSE` mg dose, three weights. Because clearance and volume scale
-allometrically with weight, heavier subjects show a different exposure profile —
-the visual rationale behind weight-based dosing decisions.
+Because the selected model has no weight covariate (it wasn't supported), this is an
+**illustrative** exercise: we apply the **standard theoretical allometric exponents**
+(0.75 on CL, 1.0 on V) to the typical parameters to show the *expected* direction and
+size of a body-weight effect at a fixed dose. It is not an estimated effect.
 
 ```{r weight}
-#| fig-cap: "Typical profiles for 55, 70, and 85 kg subjects at a fixed dose."
-wts <- sim_weight_subgroups(pars)
-sim_plot_weight(wts)
+#| fig-cap: "Illustrative typical profiles for 55, 70, and 85 kg subjects (theory-based allometry)."
+wts <- sim_weight_subgroups(pars, dose = dose)
+sim_plot_weight(wts, dose)
 ```
 
 ```{r weight-table}
@@ -81,7 +83,7 @@ wts |>
   dplyr::summarise(Cmax = round(max(cp), 2),
                    Tmax = round(time[which.max(cp)], 2),
                    .groups = "drop") |>
-  kbl(caption = "Simulated Cmax / Tmax by body weight (fixed dose)",
+  kbl(caption = "Illustrative Cmax / Tmax by body weight (fixed dose, allometric theory)",
       col.names = c("Weight (kg)", "Cmax (mg/L)", "Tmax (h)")) |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
                 full_width = FALSE)
@@ -90,28 +92,27 @@ wts |>
 ## Population variability
 
 Drawing 500 virtual subjects' random effects from the estimated ω matrix shows the
-**spread** of real-world exposures, not just the average. For a narrow-therapeutic-
-index drug like theophylline, this band is what matters — it indicates how many
+**spread** of real-world exposures, not just the average. For a narrow-therapeutic-index drug like theophylline, this band is what matters — it indicates how many
 patients might stray outside the therapeutic window on a given dose.
 
 ```{r population}
 #| fig-cap: "Population simulation: median and 90% prediction interval (500 subjects)."
-pop <- sim_population(pars)
+pop <- sim_population(pars, dose = dose)
 if (!is.null(pop)) {
-  sim_plot_population(pop)
+  sim_plot_population(pop, dose)
 } else {
-  cat("Population simulation requires an omega matrix (IIV/covariate model).")
+  cat("Population simulation requires an omega matrix (IIV model).")
 }
 ```
 
 ## Key takeaways
 
-- The qualified model reproduces a sensible **typical profile**
+- The qualified **IIV model** reproduces a sensible typical profile
   (Cmax ≈ `r cmax` mg/L), confirming internal consistency with the data.
-- **Body weight** measurably shifts exposure at a fixed dose — quantitative support
-  for individualised dosing.
-- The **population prediction interval** quantifies between-subject variability,
-  the critical output for dosing a narrow-therapeutic-index drug safely.
+- An **illustrative** allometric scaling shows the expected body-weight effect on
+  exposure, clearly separated from the (unsupported) estimated covariate of Phase 5.
+- The **population prediction interval** quantifies between-subject variability — the
+  critical output for dosing a narrow-therapeutic-index drug safely.
 - This completes the end-to-end workflow: data → NCA → structural model → IIV →
   covariate → diagnostics → simulation.
 

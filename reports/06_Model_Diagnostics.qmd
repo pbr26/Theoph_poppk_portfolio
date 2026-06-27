@@ -9,7 +9,6 @@ format:
     toc: true
     toc-depth: 3
     code-fold: true
-    code-tools: true
     number-sections: true
     fig-width: 9
     fig-height: 8

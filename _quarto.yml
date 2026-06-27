@@ -52,14 +52,12 @@ format:
     toc-title: "Contents"
     number-sections: true
     code-fold: true
-    code-tools: true
     code-copy: true
     highlight-style: github
     fig-width: 8
     fig-height: 6
     fig-dpi: 300
     embed-resources: true
-    self-contained: true
 
 execute:
   echo: true

@@ -14,9 +14,10 @@ library(nlmixr2)
 # -----------------------------------------------------------------------------
 # 1. load_final_fit(): the most complete model available
 # -----------------------------------------------------------------------------
-#' Prefer the covariate model, then IIV, then base.
+#' Selected model = IIV (Phase 5 found weight not supported). Fall back to
+#' covariate, then base, if the IIV fit is unavailable.
 load_final_fit <- function() {
-  for (f in c("cov_fit.rds", "iiv_fit.rds", "base_fit.rds")) {
+  for (f in c("iiv_fit.rds", "cov_fit.rds", "base_fit.rds")) {
     p <- fs::path(PATH_MODELS, f)
     if (fs::file_exists(p)) {
       message("Diagnostics on: ", f)
