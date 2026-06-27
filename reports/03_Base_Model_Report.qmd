@@ -1,12 +1,151 @@
 ---
-title: "Phase 3 – Base Population PK Model"
+title: "Phase 3 — Base Population PK Model"
+subtitle: "One-compartment oral, first-order absorption (nlmixr2 / rxode2)"
 author: "Pramod BR"
 date: today
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-tools: true
+    number-sections: true
+    fig-width: 8
+    fig-height: 6
+execute:
+  echo: true
+  warning: false
+  message: false
 ---
 
-```{r setup, include=FALSE}
-source(here::here("R", "00_setup.R"))
+```{r setup}
+#| include: false
+here::i_am("reports/03_Base_Model_Report.qmd")
+source(here::here("R", "03_base_model.R"))
+library(kableExtra)
 ```
 
-> **Status:** This report will be built in the corresponding phase.
+## Objectives
 
+Having characterised the data (Phase 1) and computed model-free exposure metrics
+(Phase 2), we now fit a **structural population PK model**: a one-compartment model
+with first-order oral absorption. This phase establishes the model skeleton and
+the typical (population-average) parameters; between-subject variability and
+covariates are layered on in Phases 4–5.
+
+## From tidy data to NONMEM events
+
+Estimation engines treat every row as an **event** — either a dose or an
+observation. `build_nonmem_data()` inserts one dosing row per subject at
+time 0 and keeps the concentration rows as observations.
+
+```{r build-data}
+dat <- build_nonmem_data()
+dat |>
+  dplyr::filter(ID == 1) |>
+  kbl(caption = "Subject 1 as an event dataset (dose row first, then observations)",
+      digits = 2) |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE)
+```
+
+Column meanings: **EVID** = 1 marks the dose (with **AMT** in mg) and 0 marks an
+observation (with **DV**, the concentration); **MDV** = 1 means "no measured DV on
+this row" (true for dose rows); **CMT** routes the dose to the depot (1) and the
+observation to the central compartment (2).
+
+## The structural model
+
+The model is a function with an `ini` block (starting values) and a `model` block
+(the structure). Fixed effects are estimated on the **log scale**, so the
+back-transformed CL, V, and Ka are always positive. Initial values are seeded from
+the Phase 2 NCA, which puts the optimiser close to the solution from the start.
+
+```{r show-model}
+#| code-fold: false
+print(base_model)
+```
+
+The two `d/dt(...)` lines are the compartment mass-balance equations; `cp = center/v`
+is the predicted concentration; and `cp ~ add(add.sd) + prop(prop.sd)` specifies a
+**combined additive + proportional** residual error model. The base model carries
+between-subject variability on **CL only** (`eta.cl`) — variability on V and Ka is
+added in Phase 4.
+
+## Fitting the model (FOCEi)
+
+`fit_base_model()` estimates the parameters by **FOCEi** (First-Order Conditional
+Estimation with interaction), the workhorse algorithm of population PK.
+
+```{r fit-model}
+#| cache: true
+fit <- fit_base_model(dat)
+fit
+```
+
+## Parameter estimates
+
+```{r param-table}
+base_param_table(fit) |>
+  kbl(caption = "Base model fixed-effect estimates (back-transformed)",
+      digits = 3) |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE)
+```
+
+```{r compare-nca}
+#| include: false
+# Pull typical CL/V for comparison with NCA, robust to column naming
+est <- fit$parFixed
+get_est <- function(par) {
+  v <- tryCatch(est[par, "Back-transformed"], error = function(e) NA)
+  if (is.null(v) || is.na(v)) v <- tryCatch(est[par, "Estimate"], error = function(e) NA)
+  suppressWarnings(as.numeric(v))
+}
+cl_hat <- get_est("tcl"); v_hat <- get_est("tv"); ka_hat <- get_est("tka")
+```
+
+### Sanity check vs NCA
+
+The population model and the model-free NCA should tell a consistent story:
+
+| Parameter | NCA (geo. mean, Phase 2) | Base model (typical) |
+|-----------|--------------------------|----------------------|
+| CL (L/h)  | ~2.74                    | `r round(cl_hat, 2)` |
+| V (L)     | ~31.6                    | `r round(v_hat, 1)`  |
+| Ka (1/h)  | ~1.5 (from Tmax)         | `r round(ka_hat, 2)` |
+
+Close agreement is the key validation that the structural model and dataset are
+correct — the two independent methods converge on the same physiology.
+
+## Quick predicted-vs-observed check
+
+Full diagnostics (GOF, VPC, CWRES) come in Phase 6; here we just confirm the fit is
+sensible — points should scatter around the line of identity.
+
+```{r obs-pred}
+#| fig-cap: "Population (PRED) and individual (IPRED) predictions vs observations."
+fitdf <- as.data.frame(fit)
+
+p <- ggplot2::ggplot(fitdf, ggplot2::aes(PRED, DV)) +
+  ggplot2::geom_abline(slope = 1, intercept = 0, linetype = "dashed", colour = "grey50") +
+  ggplot2::geom_point(alpha = 0.6, colour = "#2C3E50") +
+  ggplot2::labs(x = "Population prediction (mg/L)", y = "Observed (mg/L)",
+                title = "Observed vs population prediction (base model)")
+p
+save_fig(p, "03_base_obs_vs_pred")
+```
+
+## Key takeaways
+
+- The data were re-expressed as a NONMEM **event** dataset (dose + observation rows).
+- A **one-compartment oral** model with first-order absorption was fitted by **FOCEi**.
+- Typical estimates (**CL ≈ `r round(cl_hat, 2)` L/h**, **V ≈ `r round(v_hat, 1)` L**,
+  **Ka ≈ `r round(ka_hat, 2)` /h**) agree with the NCA — the structural model holds.
+- The base model includes IIV on **CL** only; the next phase adds variability on
+  **V and Ka**.
+
+> Next: **Phase 4 — IIV model**, extending between-subject variability to V and Ka
+> and examining the random-effect (η) distributions.
+```
