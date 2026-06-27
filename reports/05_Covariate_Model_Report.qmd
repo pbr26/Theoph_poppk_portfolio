@@ -1,12 +1,136 @@
 ---
-title: "Phase 5 – Covariate Modeling"
+title: "Phase 5 — Covariate Model (Body Weight)"
+subtitle: "Allometric weight effect on clearance and volume"
 author: "Pramod BR"
 date: today
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-tools: true
+    number-sections: true
+    fig-width: 8
+    fig-height: 6
+execute:
+  echo: true
+  warning: false
+  message: false
 ---
 
-```{r setup, include=FALSE}
-source(here::here("R", "00_setup.R"))
+```{r setup}
+#| include: false
+here::i_am("reports/05_Covariate_Model_Report.qmd")
+source(here::here("R", "05_covariate_model.R"))
+library(kableExtra)
 ```
 
-> **Status:** This report will be built in the corresponding phase.
+## Objectives
 
+The IIV model (Phase 4) left between-subject variability as purely *random*. Here
+we test whether **body weight** explains part of it, by adding an **allometric**
+weight effect on clearance and volume. The questions: does it improve the fit, and
+does the random IIV on CL/V shrink?
+
+## How weight enters the model
+
+We use the pharmacometric-standard **allometric** form, normalised to a 70 kg
+reference, with the exponents estimated from the data (started at the theoretical
+0.75 for CL and 1.0 for V):
+
+$$ CL = CL_{typ}\,(WT/70)^{\theta_{CL}}, \qquad V = V_{typ}\,(WT/70)^{\theta_{V}} $$
+
+```{r show-model}
+#| code-fold: false
+print(cov_model)
+```
+
+## Fit the covariate model
+
+```{r fit-cov}
+#| cache: true
+dat     <- build_nonmem_data()
+iiv_fit <- load_iiv_fit()
+cov_fit <- fit_cov_model(dat)
+cov_fit
+```
+
+## Parameter estimates
+
+The two new parameters are **dWTCL** and **dWTV** — the weight exponents. Their
+95% confidence intervals tell us whether the effect is distinguishable from zero
+(no effect).
+
+```{r cov-params}
+base_param_table(cov_fit) |>
+  kbl(caption = "Covariate model estimates (note dWTCL, dWTV exponents)",
+      digits = 3) |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE)
+```
+
+## Is the weight effect justified?
+
+```{r compare}
+cmp <- compare_models(
+  model_metrics(iiv_fit, "IIV (no covariate)"),
+  model_metrics(cov_fit, "Weight on CL & V")
+)
+cmp |>
+  kbl(caption = "IIV vs covariate model", digits = 2) |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE)
+```
+
+```{r verdict}
+#| include: false
+dofv <- cmp$dOFV[2]
+justified <- !is.na(dofv) && dofv < -5.99
+```
+
+Adding two parameters is significant (p < 0.05) if the OFV drops by more than
+**5.99**. Here ΔOFV = **`r round(dofv, 2)`**, so on the likelihood-ratio test the
+weight effect is **`r if (justified) "statistically supported" else "not clearly supported"`**
+in this dataset.
+
+## Did the random IIV shrink?
+
+If weight genuinely drives part of the between-subject variability, the BSV(CV%) on
+CL and V should be smaller in the covariate model than in the IIV model.
+
+```{r cv-change}
+dplyr::full_join(
+  iiv_cv(iiv_fit) |> dplyr::rename(`IIV model` = `BSV CV%`),
+  iiv_cv(cov_fit) |> dplyr::rename(`Covariate model` = `BSV CV%`),
+  by = "Parameter"
+) |>
+  kbl(caption = "Between-subject CV% before vs after adding weight",
+      digits = 1) |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE)
+```
+
+## Residual random effects vs weight
+
+After including weight, the random effects on CL and V should show little residual
+trend with weight — a flat line means the covariate has absorbed the size effect.
+
+```{r eta-wt}
+#| fig-cap: "Random effects on CL and V vs body weight in the covariate model."
+cov_plot_eta_wt(cov_fit, dat)
+```
+
+## Key takeaways
+
+- Body weight was added **allometrically** on CL and V, with estimated exponents.
+- On the likelihood-ratio test the effect was
+  **`r if (justified) "supported" else "not clearly supported"`**
+  (ΔOFV = `r round(dofv, 2)`).
+- We reported the change in random CV% and the residual η–weight trend honestly —
+  in a small, weight-dosed dataset like Theoph a strong weight signal is not
+  guaranteed, and recognising that is part of sound covariate analysis.
+
+> Next: **Phase 6 — Model diagnostics**: goodness-of-fit plots, CWRES vs
+> TIME/PRED, and a visual predictive check (VPC) on the selected model.
+```

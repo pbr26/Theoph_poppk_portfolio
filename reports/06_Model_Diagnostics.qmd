@@ -1,12 +1,88 @@
 ---
-title: "Phase 6 – Model Diagnostics"
+title: "Phase 6 — Model Diagnostics"
+subtitle: "Goodness-of-fit, CWRES, and Visual Predictive Check"
 author: "Pramod BR"
 date: today
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-tools: true
+    number-sections: true
+    fig-width: 9
+    fig-height: 8
+execute:
+  echo: true
+  warning: false
+  message: false
 ---
 
-```{r setup, include=FALSE}
-source(here::here("R", "00_setup.R"))
+```{r setup}
+#| include: false
+here::i_am("reports/06_Model_Diagnostics.qmd")
+source(here::here("R", "06_diagnostics.R"))
+library(kableExtra)
 ```
 
-> **Status:** This report will be built in the corresponding phase.
+## Objectives
 
+A model that converges is not necessarily a model that *fits*. This phase
+stress-tests the selected model with the standard pharmacometric diagnostics:
+goodness-of-fit (GOF) scatter plots, conditional weighted residuals (CWRES), and a
+Visual Predictive Check (VPC).
+
+```{r load-fit}
+fit <- load_final_fit()
+```
+
+## Goodness-of-fit panel
+
+Four plots, read together:
+
+- **Observed vs Population prediction (PRED)** and **vs Individual prediction
+  (IPRED)** — points should fall along the dashed line of identity. IPRED hugs the
+  line more tightly because it uses each subject's own random effects; that gap
+  between PRED and IPRED is exactly what the IIV captures.
+- **CWRES vs TIME** and **CWRES vs PRED** — conditional weighted residuals should
+  scatter randomly in a flat horizontal band, mostly within **±2**, with no trend
+  or funnel shape. A slope or curve over time would signal a structural
+  misspecification; fanning would signal a wrong residual-error model.
+
+```{r gof}
+#| fig-cap: "Four-panel goodness-of-fit diagnostics for the selected model."
+gof_panel(fit)
+```
+
+## Visual Predictive Check
+
+The VPC simulates many virtual trials from the fitted model and overlays the
+**observed** data on the **simulated** prediction intervals. If the observed median
+and spread fall within the simulated bands across time, the model reproduces both
+the typical profile and the between-subject variability — the key qualification for
+using it to simulate (Phase 7).
+
+```{r vpc}
+#| fig-cap: "Visual Predictive Check: observed data vs model-simulated prediction intervals."
+vpc <- make_vpc(fit, n = 500)
+if (!is.null(vpc)) {
+  vpc
+} else {
+  cat("VPC requires the 'vpc' package. Install with renv::install('vpc'), then re-render.")
+}
+```
+
+## Key takeaways
+
+- **GOF**: observed-vs-predicted should track the identity line, tighter for IPRED.
+- **CWRES**: a flat, ±2 band with no time/PRED trend indicates the structural and
+  error models are adequate.
+- **VPC**: observed percentiles inside the simulated intervals confirm the model
+  captures central tendency *and* variability.
+- Passing these checks is what licenses the model for the **clinical simulations**
+  in the next phase.
+
+> Next: **Phase 7 — Simulation**: use the qualified model to simulate PK profiles
+> for a typical patient and weight-based subgroups.
+```

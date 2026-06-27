@@ -9,9 +9,9 @@
   {
     "objectID": "reports/05_Covariate_Model_Report.html",
     "href": "reports/05_Covariate_Model_Report.html",
-    "title": "Phase 5 – Covariate Modeling",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
     "section": "",
-    "text": "Status: This report will be built in the corresponding phase."
+    "text": "The IIV model (Phase 4) left between-subject variability as purely random. Here we test whether body weight explains part of it, by adding an allometric weight effect on clearance and volume. The questions: does it improve the fit, and does the random IIV on CL/V shrink?"
   },
   {
     "objectID": "reports/03_Base_Model_Report.html",
@@ -376,5 +376,117 @@
     "title": "Phase 6 – Model Diagnostics",
     "section": "",
     "text": "Status: This report will be built in the corresponding phase."
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#objectives",
+    "href": "reports/05_Covariate_Model_Report.html#objectives",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "",
+    "text": "The IIV model (Phase 4) left between-subject variability as purely random. Here we test whether body weight explains part of it, by adding an allometric weight effect on clearance and volume. The questions: does it improve the fit, and does the random IIV on CL/V shrink?"
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#how-weight-enters-the-model",
+    "href": "reports/05_Covariate_Model_Report.html#how-weight-enters-the-model",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "2 How weight enters the model",
+    "text": "2 How weight enters the model\nWe use the pharmacometric-standard allometric form, normalised to a 70 kg reference, with the exponents estimated from the data (started at the theoretical 0.75 for CL and 1.0 for V):\n\\[ CL = CL_{typ}\\,(WT/70)^{\\theta_{CL}}, \\qquad V = V_{typ}\\,(WT/70)^{\\theta_{V}} \\]\n\nprint(cov_model)\n\nfunction () \n{\n    ini({\n        tka &lt;- log(1.5)\n        tcl &lt;- log(2.8)\n        tv &lt;- log(32)\n        dWTCL &lt;- 0.75\n        dWTV &lt;- 1\n        eta.ka ~ 0.3\n        eta.cl ~ 0.1\n        eta.v ~ 0.1\n        add.sd &lt;- 0.2\n        prop.sd &lt;- 0.2\n    })\n    model({\n        ka &lt;- exp(tka + eta.ka)\n        cl &lt;- exp(tcl + eta.cl) * (WT/70)^dWTCL\n        v &lt;- exp(tv + eta.v) * (WT/70)^dWTV\n        d/dt(depot) &lt;- -ka * depot\n        d/dt(center) &lt;- ka * depot - (cl/v) * center\n        cp &lt;- center/v\n        cp ~ add(add.sd) + prop(prop.sd)\n    })\n}"
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#fit-the-covariate-model",
+    "href": "reports/05_Covariate_Model_Report.html#fit-the-covariate-model",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "3 Fit the covariate model",
+    "text": "3 Fit the covariate model\n\n\nCode\ndat     &lt;- build_nonmem_data()\niiv_fit &lt;- load_iiv_fit()\ncov_fit &lt;- fit_cov_model(dat)\n\n\ncalculating covariance matrix\ndone\n\n\nCode\ncov_fit\n\n\n\\[\\begin{align*}\n{ka} & = \\exp\\left({tka}+{eta.ka}\\right) \\\\\n{cl} & = \\exp\\left({tcl}+{eta.cl}\\right) {\\times} {\\left(\\frac{{WT}}{{70}}\\right)}^{{dWTCL}} \\\\\n{v} & = \\exp\\left({tv}+{eta.v}\\right) {\\times} {\\left(\\frac{{WT}}{{70}}\\right)}^{{dWTV}} \\\\\n\\frac{d \\: depot}{dt} & = -{ka} {\\times} {depot} \\\\\n\\frac{d \\: center}{dt} & = {ka} {\\times} {depot}-\\left(\\frac{{cl}}{{v}}\\right) {\\times} {center} \\\\\n{cp} & = \\frac{{center}}{{v}} \\\\\n{cp} & \\sim add({add.sd})+prop({prop.sd})\n\\end{align*}\\]"
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#parameter-estimates",
+    "href": "reports/05_Covariate_Model_Report.html#parameter-estimates",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "4 Parameter estimates",
+    "text": "4 Parameter estimates\nThe two new parameters are dWTCL and dWTV — the weight exponents. Their 95% confidence intervals tell us whether the effect is distinguishable from zero (no effect).\n\n\nCode\nbase_param_table(cov_fit) |&gt;\n  kbl(caption = \"Covariate model estimates (note dWTCL, dWTV exponents)\",\n      digits = 3) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nCovariate model estimates (note dWTCL, dWTV exponents)\n\n\nParameter\nEst.\nSE\n%RSE\nBack-transformed(95%CI)\nBSV(CV%)\nShrink(SD)%\n\n\n\n\ntka\n0.398\n0.243\n61.1\n1.49 (0.924, 2.4)\n72.3\n2.32%&lt;\n\n\ntcl\n1.03\n0.0325\n3.16\n2.79 (2.62, 2.98)\n26.1\n3.32%&lt;\n\n\ntv\n3.47\n0.0984\n2.84\n32.1 (26.5, 39)\n10.9\n22.1%=\n\n\ndWTCL\n0.349\n0.525\n151\n0.349 (-0.68, 1.38)\n\n\n\n\ndWTV\n0.586\n0.273\n46.6\n0.586 (0.0505, 1.12)\n\n\n\n\nadd.sd\n0.265\n\n\n0.265\n\n\n\n\nprop.sd\n0.134\n\n\n0.134"
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#is-the-weight-effect-justified",
+    "href": "reports/05_Covariate_Model_Report.html#is-the-weight-effect-justified",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "5 Is the weight effect justified?",
+    "text": "5 Is the weight effect justified?\n\n\nCode\ncmp &lt;- compare_models(\n  model_metrics(iiv_fit, \"IIV (no covariate)\"),\n  model_metrics(cov_fit, \"Weight on CL & V\")\n)\ncmp |&gt;\n  kbl(caption = \"IIV vs covariate model\", digits = 2) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nIIV vs covariate model\n\n\nModel\nOFV\nAIC\nBIC\nnPar\ndOFV\ndAIC\n\n\n\n\nIIV (no covariate)\n104.36\n362.96\n386.02\n8\n0.00\n0.00\n\n\nWeight on CL & V\n100.71\n363.31\n392.14\n10\n-3.65\n0.35\n\n\n\n\n\nAdding two parameters is significant (p &lt; 0.05) if the OFV drops by more than 5.99. Here ΔOFV = -3.65, so on the likelihood-ratio test the weight effect is not clearly supported in this dataset."
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#did-the-random-iiv-shrink",
+    "href": "reports/05_Covariate_Model_Report.html#did-the-random-iiv-shrink",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "6 Did the random IIV shrink?",
+    "text": "6 Did the random IIV shrink?\nIf weight genuinely drives part of the between-subject variability, the BSV(CV%) on CL and V should be smaller in the covariate model than in the IIV model.\n\n\nCode\ndplyr::full_join(\n  iiv_cv(iiv_fit) |&gt; dplyr::rename(`IIV model` = `BSV CV%`),\n  iiv_cv(cov_fit) |&gt; dplyr::rename(`Covariate model` = `BSV CV%`),\n  by = \"Parameter\"\n) |&gt;\n  kbl(caption = \"Between-subject CV% before vs after adding weight\",\n      digits = 1) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nBetween-subject CV% before vs after adding weight\n\n\nParameter\nIIV model\nCovariate model\n\n\n\n\ntka\n68.8\n72.3\n\n\ntcl\n25.7\n26.1\n\n\ntv\n12.6\n10.9"
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#residual-random-effects-vs-weight",
+    "href": "reports/05_Covariate_Model_Report.html#residual-random-effects-vs-weight",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "7 Residual random effects vs weight",
+    "text": "7 Residual random effects vs weight\nAfter including weight, the random effects on CL and V should show little residual trend with weight — a flat line means the covariate has absorbed the size effect.\n\n\nCode\ncov_plot_eta_wt(cov_fit, dat)\n\n\n\n\n\nRandom effects on CL and V vs body weight in the covariate model."
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#key-takeaways",
+    "href": "reports/05_Covariate_Model_Report.html#key-takeaways",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "8 Key takeaways",
+    "text": "8 Key takeaways\n\nBody weight was added allometrically on CL and V, with estimated exponents.\nOn the likelihood-ratio test the effect was not clearly supported (ΔOFV = -3.65).\nWe reported the change in random CV% and the residual η–weight trend honestly — in a small, weight-dosed dataset like Theoph a strong weight signal is not guaranteed, and recognising that is part of sound covariate analysis.\n\n\nNext: Phase 6 — Model diagnostics: goodness-of-fit plots, CWRES vs TIME/PRED, and a visual predictive check (VPC) on the selected model.\n\n\n\n\n\n:::{#quarto-navigation-envelope .hidden}\n[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1zaWRlYmFyLXRpdGxl\"}\n[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXItdGl0bGU=\"}\n[Home]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6SG9tZQ==\"}\n[/index.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L2luZGV4Lmh0bWw=\"}\n[Reports]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6UmVwb3J0cw==\"}\n[1. Exploratory Data Analysis]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6MS4gRXhwbG9yYXRvcnkgRGF0YSBBbmFseXNpcw==\"}\n[/reports/01_EDA_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDFfRURBX1JlcG9ydC5odG1s\"}\n[2. Noncompartmental Analysis]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6Mi4gTm9uY29tcGFydG1lbnRhbCBBbmFseXNpcw==\"}\n[/reports/02_NCA_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDJfTkNBX1JlcG9ydC5odG1s\"}\n[3. Base PopPK Model]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6My4gQmFzZSBQb3BQSyBNb2RlbA==\"}\n[/reports/03_Base_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDNfQmFzZV9Nb2RlbF9SZXBvcnQuaHRtbA==\"}\n[4. IIV Model]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6NC4gSUlWIE1vZGVs\"}\n[/reports/04_IIV_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDRfSUlWX01vZGVsX1JlcG9ydC5odG1s\"}\n[5. Covariate Model]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6NS4gQ292YXJpYXRlIE1vZGVs\"}\n[/reports/05_Covariate_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDVfQ292YXJpYXRlX01vZGVsX1JlcG9ydC5odG1s\"}\n[6. Model Diagnostics]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6Ni4gTW9kZWwgRGlhZ25vc3RpY3M=\"}\n[/reports/06_Model_Diagnostics.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDZfTW9kZWxfRGlhZ25vc3RpY3MuaHRtbA==\"}\n[7. Simulation]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6Ny4gU2ltdWxhdGlvbg==\"}\n[/reports/07_Simulation_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDdfU2ltdWxhdGlvbl9SZXBvcnQuaHRtbA==\"}\n[https://github.com/pbr26/Theoph_poppk_portfolio]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW5hdmJhci10b29sczpodHRwczovL2dpdGh1Yi5jb20vcGJyMjYvVGhlb3BoX3BvcHBrX3BvcnRmb2xpbw==\"}\n\n:::{.hidden .quarto-markdown-envelope-contents render-id=\"Zm9vdGVyLWNlbnRlcg==\"}\nPopulation PK Portfolio · Theophylline · Built in R with nlmixr2, PKNCA & Quarto\n:::\n\n:::\n\n\n\n:::{#quarto-meta-markdown .hidden}\n[Phase 5 — Covariate Model (Body Weight) – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW1ldGF0aXRsZQ==\"}\n[Phase 5 — Covariate Model (Body Weight) – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLXR3aXR0ZXJjYXJkdGl0bGU=\"}\n[Phase 5 — Covariate Model (Body Weight) – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW9nY2FyZHRpdGxl\"}\n[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW1ldGFzaXRlbmFtZQ==\"}\n[Allometric weight effect on clearance and volume]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLXR3aXR0ZXJjYXJkZGVzYw==\"}\n[Allometric weight effect on clearance and volume]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW9nY2FyZGRkZXNj\"}\n[End-to-end population pharmacokinetics analysis of the Theophylline dataset in R.]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW1ldGFzaXRlZGVzYw==\"}\n:::\n\n\n\n\n&lt;!-- --&gt;\n\n::: {.quarto-embedded-source-code}\n```````````````````{.markdown shortcodes=\"false\"}\n---\ntitle: \"Phase 5 — Covariate Model (Body Weight)\"\nsubtitle: \"Allometric weight effect on clearance and volume\"\nauthor: \"Pramod BR\"\ndate: today\nformat:\n  html:\n    theme: cosmo\n    toc: true\n    toc-depth: 3\n    code-fold: true\n    code-tools: true\n    number-sections: true\n    fig-width: 8\n    fig-height: 6\nexecute:\n  echo: true\n  warning: false\n  message: false\n---\n\n```{r setup}\n#| include: false\nhere::i_am(\"reports/05_Covariate_Model_Report.qmd\")\nsource(here::here(\"R\", \"05_covariate_model.R\"))\nlibrary(kableExtra)"
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#objectives-1",
+    "href": "reports/05_Covariate_Model_Report.html#objectives-1",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "9 Objectives",
+    "text": "9 Objectives\nThe IIV model (Phase 4) left between-subject variability as purely random. Here we test whether body weight explains part of it, by adding an allometric weight effect on clearance and volume. The questions: does it improve the fit, and does the random IIV on CL/V shrink?"
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#how-weight-enters-the-model-1",
+    "href": "reports/05_Covariate_Model_Report.html#how-weight-enters-the-model-1",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "10 How weight enters the model",
+    "text": "10 How weight enters the model\nWe use the pharmacometric-standard allometric form, normalised to a 70 kg reference, with the exponents estimated from the data (started at the theoretical 0.75 for CL and 1.0 for V):\n\\[ CL = CL_{typ}\\,(WT/70)^{\\theta_{CL}}, \\qquad V = V_{typ}\\,(WT/70)^{\\theta_{V}} \\]\n#| code-fold: false\nprint(cov_model)"
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#fit-the-covariate-model-1",
+    "href": "reports/05_Covariate_Model_Report.html#fit-the-covariate-model-1",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "11 Fit the covariate model",
+    "text": "11 Fit the covariate model\n#| cache: true\ndat     &lt;- build_nonmem_data()\niiv_fit &lt;- load_iiv_fit()\ncov_fit &lt;- fit_cov_model(dat)\ncov_fit"
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#parameter-estimates-1",
+    "href": "reports/05_Covariate_Model_Report.html#parameter-estimates-1",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "12 Parameter estimates",
+    "text": "12 Parameter estimates\nThe two new parameters are dWTCL and dWTV — the weight exponents. Their 95% confidence intervals tell us whether the effect is distinguishable from zero (no effect).\nbase_param_table(cov_fit) |&gt;\n  kbl(caption = \"Covariate model estimates (note dWTCL, dWTV exponents)\",\n      digits = 3) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)"
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#is-the-weight-effect-justified-1",
+    "href": "reports/05_Covariate_Model_Report.html#is-the-weight-effect-justified-1",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "13 Is the weight effect justified?",
+    "text": "13 Is the weight effect justified?\ncmp &lt;- compare_models(\n  model_metrics(iiv_fit, \"IIV (no covariate)\"),\n  model_metrics(cov_fit, \"Weight on CL & V\")\n)\ncmp |&gt;\n  kbl(caption = \"IIV vs covariate model\", digits = 2) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n#| include: false\ndofv &lt;- cmp$dOFV[2]\njustified &lt;- !is.na(dofv) && dofv &lt; -5.99\nAdding two parameters is significant (p &lt; 0.05) if the OFV drops by more than 5.99. Here ΔOFV = r round(dofv, 2), so on the likelihood-ratio test the weight effect is r if (justified) \"statistically supported\" else \"not clearly supported\" in this dataset."
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#did-the-random-iiv-shrink-1",
+    "href": "reports/05_Covariate_Model_Report.html#did-the-random-iiv-shrink-1",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "14 Did the random IIV shrink?",
+    "text": "14 Did the random IIV shrink?\nIf weight genuinely drives part of the between-subject variability, the BSV(CV%) on CL and V should be smaller in the covariate model than in the IIV model.\ndplyr::full_join(\n  iiv_cv(iiv_fit) |&gt; dplyr::rename(`IIV model` = `BSV CV%`),\n  iiv_cv(cov_fit) |&gt; dplyr::rename(`Covariate model` = `BSV CV%`),\n  by = \"Parameter\"\n) |&gt;\n  kbl(caption = \"Between-subject CV% before vs after adding weight\",\n      digits = 1) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)"
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#residual-random-effects-vs-weight-1",
+    "href": "reports/05_Covariate_Model_Report.html#residual-random-effects-vs-weight-1",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "15 Residual random effects vs weight",
+    "text": "15 Residual random effects vs weight\nAfter including weight, the random effects on CL and V should show little residual trend with weight — a flat line means the covariate has absorbed the size effect.\n#| fig-cap: \"Random effects on CL and V vs body weight in the covariate model.\"\ncov_plot_eta_wt(cov_fit, dat)"
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#key-takeaways-1",
+    "href": "reports/05_Covariate_Model_Report.html#key-takeaways-1",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "16 Key takeaways",
+    "text": "16 Key takeaways\n\nBody weight was added allometrically on CL and V, with estimated exponents.\nOn the likelihood-ratio test the effect was r if (justified) \"supported\" else \"not clearly supported\" (ΔOFV = r round(dofv, 2)).\nWe reported the change in random CV% and the residual η–weight trend honestly — in a small, weight-dosed dataset like Theoph a strong weight signal is not guaranteed, and recognising that is part of sound covariate analysis.\n\n\nNext: Phase 6 — Model diagnostics: goodness-of-fit plots, CWRES vs TIME/PRED, and a visual predictive check (VPC) on the selected model.\n\n\n:::"
   }
 ]
