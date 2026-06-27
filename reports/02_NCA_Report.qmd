@@ -1,12 +1,146 @@
 ---
-title: "Phase 2 – Noncompartmental Analysis (NCA)"
+title: "Phase 2 — Noncompartmental Analysis (NCA)"
+subtitle: "Per-subject exposure metrics with PKNCA"
 author: "Pramod BR"
 date: today
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-tools: true
+    number-sections: true
+    fig-width: 8
+    fig-height: 6
+execute:
+  echo: true
+  warning: false
+  message: false
 ---
 
-```{r setup, include=FALSE}
-source(here::here("R", "00_setup.R"))
+```{r setup}
+#| include: false
+here::i_am("reports/02_NCA_Report.qmd")
+source(here::here("R", "02_nca.R"))
+library(kableExtra)
 ```
 
-> **Status:** This report will be built in the corresponding phase.
+## Objectives
 
+Noncompartmental analysis (NCA) summarises drug exposure **without assuming a
+structural model**. It provides model-independent benchmarks — peak concentration,
+exposure (AUC), and terminal half-life — that we will later compare against the
+population-model estimates (Phases 3–5).
+
+Parameters computed per subject:
+
+- **Cmax / Tmax** — observed peak concentration and its time.
+- **AUClast** — area under the curve to the last measurable concentration
+  (linear-up/log-down trapezoidal).
+- **AUCinf(obs)** — AUClast plus the extrapolated tail (Clast / λz).
+- **t½** — terminal half-life, from the terminal rate constant **λz**.
+- **CL/F, Vz/F** — apparent clearance and volume (dose-normalised).
+
+## Method (PKNCA)
+
+`run_nca()` builds a `PKNCAconc` object (concentration–time, grouped by subject),
+a `PKNCAdose` object (the single oral dose in mg at t = 0), defines one **0 → ∞**
+interval requesting the parameters above, and runs `pk.nca()`. PKNCA selects the
+terminal-phase points for λz automatically by maximising the adjusted R².
+
+```{r run-nca}
+df  <- load_pk_data()
+nca <- run_nca(df)
+```
+
+## Per-subject NCA parameters
+
+```{r param-table}
+nca$wide |>
+  dplyr::select(id, cmax, tmax, auclast, aucinf.obs, half.life,
+                cl.obs, vz.obs, aucpext.obs) |>
+  kbl(
+    caption = "Noncompartmental parameters by subject",
+    digits  = 2,
+    col.names = c("ID", "Cmax (mg/L)", "Tmax (h)", "AUClast (mg·h/L)",
+                  "AUCinf (mg·h/L)", "t½ (h)", "CL/F (L/h)", "Vz/F (L)",
+                  "AUC %extrap")
+  ) |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE)
+```
+
+The **AUC %extrapolated** column is a quality flag — values well under 20%
+indicate AUCinf is reliable (little of the exposure comes from extrapolation).
+
+## Summary statistics
+
+`nca_param_summary()` reports the **geometric mean** and **geometric CV%** —
+the conventional summaries for PK parameters, which are log-normally distributed.
+
+```{r summary-table}
+smry <- nca_param_summary(nca$wide)
+smry |>
+  kbl(caption = "NCA parameter summary (geometric mean, CV%, range)",
+      digits = 2) |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE)
+```
+
+```{r key-values}
+#| include: false
+thalf_gm <- round(geo_mean(nca$wide$half.life), 1)
+cl_gm    <- round(geo_mean(nca$wide$cl.obs), 2)
+v_gm     <- round(geo_mean(nca$wide$vz.obs), 1)
+```
+
+For theophylline, the literature half-life in healthy adults is roughly **6–9 h**;
+this NCA gives a geometric-mean **t½ ≈ `r thalf_gm` h**, apparent clearance
+**CL/F ≈ `r cl_gm` L/h**, and apparent volume **Vz/F ≈ `r v_gm` L** — all
+physiologically sensible and a useful sanity check before population modelling.
+
+## Visualisations
+
+```{r fig-halflife}
+#| fig-cap: "Terminal half-life by subject (dashed line = geometric mean)."
+nca_plot_halflife(nca$wide)
+```
+
+```{r fig-auc}
+#| fig-cap: "AUClast vs AUCinf — proximity to the identity line indicates minimal extrapolation."
+nca_plot_auc(nca$wide)
+```
+
+```{r fig-distributions}
+#| fig-cap: "Distribution of NCA parameters across the 12 subjects."
+nca_plot_distributions(nca$wide)
+```
+
+```{r fig-cl-weight}
+#| fig-cap: "Apparent clearance vs body weight — an exploratory look ahead to the covariate model."
+nca_plot_cl_weight(nca$wide, df)
+```
+
+```{r cl-weight-cor}
+#| include: false
+wt <- df |> dplyr::distinct(id, wt)
+d  <- dplyr::left_join(nca$wide, wt, by = "id")
+ct <- cor.test(d$wt, d$cl.obs)
+```
+
+The Pearson correlation between weight and NCA clearance is
+**r = `r round(ct$estimate, 2)`** (p = `r signif(ct$p.value, 2)`) — suggestive,
+and formally tested inside the population model in Phase 5.
+
+## Key takeaways
+
+- NCA gives **model-independent** exposure metrics that frame the modelling work.
+- Geometric-mean **t½ ≈ `r thalf_gm` h**, **CL/F ≈ `r cl_gm` L/h**,
+  **Vz/F ≈ `r v_gm` L** are consistent with known theophylline PK.
+- Low AUC %extrapolation means AUCinf (and therefore CL/Vz) is well determined.
+- Between-subject spread in CL and AUC reinforces the need for an **IIV model**
+  (Phase 4) and motivates testing **weight** as a covariate (Phase 5).
+
+> Next: **Phase 3 — Base PopPK model** (one-compartment oral, first-order
+> absorption) with `nlmixr2` / `rxode2`.

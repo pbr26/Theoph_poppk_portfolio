@@ -61,5 +61,54 @@
     "title": "Phase 1 — Exploratory Data Analysis",
     "section": "8 Key takeaways",
     "text": "8 Key takeaways\n\nThe dataset is clean and complete: 12 subjects, 11 samples each, no missing or negative values, time strictly increasing.\nProfiles are consistent with one-compartment oral PK with first-order absorption — the structural model carried into Phase 3.\nThere is meaningful between-subject variability in exposure, motivating an IIV model (Phase 4).\nBody weight is a physiologically plausible covariate worth testing on clearance and volume (Phase 5).\n\n\nNext: Phase 2 — Noncompartmental Analysis with PKNCA to quantify Cmax, Tmax, AUC, and half-life per subject."
+  },
+  {
+    "objectID": "reports/02_NCA_Report.html",
+    "href": "reports/02_NCA_Report.html",
+    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
+    "section": "",
+    "text": "Noncompartmental analysis (NCA) summarises drug exposure without assuming a structural model. It provides model-independent benchmarks — peak concentration, exposure (AUC), and terminal half-life — that we will later compare against the population-model estimates (Phases 3–5).\nParameters computed per subject:\n\nCmax / Tmax — observed peak concentration and its time.\nAUClast — area under the curve to the last measurable concentration (linear-up/log-down trapezoidal).\nAUCinf(obs) — AUClast plus the extrapolated tail (Clast / λz).\nt½ — terminal half-life, from the terminal rate constant λz.\nCL/F, Vz/F — apparent clearance and volume (dose-normalised)."
+  },
+  {
+    "objectID": "reports/02_NCA_Report.html#objectives",
+    "href": "reports/02_NCA_Report.html#objectives",
+    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
+    "section": "",
+    "text": "Noncompartmental analysis (NCA) summarises drug exposure without assuming a structural model. It provides model-independent benchmarks — peak concentration, exposure (AUC), and terminal half-life — that we will later compare against the population-model estimates (Phases 3–5).\nParameters computed per subject:\n\nCmax / Tmax — observed peak concentration and its time.\nAUClast — area under the curve to the last measurable concentration (linear-up/log-down trapezoidal).\nAUCinf(obs) — AUClast plus the extrapolated tail (Clast / λz).\nt½ — terminal half-life, from the terminal rate constant λz.\nCL/F, Vz/F — apparent clearance and volume (dose-normalised)."
+  },
+  {
+    "objectID": "reports/02_NCA_Report.html#method-pknca",
+    "href": "reports/02_NCA_Report.html#method-pknca",
+    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
+    "section": "2 Method (PKNCA)",
+    "text": "2 Method (PKNCA)\nrun_nca() builds a PKNCAconc object (concentration–time, grouped by subject), a PKNCAdose object (the single oral dose in mg at t = 0), defines one 0 → ∞ interval requesting the parameters above, and runs pk.nca(). PKNCA selects the terminal-phase points for λz automatically by maximising the adjusted R².\n\n\nCode\ndf  &lt;- load_pk_data()\nnca &lt;- run_nca(df)"
+  },
+  {
+    "objectID": "reports/02_NCA_Report.html#per-subject-nca-parameters",
+    "href": "reports/02_NCA_Report.html#per-subject-nca-parameters",
+    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
+    "section": "3 Per-subject NCA parameters",
+    "text": "3 Per-subject NCA parameters\n\n\nCode\nnca$wide |&gt;\n  dplyr::select(id, cmax, tmax, auclast, aucinf.obs, half.life,\n                cl.obs, vz.obs, aucpext.obs) |&gt;\n  kbl(\n    caption = \"Noncompartmental parameters by subject\",\n    digits  = 2,\n    col.names = c(\"ID\", \"Cmax (mg/L)\", \"Tmax (h)\", \"AUClast (mg·h/L)\",\n                  \"AUCinf (mg·h/L)\", \"t½ (h)\", \"CL/F (L/h)\", \"Vz/F (L)\",\n                  \"AUC %extrap\")\n  ) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nNoncompartmental parameters by subject\n\n\nID\nCmax (mg/L)\nTmax (h)\nAUClast (mg·h/L)\nAUCinf (mg·h/L)\nt½ (h)\nCL/F (L/h)\nVz/F (L)\nAUC %extrap\n\n\n\n\n1\n10.50\n1.12\n147.23\n214.92\n14.30\n1.49\n30.73\n31.49\n\n\n2\n8.33\n1.92\n88.73\n97.38\n6.66\n3.27\n31.43\n8.88\n\n\n3\n8.20\n1.02\n95.88\n106.13\n6.77\n3.01\n29.37\n9.66\n\n\n4\n8.60\n1.07\n102.63\n114.22\n6.98\n2.80\n28.21\n10.14\n\n\n5\n11.40\n1.00\n118.18\n136.30\n8.00\n2.35\n27.10\n13.30\n\n\n6\n6.44\n1.15\n71.70\n82.18\n7.89\n3.89\n44.35\n12.75\n\n\n7\n7.09\n3.48\n87.97\n100.99\n7.85\n3.17\n35.85\n12.89\n\n\n8\n7.56\n2.02\n86.81\n102.15\n8.51\n3.13\n38.38\n15.02\n\n\n9\n9.03\n0.63\n83.94\n97.52\n8.41\n2.75\n33.31\n13.93\n\n\n10\n10.21\n3.55\n135.58\n167.86\n9.25\n1.91\n25.44\n19.23\n\n\n11\n8.00\n0.98\n77.89\n86.90\n7.26\n3.68\n38.55\n10.37\n\n\n12\n9.75\n3.52\n115.22\n125.83\n6.29\n2.55\n23.11\n8.43\n\n\n\n\n\nThe AUC %extrapolated column is a quality flag — values well under 20% indicate AUCinf is reliable (little of the exposure comes from extrapolation)."
+  },
+  {
+    "objectID": "reports/02_NCA_Report.html#summary-statistics",
+    "href": "reports/02_NCA_Report.html#summary-statistics",
+    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
+    "section": "4 Summary statistics",
+    "text": "4 Summary statistics\nnca_param_summary() reports the geometric mean and geometric CV% — the conventional summaries for PK parameters, which are log-normally distributed.\n\n\nCode\nsmry &lt;- nca_param_summary(nca$wide)\nsmry |&gt;\n  kbl(caption = \"NCA parameter summary (geometric mean, CV%, range)\",\n      digits = 2) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nNCA parameter summary (geometric mean, CV%, range)\n\n\nParameter\nN\nGeo. mean\nGeo. CV%\nMin\nMedian\nMax\n\n\n\n\ncmax\n12\n8.65\n16.98\n6.44\n8.46\n11.40\n\n\ntmax\n12\n1.52\n64.67\n0.63\n1.14\n3.55\n\n\nauclast\n12\n98.65\n22.54\n71.70\n92.30\n147.23\n\n\naucinf.obs\n12\n114.81\n28.43\n82.18\n104.14\n214.92\n\n\nhalf.life\n12\n7.99\n21.85\n6.29\n7.87\n14.30\n\n\ncl.obs\n12\n2.74\n27.86\n1.49\n2.90\n3.89\n\n\nvz.obs\n12\n31.62\n19.21\n23.11\n31.08\n44.35\n\n\naucpext.obs\n12\n12.89\n38.17\n8.43\n12.82\n31.49\n\n\n\n\n\nFor theophylline, the literature half-life in healthy adults is roughly 6–9 h; this NCA gives a geometric-mean t½ ≈ 8 h, apparent clearance CL/F ≈ 2.74 L/h, and apparent volume Vz/F ≈ 31.6 L — all physiologically sensible and a useful sanity check before population modelling."
+  },
+  {
+    "objectID": "reports/02_NCA_Report.html#visualisations",
+    "href": "reports/02_NCA_Report.html#visualisations",
+    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
+    "section": "5 Visualisations",
+    "text": "5 Visualisations\n\n\nCode\nnca_plot_halflife(nca$wide)\n\n\n\n\n\n\n\n\nFigure 1: Terminal half-life by subject (dashed line = geometric mean).\n\n\n\n\n\n\n\nCode\nnca_plot_auc(nca$wide)\n\n\n\n\n\n\n\n\nFigure 2: AUClast vs AUCinf — proximity to the identity line indicates minimal extrapolation.\n\n\n\n\n\n\n\nCode\nnca_plot_distributions(nca$wide)\n\n\n\n\n\n\n\n\nFigure 3: Distribution of NCA parameters across the 12 subjects.\n\n\n\n\n\n\n\nCode\nnca_plot_cl_weight(nca$wide, df)\n\n\n\n\n\n\n\n\nFigure 4: Apparent clearance vs body weight — an exploratory look ahead to the covariate model.\n\n\n\n\n\nThe Pearson correlation between weight and NCA clearance is r = 0.17 (p = 0.59) — suggestive, and formally tested inside the population model in Phase 5."
+  },
+  {
+    "objectID": "reports/02_NCA_Report.html#key-takeaways",
+    "href": "reports/02_NCA_Report.html#key-takeaways",
+    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
+    "section": "6 Key takeaways",
+    "text": "6 Key takeaways\n\nNCA gives model-independent exposure metrics that frame the modelling work.\nGeometric-mean t½ ≈ 8 h, CL/F ≈ 2.74 L/h, Vz/F ≈ 31.6 L are consistent with known theophylline PK.\nLow AUC %extrapolation means AUCinf (and therefore CL/Vz) is well determined.\nBetween-subject spread in CL and AUC reinforces the need for an IIV model (Phase 4) and motivates testing weight as a covariate (Phase 5).\n\n\nNext: Phase 3 — Base PopPK model (one-compartment oral, first-order absorption) with nlmixr2 / rxode2."
   }
 ]

@@ -105,7 +105,15 @@ save_fig <- function(plot, name, w = 8, h = 6, pdf = TRUE) {
   ggplot2::ggsave(png_path, plot = plot, width = w, height = h, dpi = 300, bg = "white")
   if (isTRUE(pdf)) {
     pdf_path <- fs::path(PATH_FIGS, paste0(name, ".pdf"))
-    ggplot2::ggsave(pdf_path, plot = plot, width = w, height = h, device = grDevices::cairo_pdf)
+    # Prefer cairo_pdf (best font handling); fall back to the base pdf device
+    # on builds where cairo is unavailable (e.g. no XQuartz/cairo DLL).
+    pdf_device <- if (isTRUE(capabilities("cairo"))) grDevices::cairo_pdf else grDevices::pdf
+    tryCatch(
+      ggplot2::ggsave(pdf_path, plot = plot, width = w, height = h, device = pdf_device),
+      error = function(e)
+        message(sprintf("• PDF skipped for '%s' (%s). PNG was still written.",
+                        name, conditionMessage(e)))
+    )
   }
   invisible(plot)
 }
