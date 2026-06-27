@@ -100,7 +100,7 @@ fs::dir_create(c(PATH_DATA_RAW, PATH_DATA_PROC, PATH_FIGS, PATH_TABLES, PATH_MOD
 #' @param name Base filename without extension.
 #' @param w,h  Width / height in inches.
 #' @param pdf  Also write a vector PDF (via cairo_pdf).
-save_fig <- function(plot, name, w = 8, h = 6, pdf = TRUE) {
+save_fig <- function(plot, name, w = 8, h = 6, pdf = FALSE) {
   png_path <- fs::path(PATH_FIGS, paste0(name, ".png"))
   ggplot2::ggsave(png_path, plot = plot, width = w, height = h, dpi = 300, bg = "white")
   if (isTRUE(pdf)) {
