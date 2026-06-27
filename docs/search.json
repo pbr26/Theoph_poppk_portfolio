@@ -2,9 +2,9 @@
   {
     "objectID": "reports/07_Simulation_Report.html",
     "href": "reports/07_Simulation_Report.html",
-    "title": "Phase 7 – Clinical Simulation",
+    "title": "Phase 7 — Clinical Simulation",
     "section": "",
-    "text": "Status: This report will be built in the corresponding phase."
+    "text": "With a model that passed diagnostics (Phase 6), we can now simulate — predict concentration-time profiles for scenarios we never measured. This is where a population PK model earns its keep clinically. We simulate three things with rxode2: a typical patient, the effect of body weight, and the full population spread.\n\n\nCode\npars &lt;- get_typical_params()\n\n\nThe simulations use the typical parameters from the final model (cov_fit.rds): CL ≈ 2.79 L/h, V ≈ 32.1 L, Ka ≈ 1.49 /h, with weight exponents θ_CL = 0.35, θ_V = 0.59."
   },
   {
     "objectID": "reports/05_Covariate_Model_Report.html",
@@ -544,5 +544,75 @@
     "title": "Phase 6 — Model Diagnostics",
     "section": "8 Key takeaways",
     "text": "8 Key takeaways\n\nGOF: observed-vs-predicted should track the identity line, tighter for IPRED.\nCWRES: a flat, ±2 band with no time/PRED trend indicates the structural and error models are adequate.\nVPC: observed percentiles inside the simulated intervals confirm the model captures central tendency and variability.\nPassing these checks is what licenses the model for the clinical simulations in the next phase.\n\n\nNext: Phase 7 — Simulation: use the qualified model to simulate PK profiles for a typical patient and weight-based subgroups.\n\n\n:::"
+  },
+  {
+    "objectID": "reports/07_Simulation_Report.html#objectives",
+    "href": "reports/07_Simulation_Report.html#objectives",
+    "title": "Phase 7 — Clinical Simulation",
+    "section": "",
+    "text": "With a model that passed diagnostics (Phase 6), we can now simulate — predict concentration-time profiles for scenarios we never measured. This is where a population PK model earns its keep clinically. We simulate three things with rxode2: a typical patient, the effect of body weight, and the full population spread.\n\n\nCode\npars &lt;- get_typical_params()\n\n\nThe simulations use the typical parameters from the final model (cov_fit.rds): CL ≈ 2.79 L/h, V ≈ 32.1 L, Ka ≈ 1.49 /h, with weight exponents θ_CL = 0.35, θ_V = 0.59."
+  },
+  {
+    "objectID": "reports/07_Simulation_Report.html#typical-patient",
+    "href": "reports/07_Simulation_Report.html#typical-patient",
+    "title": "Phase 7 — Clinical Simulation",
+    "section": "2 Typical patient",
+    "text": "2 Typical patient\nSetting the random effects to zero gives the single population-average curve for a 70 kg subject after a 300 mg oral dose.\n\n\nCode\ntyp &lt;- sim_typical(pars)\nsim_plot_typical(typ)\n\n\n\n\n\nSimulated typical-patient concentration-time profile.\n\n\n\n\nPredicted Cmax ≈ 7.83 mg/L at Tmax ≈ 2 h — consistent with the observed data and the NCA, the expected internal coherence of a good model."
+  },
+  {
+    "objectID": "reports/07_Simulation_Report.html#effect-of-body-weight",
+    "href": "reports/07_Simulation_Report.html#effect-of-body-weight",
+    "title": "Phase 7 — Clinical Simulation",
+    "section": "3 Effect of body weight",
+    "text": "3 Effect of body weight\nSame 300 mg dose, three weights. Because clearance and volume scale allometrically with weight, heavier subjects show a different exposure profile — the visual rationale behind weight-based dosing decisions.\n\n\nCode\nwts &lt;- sim_weight_subgroups(pars)\nsim_plot_weight(wts)\n\n\n\n\n\nTypical profiles for 55, 70, and 85 kg subjects at a fixed dose.\n\n\n\n\n\n\nCode\nwts |&gt;\n  dplyr::group_by(WT) |&gt;\n  dplyr::summarise(Cmax = round(max(cp), 2),\n                   Tmax = round(time[which.max(cp)], 2),\n                   .groups = \"drop\") |&gt;\n  kbl(caption = \"Simulated Cmax / Tmax by body weight (fixed dose)\",\n      col.names = c(\"Weight (kg)\", \"Cmax (mg/L)\", \"Tmax (h)\")) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nSimulated Cmax / Tmax by body weight (fixed dose)\n\n\nWeight (kg)\nCmax (mg/L)\nTmax (h)\n\n\n\n\n55\n8.95\n2.0\n\n\n70\n7.83\n2.0\n\n\n85\n7.02\n2.1"
+  },
+  {
+    "objectID": "reports/07_Simulation_Report.html#population-variability",
+    "href": "reports/07_Simulation_Report.html#population-variability",
+    "title": "Phase 7 — Clinical Simulation",
+    "section": "4 Population variability",
+    "text": "4 Population variability\nDrawing 500 virtual subjects’ random effects from the estimated ω matrix shows the spread of real-world exposures, not just the average. For a narrow-therapeutic- index drug like theophylline, this band is what matters — it indicates how many patients might stray outside the therapeutic window on a given dose.\n\n\nCode\npop &lt;- sim_population(pars)\nif (!is.null(pop)) {\n  sim_plot_population(pop)\n} else {\n  cat(\"Population simulation requires an omega matrix (IIV/covariate model).\")\n}\n\n\n\n\n\nPopulation simulation: median and 90% prediction interval (500 subjects)."
+  },
+  {
+    "objectID": "reports/07_Simulation_Report.html#key-takeaways",
+    "href": "reports/07_Simulation_Report.html#key-takeaways",
+    "title": "Phase 7 — Clinical Simulation",
+    "section": "5 Key takeaways",
+    "text": "5 Key takeaways\n\nThe qualified model reproduces a sensible typical profile (Cmax ≈ 7.83 mg/L), confirming internal consistency with the data.\nBody weight measurably shifts exposure at a fixed dose — quantitative support for individualised dosing.\nThe population prediction interval quantifies between-subject variability, the critical output for dosing a narrow-therapeutic-index drug safely.\nThis completes the end-to-end workflow: data → NCA → structural model → IIV → covariate → diagnostics → simulation.\n\n\nThe full analysis is published as a Quarto website under docs/ and deployed via GitHub Pages.\n\n\n\n\n\n:::{#quarto-navigation-envelope .hidden}\n[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1zaWRlYmFyLXRpdGxl\"}\n[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXItdGl0bGU=\"}\n[Home]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6SG9tZQ==\"}\n[/index.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L2luZGV4Lmh0bWw=\"}\n[Reports]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6UmVwb3J0cw==\"}\n[1. Exploratory Data Analysis]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6MS4gRXhwbG9yYXRvcnkgRGF0YSBBbmFseXNpcw==\"}\n[/reports/01_EDA_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDFfRURBX1JlcG9ydC5odG1s\"}\n[2. Noncompartmental Analysis]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6Mi4gTm9uY29tcGFydG1lbnRhbCBBbmFseXNpcw==\"}\n[/reports/02_NCA_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDJfTkNBX1JlcG9ydC5odG1s\"}\n[3. Base PopPK Model]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6My4gQmFzZSBQb3BQSyBNb2RlbA==\"}\n[/reports/03_Base_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDNfQmFzZV9Nb2RlbF9SZXBvcnQuaHRtbA==\"}\n[4. IIV Model]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6NC4gSUlWIE1vZGVs\"}\n[/reports/04_IIV_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDRfSUlWX01vZGVsX1JlcG9ydC5odG1s\"}\n[5. Covariate Model]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6NS4gQ292YXJpYXRlIE1vZGVs\"}\n[/reports/05_Covariate_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDVfQ292YXJpYXRlX01vZGVsX1JlcG9ydC5odG1s\"}\n[6. Model Diagnostics]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6Ni4gTW9kZWwgRGlhZ25vc3RpY3M=\"}\n[/reports/06_Model_Diagnostics.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDZfTW9kZWxfRGlhZ25vc3RpY3MuaHRtbA==\"}\n[7. Simulation]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6Ny4gU2ltdWxhdGlvbg==\"}\n[/reports/07_Simulation_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDdfU2ltdWxhdGlvbl9SZXBvcnQuaHRtbA==\"}\n[https://github.com/pbr26/Theoph_poppk_portfolio]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW5hdmJhci10b29sczpodHRwczovL2dpdGh1Yi5jb20vcGJyMjYvVGhlb3BoX3BvcHBrX3BvcnRmb2xpbw==\"}\n\n:::{.hidden .quarto-markdown-envelope-contents render-id=\"Zm9vdGVyLWNlbnRlcg==\"}\nPopulation PK Portfolio · Theophylline · Built in R with nlmixr2, PKNCA & Quarto\n:::\n\n:::\n\n\n\n:::{#quarto-meta-markdown .hidden}\n[Phase 7 — Clinical Simulation – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW1ldGF0aXRsZQ==\"}\n[Phase 7 — Clinical Simulation – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLXR3aXR0ZXJjYXJkdGl0bGU=\"}\n[Phase 7 — Clinical Simulation – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW9nY2FyZHRpdGxl\"}\n[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW1ldGFzaXRlbmFtZQ==\"}\n[Typical patient, weight subgroups, and population variability (rxode2)]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLXR3aXR0ZXJjYXJkZGVzYw==\"}\n[Typical patient, weight subgroups, and population variability (rxode2)]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW9nY2FyZGRkZXNj\"}\n[End-to-end population pharmacokinetics analysis of the Theophylline dataset in R.]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW1ldGFzaXRlZGVzYw==\"}\n:::\n\n\n\n\n&lt;!-- --&gt;\n\n::: {.quarto-embedded-source-code}\n```````````````````{.markdown shortcodes=\"false\"}\n---\ntitle: \"Phase 7 — Clinical Simulation\"\nsubtitle: \"Typical patient, weight subgroups, and population variability (rxode2)\"\nauthor: \"Pramod BR\"\ndate: today\nformat:\n  html:\n    theme: cosmo\n    toc: true\n    toc-depth: 3\n    code-fold: true\n    code-tools: true\n    number-sections: true\n    fig-width: 8\n    fig-height: 6\nexecute:\n  echo: true\n  warning: false\n  message: false\n---\n\n```{r setup}\n#| include: false\nhere::i_am(\"reports/07_Simulation_Report.qmd\")\nsource(here::here(\"R\", \"07_simulation.R\"))\nlibrary(kableExtra)"
+  },
+  {
+    "objectID": "reports/07_Simulation_Report.html#objectives-1",
+    "href": "reports/07_Simulation_Report.html#objectives-1",
+    "title": "Phase 7 — Clinical Simulation",
+    "section": "6 Objectives",
+    "text": "6 Objectives\nWith a model that passed diagnostics (Phase 6), we can now simulate — predict concentration-time profiles for scenarios we never measured. This is where a population PK model earns its keep clinically. We simulate three things with rxode2: a typical patient, the effect of body weight, and the full population spread.\npars &lt;- get_typical_params()\nThe simulations use the typical parameters from the final model (r pars$source): CL ≈ r round(pars$cl, 2) L/h, V ≈ r round(pars$v, 1) L, Ka ≈ r round(pars$ka, 2) /h, with weight exponents θ_CL = r round(pars$dWTCL, 2), θ_V = r round(pars$dWTV, 2)."
+  },
+  {
+    "objectID": "reports/07_Simulation_Report.html#typical-patient-1",
+    "href": "reports/07_Simulation_Report.html#typical-patient-1",
+    "title": "Phase 7 — Clinical Simulation",
+    "section": "7 Typical patient",
+    "text": "7 Typical patient\nSetting the random effects to zero gives the single population-average curve for a 70 kg subject after a r SIM_DOSE mg oral dose.\n#| fig-cap: \"Simulated typical-patient concentration-time profile.\"\ntyp &lt;- sim_typical(pars)\nsim_plot_typical(typ)\n#| include: false\ncmax &lt;- round(max(typ$cp), 2)\ntmax &lt;- round(typ$time[which.max(typ$cp)], 2)\nPredicted Cmax ≈ r cmax mg/L at Tmax ≈ r tmax h — consistent with the observed data and the NCA, the expected internal coherence of a good model."
+  },
+  {
+    "objectID": "reports/07_Simulation_Report.html#effect-of-body-weight-1",
+    "href": "reports/07_Simulation_Report.html#effect-of-body-weight-1",
+    "title": "Phase 7 — Clinical Simulation",
+    "section": "8 Effect of body weight",
+    "text": "8 Effect of body weight\nSame r SIM_DOSE mg dose, three weights. Because clearance and volume scale allometrically with weight, heavier subjects show a different exposure profile — the visual rationale behind weight-based dosing decisions.\n#| fig-cap: \"Typical profiles for 55, 70, and 85 kg subjects at a fixed dose.\"\nwts &lt;- sim_weight_subgroups(pars)\nsim_plot_weight(wts)\nwts |&gt;\n  dplyr::group_by(WT) |&gt;\n  dplyr::summarise(Cmax = round(max(cp), 2),\n                   Tmax = round(time[which.max(cp)], 2),\n                   .groups = \"drop\") |&gt;\n  kbl(caption = \"Simulated Cmax / Tmax by body weight (fixed dose)\",\n      col.names = c(\"Weight (kg)\", \"Cmax (mg/L)\", \"Tmax (h)\")) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)"
+  },
+  {
+    "objectID": "reports/07_Simulation_Report.html#population-variability-1",
+    "href": "reports/07_Simulation_Report.html#population-variability-1",
+    "title": "Phase 7 — Clinical Simulation",
+    "section": "9 Population variability",
+    "text": "9 Population variability\nDrawing 500 virtual subjects’ random effects from the estimated ω matrix shows the spread of real-world exposures, not just the average. For a narrow-therapeutic- index drug like theophylline, this band is what matters — it indicates how many patients might stray outside the therapeutic window on a given dose.\n#| fig-cap: \"Population simulation: median and 90% prediction interval (500 subjects).\"\npop &lt;- sim_population(pars)\nif (!is.null(pop)) {\n  sim_plot_population(pop)\n} else {\n  cat(\"Population simulation requires an omega matrix (IIV/covariate model).\")\n}"
+  },
+  {
+    "objectID": "reports/07_Simulation_Report.html#key-takeaways-1",
+    "href": "reports/07_Simulation_Report.html#key-takeaways-1",
+    "title": "Phase 7 — Clinical Simulation",
+    "section": "10 Key takeaways",
+    "text": "10 Key takeaways\n\nThe qualified model reproduces a sensible typical profile (Cmax ≈ r cmax mg/L), confirming internal consistency with the data.\nBody weight measurably shifts exposure at a fixed dose — quantitative support for individualised dosing.\nThe population prediction interval quantifies between-subject variability, the critical output for dosing a narrow-therapeutic-index drug safely.\nThis completes the end-to-end workflow: data → NCA → structural model → IIV → covariate → diagnostics → simulation.\n\n\nThe full analysis is published as a Quarto website under docs/ and deployed via GitHub Pages.\n\n\n:::"
   }
 ]
