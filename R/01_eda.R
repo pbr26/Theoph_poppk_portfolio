@@ -1,248 +1,250 @@
 # =============================================================================
 # 01_eda.R
-# Purpose : Helper functions for Exploratory Data Analysis of Theoph dataset
-# Author  : Pramod BR
-# Date    : 2026-06-21
+# Project : Population PK Portfolio — Theophylline
+# Phase 1 : Exploratory Data Analysis
+# Purpose : Prepare the Theoph dataset, run data-quality checks, build a
+#           per-subject summary, and produce the core EDA figures.
+# Usage   : source(here::here("R", "01_eda.R"))   # defines functions
+#           Then call prepare_theoph(), run_dq_checks(), subject_summary(),
+#           and the eda_plot_*() builders. Running this file directly (via
+#           Rscript / Source) executes the demo block at the bottom.
 # =============================================================================
 
-# ── 1. Load and prepare Theoph dataset ───────────────────────────────────────
+source(here::here("R", "00_setup.R"))
 
-#' Prepare the Theoph dataset for PK analysis
+# -----------------------------------------------------------------------------
+# 1. prepare_theoph(): tidy the built-in Theoph dataset
+# -----------------------------------------------------------------------------
+#' Load and tidy the Theoph dataset.
 #'
-#' Returns a cleaned tibble with renamed columns following NONMEM convention:
-#'   ID, TIME, DV, AMT, WT, DOSE
+#' The base `datasets::Theoph` object stores `Subject` as an ordered factor
+#' whose level order is NOT 1..12. We coerce to an integer ID via the factor
+#' label (the actual subject number), and derive the absolute dose in mg.
 #'
+#' Columns returned:
+#'   id     integer subject id (1..12)
+#'   wt     body weight (kg)
+#'   dose   administered dose (mg/kg)
+#'   amt    absolute dose (mg) = dose * wt
+#'   time   time since dose (h)
+#'   conc   theophylline concentration (mg/L)
+#'
+#' @return A tibble ordered by id, time.
 prepare_theoph <- function() {
-  data(Theoph, package = "datasets")
+  raw <- datasets::Theoph
 
-  df <- Theoph |>
-    as_tibble() |>
-    rename(
-      ID   = Subject,   # Subject identifier (factor → numeric)
-      TIME = Time,      # Time after dose (hours)
-      DV   = conc,      # Observed concentration (mg/L)
-      WT   = Wt,        # Body weight (kg)
-      DOSE = Dose       # Dose (mg/kg)
+  df <- tibble::as_tibble(raw) |>
+    janitor::clean_names() |>
+    dplyr::transmute(
+      id   = as.integer(as.character(subject)),
+      wt   = as.numeric(wt),
+      dose = as.numeric(dose),
+      amt  = as.numeric(dose) * as.numeric(wt),   # mg/kg * kg = mg
+      time = as.numeric(time),
+      conc = as.numeric(conc)
     ) |>
-    mutate(
-      ID     = as.numeric(as.character(ID)),
-      AMT    = ifelse(TIME == 0, DOSE * WT, 0),  # Actual dose in mg
-      EVID   = ifelse(TIME == 0, 1, 0),           # Event ID: 1=dose, 0=obs
-      MDV    = ifelse(TIME == 0, 1, 0),           # Missing DV flag
-      LLOQ   = 0.1                                # Assumed LLOQ (mg/L)
-    ) |>
-    arrange(ID, TIME)
+    dplyr::arrange(id, time)
 
-  return(df)
+  df
 }
 
-
-# ── 2. Data quality checks ────────────────────────────────────────────────────
-
-#' Run data quality checks and return a summary list
+# -----------------------------------------------------------------------------
+# 2. run_dq_checks(): data-quality / integrity checks
+# -----------------------------------------------------------------------------
+#' Run a battery of data-quality checks on a prepared Theoph tibble.
+#'
+#' @param df Output of prepare_theoph().
+#' @return A tibble with one row per check: check, status (PASS/FLAG), detail.
 run_dq_checks <- function(df) {
-  obs <- df |> filter(EVID == 0)   # observations only
+  add <- function(check, ok, detail) {
+    tibble::tibble(check = check,
+                   status = ifelse(ok, "PASS", "FLAG"),
+                   detail = detail)
+  }
 
-  list(
-    n_subjects     = n_distinct(df$ID),
-    n_obs_total    = nrow(obs),
-    n_obs_per_subj = obs |> count(ID) |> pull(n) |> summary(),
-    time_range     = range(obs$TIME),
-    conc_range     = range(obs$DV),
-    n_below_lloq   = sum(obs$DV < obs$LLOQ),
-    n_missing_conc = sum(is.na(obs$DV)),
-    n_missing_time = sum(is.na(obs$TIME)),
-    weight_range   = range(df$WT),
-    dose_range     = range(df$DOSE),
-    dose_mg_range  = range(df$AMT[df$EVID == 1])
+  n_subj   <- dplyr::n_distinct(df$id)
+  per_subj <- df |> dplyr::count(id, name = "n_obs")
+  dup      <- df |> dplyr::count(id, time) |> dplyr::filter(n > 1)
+  miss     <- colSums(is.na(df))
+  neg_conc <- df |> dplyr::filter(conc < 0)
+  unsorted <- df |>
+    dplyr::group_by(id) |>
+    dplyr::summarise(ok = !is.unsorted(time), .groups = "drop") |>
+    dplyr::filter(!ok)
+  baseline <- df |>
+    dplyr::group_by(id) |>
+    dplyr::summarise(t0 = min(time), c0 = conc[which.min(time)], .groups = "drop")
+  wt_rng   <- range(df$wt)
+  dose_rng <- range(df$dose)
+
+  dplyr::bind_rows(
+    add("Subject count",
+        n_subj == 12,
+        glue::glue("{n_subj} unique subjects (expected 12)")),
+    add("Samples per subject",
+        all(per_subj$n_obs == 11),
+        glue::glue("range {min(per_subj$n_obs)}–{max(per_subj$n_obs)} ",
+                   "(Theoph has 11 samples/subject)")),
+    add("Duplicate id×time rows",
+        nrow(dup) == 0,
+        glue::glue("{nrow(dup)} duplicate time points")),
+    add("Missing values",
+        sum(miss) == 0,
+        glue::glue("{sum(miss)} NA cells across all columns")),
+    add("Negative concentrations",
+        nrow(neg_conc) == 0,
+        glue::glue("{nrow(neg_conc)} negative conc values")),
+    add("Time monotonic within subject",
+        nrow(unsorted) == 0,
+        glue::glue("{nrow(unsorted)} subjects with non-increasing time")),
+    add("Baseline (t=0) concentrations",
+        all(baseline$c0 >= 0),
+        glue::glue("first-sample conc range ",
+                   "{round(min(baseline$c0),2)}–{round(max(baseline$c0),2)} mg/L")),
+    add("Weight range plausible",
+        wt_rng[1] > 30 & wt_rng[2] < 120,
+        glue::glue("{wt_rng[1]}–{wt_rng[2]} kg")),
+    add("Dose range plausible",
+        dose_rng[1] > 1 & dose_rng[2] < 12,
+        glue::glue("{dose_rng[1]}–{dose_rng[2]} mg/kg"))
   )
 }
 
-
-# ── 3. Subject-level summary ──────────────────────────────────────────────────
-
-#' Compute per-subject descriptive PK summary
+# -----------------------------------------------------------------------------
+# 3. subject_summary(): per-subject descriptive summary
+# -----------------------------------------------------------------------------
+#' Build a per-subject summary (demographics + observed PK landmarks).
+#'
+#' @param df Output of prepare_theoph().
+#' @return A tibble, one row per subject.
 subject_summary <- function(df) {
   df |>
-    filter(EVID == 0) |>
-    group_by(ID, WT, DOSE) |>
-    summarise(
-      AMT_mg   = unique(DOSE * WT),
-      Cmax     = max(DV, na.rm = TRUE),
-      Tmax     = TIME[which.max(DV)],
-      Clast    = DV[which.max(TIME)],
-      Tlast    = max(TIME),
-      n_obs    = n(),
-      .groups  = "drop"
+    dplyr::group_by(id) |>
+    dplyr::summarise(
+      wt        = dplyr::first(wt),
+      dose_mgkg = dplyr::first(dose),
+      amt_mg    = dplyr::first(amt),
+      n_obs     = dplyr::n(),
+      tmax_obs  = time[which.max(conc)],
+      cmax_obs  = max(conc),
+      tlast     = max(time),
+      clast     = conc[which.max(time)],
+      .groups   = "drop"
     ) |>
-    mutate(across(where(is.numeric), \(x) round(x, 2)))
+    dplyr::arrange(id)
 }
 
+# -----------------------------------------------------------------------------
+# 4. EDA plot builders
+# -----------------------------------------------------------------------------
 
-# ── 4. Plotting functions ─────────────────────────────────────────────────────
-
-#' Individual concentration-time profiles (linear scale)
-plot_individual_linear <- function(df) {
-  obs <- df |> filter(EVID == 0)
-
-  ggplot(obs, aes(x = TIME, y = DV, group = ID, colour = factor(ID))) +
-    geom_line(linewidth = 0.7) +
-    geom_point(size = 2) +
-    facet_wrap(~ID, ncol = 4, labeller = label_both) +
-    scale_colour_viridis_d(option = "turbo", guide = "none") +
-    scale_x_continuous(breaks = seq(0, 25, 5)) +
-    labs(
-      title    = "Individual Concentration-Time Profiles",
-      subtitle = "Theophylline – oral single dose, n = 12 subjects",
-      x        = "Time after dose (h)",
-      y        = "Theophylline concentration (mg/L)",
-      caption  = "Each panel = one subject. Dose administered at time 0."
+#' Individual concentration–time profiles, faceted by subject (linear scale).
+eda_plot_individual <- function(df, semilog = FALSE) {
+  p <- ggplot2::ggplot(df, ggplot2::aes(time, conc, group = id)) +
+    ggplot2::geom_line(colour = "#2C3E50", linewidth = 0.5) +
+    ggplot2::geom_point(colour = "#E74C3C", size = 1.1) +
+    ggplot2::facet_wrap(~ id, ncol = 4, labeller = ggplot2::label_both) +
+    ggplot2::labs(
+      x = "Time (h)", y = "Concentration (mg/L)",
+      title = if (semilog) "Individual profiles (semi-log)" else "Individual profiles (linear)",
+      subtitle = "Theophylline — single oral dose, 12 subjects"
     )
+  if (semilog) {
+    p <- p + ggplot2::scale_y_log10()
+  }
+  p
 }
 
-
-#' Individual concentration-time profiles (semi-log scale)
-plot_individual_semilog <- function(df) {
-  obs <- df |> filter(EVID == 0, DV > 0)
-
-  ggplot(obs, aes(x = TIME, y = DV, group = ID, colour = factor(ID))) +
-    geom_line(linewidth = 0.7) +
-    geom_point(size = 2) +
-    facet_wrap(~ID, ncol = 4, labeller = label_both) +
-    scale_y_log10(
-      breaks = c(0.1, 0.5, 1, 2, 5, 10, 20),
-      labels = scales::label_number()
+#' Spaghetti plot: all subjects overlaid, coloured by subject.
+eda_plot_spaghetti <- function(df, semilog = FALSE) {
+  p <- ggplot2::ggplot(df, ggplot2::aes(time, conc, colour = factor(id), group = id)) +
+    ggplot2::geom_line(linewidth = 0.6, alpha = 0.85) +
+    ggplot2::geom_point(size = 1) +
+    viridis::scale_colour_viridis(discrete = TRUE, option = "turbo", name = "Subject") +
+    ggplot2::labs(
+      x = "Time (h)", y = "Concentration (mg/L)",
+      title = if (semilog) "All subjects overlaid (semi-log)" else "All subjects overlaid (linear)",
+      subtitle = "Spaghetti plot of individual concentration–time data"
     ) +
-    scale_colour_viridis_d(option = "turbo", guide = "none") +
-    scale_x_continuous(breaks = seq(0, 25, 5)) +
-    annotation_logticks(sides = "l", colour = "grey60", linewidth = 0.3) +
-    labs(
-      title    = "Individual Concentration-Time Profiles (Semi-log)",
-      subtitle = "Log-linear terminal phase reveals first-order elimination",
-      x        = "Time after dose (h)",
-      y        = "Theophylline concentration (mg/L) – log scale",
-      caption  = "Straight line on semi-log = first-order elimination kinetics"
-    )
+    ggplot2::guides(colour = ggplot2::guide_legend(nrow = 2))
+  if (semilog) p <- p + ggplot2::scale_y_log10()
+  p
 }
 
-
-#' Mean ± SD concentration-time profile (all subjects overlaid + mean)
-plot_mean_profile <- function(df) {
-  obs <- df |> filter(EVID == 0)
-
-  mean_df <- obs |>
-    group_by(TIME) |>
-    summarise(
-      mean_conc = mean(DV, na.rm = TRUE),
-      sd_conc   = sd(DV, na.rm = TRUE),
-      n         = n(),
-      se_conc   = sd_conc / sqrt(n),
+#' Mean (± SD) concentration–time profile across subjects.
+eda_plot_mean <- function(df) {
+  mean_df <- df |>
+    dplyr::group_by(time) |>
+    dplyr::summarise(
+      mean_conc = mean(conc),
+      sd_conc   = stats::sd(conc),
+      n         = dplyr::n(),
       .groups   = "drop"
     )
-
-  ggplot() +
-    # Individual lines (faded)
-    geom_line(
-      data    = obs,
-      aes(x = TIME, y = DV, group = ID),
-      colour  = "steelblue", alpha = 0.25, linewidth = 0.5
-    ) +
-    geom_point(
-      data    = obs,
-      aes(x = TIME, y = DV),
-      colour  = "steelblue", alpha = 0.3, size = 1.5
-    ) +
-    # Mean ± SD ribbon
-    geom_ribbon(
-      data    = mean_df,
-      aes(x = TIME, ymin = mean_conc - sd_conc, ymax = mean_conc + sd_conc),
-      fill    = "#E74C3C", alpha = 0.15
-    ) +
-    # Mean line
-    geom_line(
-      data      = mean_df,
-      aes(x = TIME, y = mean_conc),
-      colour    = "#E74C3C", linewidth = 1.2
-    ) +
-    geom_point(
-      data    = mean_df,
-      aes(x = TIME, y = mean_conc),
-      colour  = "#E74C3C", size = 3, shape = 18
-    ) +
-    scale_x_continuous(breaks = seq(0, 25, 5)) +
-    labs(
-      title    = "Mean (±SD) Concentration-Time Profile",
-      subtitle = "Red = mean ± SD; blue = individual observations (n = 12)",
-      x        = "Time after dose (h)",
-      y        = "Theophylline concentration (mg/L)",
-      caption  = "Absorption phase visible in first 2 h; elimination phase from ~2–25 h"
+  ggplot2::ggplot(mean_df, ggplot2::aes(time, mean_conc)) +
+    ggplot2::geom_ribbon(ggplot2::aes(ymin = pmax(mean_conc - sd_conc, 0),
+                                      ymax = mean_conc + sd_conc),
+                         fill = "#3498DB", alpha = 0.25) +
+    ggplot2::geom_line(colour = "#2C3E50", linewidth = 0.9) +
+    ggplot2::geom_point(colour = "#2C3E50", size = 1.6) +
+    ggplot2::labs(
+      x = "Time (h)", y = "Mean concentration (mg/L)",
+      title = "Mean concentration–time profile (± SD)",
+      subtitle = "Pooled across all 12 subjects at nominal sampling times"
     )
 }
 
-
-#' All subjects overlaid on one panel (spaghetti plot)
-plot_spaghetti <- function(df) {
-  obs <- df |> filter(EVID == 0)
-
-  ggplot(obs, aes(x = TIME, y = DV, group = ID, colour = factor(ID))) +
-    geom_line(linewidth = 0.8, alpha = 0.85) +
-    geom_point(size = 2, alpha = 0.85) +
-    scale_colour_viridis_d(option = "turbo", name = "Subject ID") +
-    scale_x_continuous(breaks = seq(0, 25, 5)) +
-    labs(
-      title    = "Spaghetti Plot – All Subjects",
-      subtitle = "Between-subject variability in Cmax, Tmax, and elimination",
-      x        = "Time after dose (h)",
-      y        = "Theophylline concentration (mg/L)"
-    ) +
-    guides(colour = guide_legend(nrow = 2))
-}
-
-
-#' Weight distribution plot
-plot_weight_dist <- function(df) {
-  subj <- df |> distinct(ID, WT, DOSE) |>
-    mutate(AMT_mg = DOSE * WT)
-
-  p1 <- ggplot(subj, aes(x = WT)) +
-    geom_histogram(bins = 8, fill = "#2980B9", colour = "white", alpha = 0.8) +
-    geom_vline(xintercept = mean(subj$WT), linetype = "dashed", colour = "#E74C3C") +
-    labs(title = "Body Weight Distribution", x = "Weight (kg)", y = "Count") +
-    annotate("text", x = mean(subj$WT) + 1.5, y = 2.8,
-             label = paste0("Mean = ", round(mean(subj$WT), 1), " kg"),
-             colour = "#E74C3C", size = 3.5)
-
-  p2 <- ggplot(subj, aes(x = AMT_mg)) +
-    geom_histogram(bins = 8, fill = "#27AE60", colour = "white", alpha = 0.8) +
-    geom_vline(xintercept = mean(subj$AMT_mg), linetype = "dashed", colour = "#E74C3C") +
-    labs(title = "Total Dose Distribution", x = "Dose (mg)", y = "Count") +
-    annotate("text", x = mean(subj$AMT_mg) + 15, y = 2.8,
-             label = paste0("Mean = ", round(mean(subj$AMT_mg), 1), " mg"),
-             colour = "#E74C3C", size = 3.5)
-
-  p1 + p2 +
-    plot_annotation(
-      title    = "Subject Characteristics",
-      subtitle = "Weight-normalised dosing (mg/kg) leads to variable absolute doses"
+#' Body-weight distribution across subjects.
+eda_plot_weight <- function(df) {
+  wt_df <- df |> dplyr::distinct(id, wt)
+  ggplot2::ggplot(wt_df, ggplot2::aes(wt)) +
+    ggplot2::geom_histogram(binwidth = 5, fill = "#3498DB",
+                            colour = "white", boundary = 0) +
+    ggplot2::geom_rug(colour = "#E74C3C") +
+    ggplot2::labs(
+      x = "Body weight (kg)", y = "Number of subjects",
+      title = "Body-weight distribution",
+      subtitle = glue::glue("n = {nrow(wt_df)} subjects; ",
+                            "range {min(wt_df$wt)}–{max(wt_df$wt)} kg")
     )
 }
 
-
-#' Cmax vs Body Weight scatter
-plot_cmax_vs_wt <- function(df) {
-  ss <- subject_summary(df)
-
-  ggplot(ss, aes(x = WT, y = Cmax, label = ID)) +
-    geom_point(aes(size = AMT_mg), colour = "#8E44AD", alpha = 0.8) +
-    geom_smooth(method = "lm", se = TRUE, colour = "#E74C3C",
-                linetype = "dashed", linewidth = 0.8) +
-    ggrepel::geom_text_repel(size = 3, colour = "grey30") +
-    scale_size_continuous(name = "Dose (mg)", range = c(3, 8)) +
-    labs(
-      title    = "Cmax vs Body Weight",
-      subtitle = "Exploring covariate relationships before formal modeling",
-      x        = "Body weight (kg)",
-      y        = "Observed Cmax (mg/L)",
-      caption  = "Point size ∝ total dose administered"
+#' Observed Cmax vs body weight, with subject labels.
+eda_plot_cmax_weight <- function(ss) {
+  ggplot2::ggplot(ss, ggplot2::aes(wt, cmax_obs)) +
+    ggplot2::geom_smooth(method = "lm", se = TRUE, colour = "#3498DB",
+                         fill = "#3498DB", alpha = 0.15, formula = y ~ x) +
+    ggplot2::geom_point(ggplot2::aes(colour = factor(id)), size = 2.6) +
+    ggrepel::geom_text_repel(ggplot2::aes(label = id), size = 3, seed = 1) +
+    viridis::scale_colour_viridis(discrete = TRUE, option = "turbo", guide = "none") +
+    ggplot2::labs(
+      x = "Body weight (kg)", y = "Observed Cmax (mg/L)",
+      title = "Observed Cmax vs body weight",
+      subtitle = "Heavier subjects received more total drug (dose is mg/kg)"
     )
+}
+
+# -----------------------------------------------------------------------------
+# 5. Demo / pipeline block (runs when the file is sourced directly)
+# -----------------------------------------------------------------------------
+if (sys.nframe() == 0L || identical(environment(), globalenv())) {
+  theoph    <- prepare_theoph()
+  dq        <- run_dq_checks(theoph)
+  ss        <- subject_summary(theoph)
+
+  # Persist the prepared dataset for downstream phases
+  readr::write_csv(theoph, fs::path(PATH_DATA_PROC, "theoph_clean.csv"))
+  readr::write_csv(ss,     fs::path(PATH_TABLES,    "subject_summary.csv"))
+
+  # Build and save figures
+  save_fig(eda_plot_individual(theoph, semilog = FALSE), "01_individual_linear")
+  save_fig(eda_plot_individual(theoph, semilog = TRUE),  "01_individual_semilog")
+  save_fig(eda_plot_mean(theoph),                        "01_mean_profile")
+  save_fig(eda_plot_spaghetti(theoph),                   "01_spaghetti")
+  save_fig(eda_plot_weight(theoph),                      "01_weight_dist")
+  save_fig(eda_plot_cmax_weight(ss),                     "01_cmax_vs_weight")
+
+  print(dq)
+  message("✓ Phase 1 EDA pipeline complete. Figures in outputs/figures/, ",
+          "tables in outputs/tables/.")
 }

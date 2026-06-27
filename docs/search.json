@@ -1,0 +1,65 @@
+[
+  {
+    "objectID": "reports/01_EDA_Report.html",
+    "href": "reports/01_EDA_Report.html",
+    "title": "Phase 1 — Exploratory Data Analysis",
+    "section": "",
+    "text": "This report explores the Theophylline single-dose dataset to understand its structure, verify data quality, and characterise the concentration–time behaviour before any modelling. Theophylline is a narrow-therapeutic-index bronchodilator with well-described one-compartment, first-order oral kinetics, which makes it an ideal teaching dataset for population PK.\nThe questions we answer here:\n\nIs the dataset complete and internally consistent (data-quality checks)?\nWhat do the individual and population concentration–time profiles look like?\nHow variable are subjects, and does body weight look like a covariate worth testing?"
+  },
+  {
+    "objectID": "reports/01_EDA_Report.html#objectives",
+    "href": "reports/01_EDA_Report.html#objectives",
+    "title": "Phase 1 — Exploratory Data Analysis",
+    "section": "",
+    "text": "This report explores the Theophylline single-dose dataset to understand its structure, verify data quality, and characterise the concentration–time behaviour before any modelling. Theophylline is a narrow-therapeutic-index bronchodilator with well-described one-compartment, first-order oral kinetics, which makes it an ideal teaching dataset for population PK.\nThe questions we answer here:\n\nIs the dataset complete and internally consistent (data-quality checks)?\nWhat do the individual and population concentration–time profiles look like?\nHow variable are subjects, and does body weight look like a covariate worth testing?"
+  },
+  {
+    "objectID": "reports/01_EDA_Report.html#dataset-preparation",
+    "href": "reports/01_EDA_Report.html#dataset-preparation",
+    "title": "Phase 1 — Exploratory Data Analysis",
+    "section": "2 Dataset preparation",
+    "text": "2 Dataset preparation\nprepare_theoph() tidies datasets::Theoph: it coerces Subject to an integer id, standardises names, and derives the absolute dose in mg (amt = dose × wt, since the recorded dose is in mg/kg).\n\n\nCode\ntheoph &lt;- prepare_theoph()\nglimpse(theoph)\n\n\nRows: 132\nColumns: 6\n$ id   &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,…\n$ wt   &lt;dbl&gt; 79.6, 79.6, 79.6, 79.6, 79.6, 79.6, 79.6, 79.6, 79.6, 79.6, 79.6,…\n$ dose &lt;dbl&gt; 4.02, 4.02, 4.02, 4.02, 4.02, 4.02, 4.02, 4.02, 4.02, 4.02, 4.02,…\n$ amt  &lt;dbl&gt; 319.992, 319.992, 319.992, 319.992, 319.992, 319.992, 319.992, 31…\n$ time &lt;dbl&gt; 0.00, 0.25, 0.57, 1.12, 2.02, 3.82, 5.10, 7.03, 9.05, 12.12, 24.3…\n$ conc &lt;dbl&gt; 0.74, 2.84, 6.57, 10.50, 9.66, 8.58, 8.36, 7.47, 6.89, 5.94, 3.28…\n\n\n\n\nCode\ntheoph |&gt;\n  head(11) |&gt;\n  kbl(caption = \"First subject — full concentration–time record\",\n      digits = 2) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nFirst subject — full concentration–time record\n\n\nid\nwt\ndose\namt\ntime\nconc\n\n\n\n\n1\n79.6\n4.02\n319.99\n0.00\n0.74\n\n\n1\n79.6\n4.02\n319.99\n0.25\n2.84\n\n\n1\n79.6\n4.02\n319.99\n0.57\n6.57\n\n\n1\n79.6\n4.02\n319.99\n1.12\n10.50\n\n\n1\n79.6\n4.02\n319.99\n2.02\n9.66\n\n\n1\n79.6\n4.02\n319.99\n3.82\n8.58\n\n\n1\n79.6\n4.02\n319.99\n5.10\n8.36\n\n\n1\n79.6\n4.02\n319.99\n7.03\n7.47\n\n\n1\n79.6\n4.02\n319.99\n9.05\n6.89\n\n\n1\n79.6\n4.02\n319.99\n12.12\n5.94\n\n\n1\n79.6\n4.02\n319.99\n24.37\n3.28\n\n\n\n\n\nThe dataset contains 12 subjects, 132 observations, and the following columns: subject id, body weight wt (kg), dose (mg/kg), absolute dose amt (mg), time (h), and conc (mg/L)."
+  },
+  {
+    "objectID": "reports/01_EDA_Report.html#data-quality-checks",
+    "href": "reports/01_EDA_Report.html#data-quality-checks",
+    "title": "Phase 1 — Exploratory Data Analysis",
+    "section": "3 Data-quality checks",
+    "text": "3 Data-quality checks\nrun_dq_checks() runs a battery of integrity checks — subject count, samples per subject, duplicate time points, missingness, negative concentrations, time monotonicity, baseline values, and plausible weight/dose ranges.\n\n\nCode\ndq &lt;- run_dq_checks(theoph)\n\ndq |&gt;\n  kbl(caption = \"Data-quality check results\") |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE) |&gt;\n  column_spec(2, bold = TRUE) |&gt;\n  row_spec(which(dq$status == \"FLAG\"), background = \"#FDEDEC\")\n\n\n\nData-quality check results\n\n\ncheck\nstatus\ndetail\n\n\n\n\nSubject count\nPASS\n12 unique subjects (expected 12)\n\n\nSamples per subject\nPASS\nrange 11–11 (Theoph has 11 samples/subject)\n\n\nDuplicate id×time rows\nPASS\n0 duplicate time points\n\n\nMissing values\nPASS\n0 NA cells across all columns\n\n\nNegative concentrations\nPASS\n0 negative conc values\n\n\nTime monotonic within subject\nPASS\n0 subjects with non-increasing time\n\n\nBaseline (t=0) concentrations\nPASS\nfirst-sample conc range 0–0.74 mg/L\n\n\nWeight range plausible\nPASS\n54.6–86.4 kg\n\n\nDose range plausible\nPASS\n3.1–5.86 mg/kg\n\n\n\n\n\nAll checks should report PASS — Theoph is a clean benchmark dataset (12 subjects × 11 samples, no missing or negative values, time strictly increasing within each subject)."
+  },
+  {
+    "objectID": "reports/01_EDA_Report.html#per-subject-summary",
+    "href": "reports/01_EDA_Report.html#per-subject-summary",
+    "title": "Phase 1 — Exploratory Data Analysis",
+    "section": "4 Per-subject summary",
+    "text": "4 Per-subject summary\nsubject_summary() collapses the data to one row per subject with demographics and observed PK landmarks (observed Cmax, Tmax, last sampled time/conc).\n\n\nCode\nss &lt;- subject_summary(theoph)\n\nss |&gt;\n  kbl(caption = \"Per-subject demographics and observed PK landmarks\",\n      digits = 2,\n      col.names = c(\"ID\", \"Wt (kg)\", \"Dose (mg/kg)\", \"Amt (mg)\", \"n\",\n                    \"Tmax (h)\", \"Cmax (mg/L)\", \"Tlast (h)\", \"Clast (mg/L)\")) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nPer-subject demographics and observed PK landmarks\n\n\nID\nWt (kg)\nDose (mg/kg)\nAmt (mg)\nn\nTmax (h)\nCmax (mg/L)\nTlast (h)\nClast (mg/L)\n\n\n\n\n1\n79.6\n4.02\n319.99\n11\n1.12\n10.50\n24.37\n3.28\n\n\n2\n72.4\n4.40\n318.56\n11\n1.92\n8.33\n24.30\n0.90\n\n\n3\n70.5\n4.53\n319.36\n11\n1.02\n8.20\n24.17\n1.05\n\n\n4\n72.7\n4.40\n319.88\n11\n1.07\n8.60\n24.65\n1.15\n\n\n5\n54.6\n5.86\n319.96\n11\n1.00\n11.40\n24.35\n1.57\n\n\n6\n80.0\n4.00\n320.00\n11\n1.15\n6.44\n23.85\n0.92\n\n\n7\n64.6\n4.95\n319.77\n11\n3.48\n7.09\n24.22\n1.15\n\n\n8\n70.5\n4.53\n319.36\n11\n2.02\n7.56\n24.12\n1.25\n\n\n9\n86.4\n3.10\n267.84\n11\n0.63\n9.03\n24.43\n1.12\n\n\n10\n58.2\n5.50\n320.10\n11\n3.55\n10.21\n23.70\n2.42\n\n\n11\n65.0\n4.92\n319.80\n11\n0.98\n8.00\n24.08\n0.86\n\n\n12\n60.5\n5.30\n320.65\n11\n3.52\n9.75\n24.15\n1.17\n\n\n\n\n\n\n\nCode\nss |&gt;\n  summarise(\n    `Weight (kg)`      = sprintf(\"%.1f (%.1f–%.1f)\", mean(wt), min(wt), max(wt)),\n    `Dose (mg/kg)`     = sprintf(\"%.2f (%.2f–%.2f)\", mean(dose_mgkg), min(dose_mgkg), max(dose_mgkg)),\n    `Observed Cmax`    = sprintf(\"%.1f (%.1f–%.1f)\", mean(cmax_obs), min(cmax_obs), max(cmax_obs)),\n    `Observed Tmax (h)`= sprintf(\"%.2f (%.2f–%.2f)\", mean(tmax_obs), min(tmax_obs), max(tmax_obs))\n  ) |&gt;\n  tidyr::pivot_longer(everything(), names_to = \"Parameter\", values_to = \"Mean (range)\") |&gt;\n  kbl(caption = \"Population descriptive statistics — mean (range)\") |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nPopulation descriptive statistics — mean (range)\n\n\nParameter\nMean (range)\n\n\n\n\nWeight (kg)\n69.6 (54.6–86.4)\n\n\nDose (mg/kg)\n4.63 (3.10–5.86)\n\n\nObserved Cmax\n8.8 (6.4–11.4)\n\n\nObserved Tmax (h)\n1.79 (0.63–3.55)"
+  },
+  {
+    "objectID": "reports/01_EDA_Report.html#individual-concentrationtime-profiles",
+    "href": "reports/01_EDA_Report.html#individual-concentrationtime-profiles",
+    "title": "Phase 1 — Exploratory Data Analysis",
+    "section": "5 Individual concentration–time profiles",
+    "text": "5 Individual concentration–time profiles\nEach subject shows the classic oral-absorption shape: a rising limb (absorption), a peak, then a log-linear decline (elimination).\n\n\nCode\neda_plot_individual(theoph, semilog = FALSE)\n\n\n\n\n\nIndividual concentration–time profiles (linear scale), faceted by subject.\n\n\n\n\nOn a semi-log scale the terminal decline is approximately linear, consistent with first-order (one-compartment) elimination.\n\n\nCode\neda_plot_individual(theoph, semilog = TRUE)\n\n\n\n\n\nIndividual profiles on a semi-log scale — a near-linear terminal slope supports one-compartment kinetics."
+  },
+  {
+    "objectID": "reports/01_EDA_Report.html#population-overview",
+    "href": "reports/01_EDA_Report.html#population-overview",
+    "title": "Phase 1 — Exploratory Data Analysis",
+    "section": "6 Population overview",
+    "text": "6 Population overview\nThe spaghetti plot overlays all subjects, exposing the spread of exposures and the consistent absorption/elimination pattern.\n\n\nCode\neda_plot_spaghetti(theoph)\n\n\n\n\n\nAll subjects overlaid (spaghetti plot).\n\n\n\n\nThe mean (± SD) profile summarises the central tendency and the magnitude of between-subject variability at each nominal time.\n\n\nCode\neda_plot_mean(theoph)\n\n\n\n\n\nMean concentration–time profile with ± SD ribbon."
+  },
+  {
+    "objectID": "reports/01_EDA_Report.html#body-weight-as-a-candidate-covariate",
+    "href": "reports/01_EDA_Report.html#body-weight-as-a-candidate-covariate",
+    "title": "Phase 1 — Exploratory Data Analysis",
+    "section": "7 Body weight as a candidate covariate",
+    "text": "7 Body weight as a candidate covariate\nBecause the dose is weight-normalised (mg/kg), every subject received an absolute dose proportional to weight. We inspect the weight distribution and the relationship between observed Cmax and weight to motivate the covariate testing in Phase 5.\n\n\nCode\neda_plot_weight(theoph)\n\n\n\n\n\nDistribution of body weight across the 12 subjects.\n\n\n\n\n\n\nCode\neda_plot_cmax_weight(ss)\n\n\n\n\n\nObserved Cmax vs body weight, with a linear fit and subject labels.\n\n\n\n\n\n\nCode\nct &lt;- cor.test(ss$wt, ss$cmax_obs)\n\n\nThe Pearson correlation between weight and observed Cmax is r = -0.38 (p = 0.22). This is exploratory only — formal covariate evaluation happens within the population model (Phase 5), where weight will be tested on clearance and volume."
+  },
+  {
+    "objectID": "reports/01_EDA_Report.html#key-takeaways",
+    "href": "reports/01_EDA_Report.html#key-takeaways",
+    "title": "Phase 1 — Exploratory Data Analysis",
+    "section": "8 Key takeaways",
+    "text": "8 Key takeaways\n\nThe dataset is clean and complete: 12 subjects, 11 samples each, no missing or negative values, time strictly increasing.\nProfiles are consistent with one-compartment oral PK with first-order absorption — the structural model carried into Phase 3.\nThere is meaningful between-subject variability in exposure, motivating an IIV model (Phase 4).\nBody weight is a physiologically plausible covariate worth testing on clearance and volume (Phase 5).\n\n\nNext: Phase 2 — Noncompartmental Analysis with PKNCA to quantify Cmax, Tmax, AUC, and half-life per subject."
+  }
+]
