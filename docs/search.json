@@ -215,5 +215,110 @@
     "title": "Phase 3 — Base Population PK Model",
     "section": "14 Key takeaways",
     "text": "14 Key takeaways\n\nThe data were re-expressed as a NONMEM event dataset (dose + observation rows).\nA one-compartment oral model with first-order absorption was fitted by FOCEi.\nTypical estimates (CL ≈ r round(cl_hat, 2) L/h, V ≈ r round(v_hat, 1) L, Ka ≈ r round(ka_hat, 2) /h) agree with the NCA — the structural model holds.\nThe base model includes IIV on CL only; the next phase adds variability on V and Ka.\n\n\nNext: Phase 4 — IIV model, extending between-subject variability to V and Ka and examining the random-effect (η) distributions.\n\n\n:::"
+  },
+  {
+    "objectID": "reports/04_IIV_Model_Report.html",
+    "href": "reports/04_IIV_Model_Report.html",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "",
+    "text": "The base model (Phase 3) allowed only clearance to vary between subjects. Here we add between-subject random effects on V and Ka as well, so each subject has their own clearance, volume, and absorption rate. We then test whether the extra variability is justified — better fit, well-estimated, and plausibly distributed."
+  },
+  {
+    "objectID": "reports/04_IIV_Model_Report.html#objectives",
+    "href": "reports/04_IIV_Model_Report.html#objectives",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "",
+    "text": "The base model (Phase 3) allowed only clearance to vary between subjects. Here we add between-subject random effects on V and Ka as well, so each subject has their own clearance, volume, and absorption rate. We then test whether the extra variability is justified — better fit, well-estimated, and plausibly distributed."
+  },
+  {
+    "objectID": "reports/04_IIV_Model_Report.html#what-a-random-effect-is",
+    "href": "reports/04_IIV_Model_Report.html#what-a-random-effect-is",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "2 What a random effect is",
+    "text": "2 What a random effect is\nFor each parameter we write, e.g., cl = exp(tcl + eta.cl), where eta.cl is a subject-specific deviation drawn from a normal distribution N(0, omega^2). The population shares one typical curve; each subject’s curve is a shifted version of it. The spread of those shifts — the IIV — is summarised as a CV%.\n\nprint(iiv_model)\n\nfunction () \n{\n    ini({\n        tka &lt;- log(1.5)\n        tcl &lt;- log(2.8)\n        tv &lt;- log(32)\n        eta.ka ~ 0.3\n        eta.cl ~ 0.1\n        eta.v ~ 0.1\n        add.sd &lt;- 0.2\n        prop.sd &lt;- 0.2\n    })\n    model({\n        ka &lt;- exp(tka + eta.ka)\n        cl &lt;- exp(tcl + eta.cl)\n        v &lt;- exp(tv + eta.v)\n        d/dt(depot) &lt;- -ka * depot\n        d/dt(center) &lt;- ka * depot - (cl/v) * center\n        cp &lt;- center/v\n        cp ~ add(add.sd) + prop(prop.sd)\n    })\n}"
+  },
+  {
+    "objectID": "reports/04_IIV_Model_Report.html#fit-the-iiv-model",
+    "href": "reports/04_IIV_Model_Report.html#fit-the-iiv-model",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "3 Fit the IIV model",
+    "text": "3 Fit the IIV model\n\n\nCode\ndat      &lt;- build_nonmem_data()\nbase_fit &lt;- readRDS(fs::path(PATH_MODELS, \"base_fit.rds\"))\niiv_fit  &lt;- fit_iiv_model(dat)\n\n\ncalculating covariance matrix\ndone\n\n\nCode\niiv_fit\n\n\n\\[\\begin{align*}\n{ka} & = \\exp\\left({tka}+{eta.ka}\\right) \\\\\n{cl} & = \\exp\\left({tcl}+{eta.cl}\\right) \\\\\n{v} & = \\exp\\left({tv}+{eta.v}\\right) \\\\\n\\frac{d \\: depot}{dt} & = -{ka} {\\times} {depot} \\\\\n\\frac{d \\: center}{dt} & = {ka} {\\times} {depot}-\\left(\\frac{{cl}}{{v}}\\right) {\\times} {center} \\\\\n{cp} & = \\frac{{center}}{{v}} \\\\\n{cp} & \\sim add({add.sd})+prop({prop.sd})\n\\end{align*}\\]"
+  },
+  {
+    "objectID": "reports/04_IIV_Model_Report.html#parameter-estimates",
+    "href": "reports/04_IIV_Model_Report.html#parameter-estimates",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "4 Parameter estimates",
+    "text": "4 Parameter estimates\n\n\nCode\nbase_param_table(iiv_fit) |&gt;\n  kbl(caption = \"IIV model estimates (fixed effects, IIV CV%, and shrinkage)\",\n      digits = 3) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nIIV model estimates (fixed effects, IIV CV%, and shrinkage)\n\n\nParameter\nEst.\nSE\n%RSE\nBack-transformed(95%CI)\nBSV(CV%)\nShrink(SD)%\n\n\n\n\ntka\n0.389\n0.198\n50.9\n1.48 (1, 2.17)\n68.8\n1.88%&lt;\n\n\ntcl\n1.03\n0.074\n7.22\n2.79 (2.41, 3.22)\n25.7\n1.12%&lt;\n\n\ntv\n3.47\n0.046\n1.33\n32 (29.3, 35)\n12.6\n15.7%&lt;\n\n\nadd.sd\n0.261\n\n\n0.261\n\n\n\n\nprop.sd\n0.136\n\n\n0.136\n\n\n\n\n\n\n\nRead the BSV(CV%) column for the size of each random effect and the Shrink(SD)% column for how well the data support it. As a rule of thumb, shrinkage under ~30% means the individual estimates are genuinely informed by the data rather than collapsing to the population mean."
+  },
+  {
+    "objectID": "reports/04_IIV_Model_Report.html#is-the-added-variability-justified",
+    "href": "reports/04_IIV_Model_Report.html#is-the-added-variability-justified",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "5 Is the added variability justified?",
+    "text": "5 Is the added variability justified?\nWe compare the base and IIV models by objective function value (OFV), and by AIC/BIC, which penalise extra parameters. By the likelihood-ratio test, adding two random effects (V and Ka) is significant at p &lt; 0.05 if the OFV drops by more than 5.99 (χ², 2 df).\n\n\nCode\ncmp &lt;- compare_models(\n  model_metrics(base_fit, \"Base (IIV on CL)\"),\n  model_metrics(iiv_fit,  \"IIV on CL, V, Ka\")\n)\ncmp |&gt;\n  kbl(caption = \"Base vs IIV model comparison\", digits = 2) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nBase vs IIV model comparison\n\n\nModel\nOFV\nAIC\nBIC\nnPar\ndOFV\ndAIC\n\n\n\n\nBase (IIV on CL)\n177.81\n432.41\n449.70\n6\n0.00\n0.00\n\n\nIIV on CL, V, Ka\n104.36\n362.96\n386.02\n8\n-73.45\n-69.45\n\n\n\n\n\nThe IIV model lowers the OFV by 73.45 points relative to base (ΔAIC = -69.45). A drop well beyond the 5.99 threshold means the between-subject variability on V and Ka is statistically warranted — the model genuinely fits better, not just by added flexibility."
+  },
+  {
+    "objectID": "reports/04_IIV_Model_Report.html#random-effect-distributions",
+    "href": "reports/04_IIV_Model_Report.html#random-effect-distributions",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "6 Random-effect distributions",
+    "text": "6 Random-effect distributions\nThe empirical-Bayes η estimates should be centred on 0 and roughly symmetric — the model’s normality assumption.\n\n\nCode\niiv_plot_eta(iiv_fit)\n\n\n\n\n\nEta distributions for CL, V, and Ka (centred on zero = assumption met)."
+  },
+  {
+    "objectID": "reports/04_IIV_Model_Report.html#key-takeaways",
+    "href": "reports/04_IIV_Model_Report.html#key-takeaways",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "7 Key takeaways",
+    "text": "7 Key takeaways\n\nRandom effects on V and Ka were added to the base (CL-only) model.\nThe OFV fell by 73.45 (≫ the 5.99 cut-off for 2 df), so the extra IIV is justified.\nShrinkage and the η distributions indicate the random effects are data-supported, not artefacts.\nThis full-IIV model is now the reference onto which we test a covariate (body weight) next.\n\n\nNext: Phase 5 — Covariate model, testing whether body weight explains part of the between-subject variability in CL and V.\n\n\n\n\n\n:::{#quarto-navigation-envelope .hidden}\n[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1zaWRlYmFyLXRpdGxl\"}\n[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXItdGl0bGU=\"}\n[Home]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6SG9tZQ==\"}\n[/index.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L2luZGV4Lmh0bWw=\"}\n[Reports]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6UmVwb3J0cw==\"}\n[1. Exploratory Data Analysis]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6MS4gRXhwbG9yYXRvcnkgRGF0YSBBbmFseXNpcw==\"}\n[/reports/01_EDA_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDFfRURBX1JlcG9ydC5odG1s\"}\n[2. Noncompartmental Analysis]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6Mi4gTm9uY29tcGFydG1lbnRhbCBBbmFseXNpcw==\"}\n[/reports/02_NCA_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDJfTkNBX1JlcG9ydC5odG1s\"}\n[3. Base PopPK Model]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6My4gQmFzZSBQb3BQSyBNb2RlbA==\"}\n[/reports/03_Base_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDNfQmFzZV9Nb2RlbF9SZXBvcnQuaHRtbA==\"}\n[4. IIV Model]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6NC4gSUlWIE1vZGVs\"}\n[/reports/04_IIV_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDRfSUlWX01vZGVsX1JlcG9ydC5odG1s\"}\n[5. Covariate Model]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6NS4gQ292YXJpYXRlIE1vZGVs\"}\n[/reports/05_Covariate_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDVfQ292YXJpYXRlX01vZGVsX1JlcG9ydC5odG1s\"}\n[6. Model Diagnostics]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6Ni4gTW9kZWwgRGlhZ25vc3RpY3M=\"}\n[/reports/06_Model_Diagnostics.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDZfTW9kZWxfRGlhZ25vc3RpY3MuaHRtbA==\"}\n[7. Simulation]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6Ny4gU2ltdWxhdGlvbg==\"}\n[/reports/07_Simulation_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDdfU2ltdWxhdGlvbl9SZXBvcnQuaHRtbA==\"}\n[https://github.com/]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW5hdmJhci10b29sczpodHRwczovL2dpdGh1Yi5jb20v\"}\n\n:::{.hidden .quarto-markdown-envelope-contents render-id=\"Zm9vdGVyLWNlbnRlcg==\"}\nPopulation PK Portfolio · Theophylline · Built in R with nlmixr2, PKNCA & Quarto\n:::\n\n:::\n\n\n\n:::{#quarto-meta-markdown .hidden}\n[Phase 4 — Inter-Individual Variability (IIV) – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW1ldGF0aXRsZQ==\"}\n[Phase 4 — Inter-Individual Variability (IIV) – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLXR3aXR0ZXJjYXJkdGl0bGU=\"}\n[Phase 4 — Inter-Individual Variability (IIV) – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW9nY2FyZHRpdGxl\"}\n[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW1ldGFzaXRlbmFtZQ==\"}\n[Adding random effects on CL, V, and Ka]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLXR3aXR0ZXJjYXJkZGVzYw==\"}\n[Adding random effects on CL, V, and Ka]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW9nY2FyZGRkZXNj\"}\n[End-to-end population pharmacokinetics analysis of the Theophylline dataset in R.]{.hidden .quarto-markdown-envelope-contents render-id=\"cXVhcnRvLW1ldGFzaXRlZGVzYw==\"}\n:::\n\n\n\n\n&lt;!-- --&gt;\n\n::: {.quarto-embedded-source-code}\n```````````````````{.markdown shortcodes=\"false\"}\n---\ntitle: \"Phase 4 — Inter-Individual Variability (IIV)\"\nsubtitle: \"Adding random effects on CL, V, and Ka\"\nauthor: \"Pramod BR\"\ndate: today\nformat:\n  html:\n    theme: cosmo\n    toc: true\n    toc-depth: 3\n    code-fold: true\n    code-tools: true\n    number-sections: true\n    fig-width: 8\n    fig-height: 6\nexecute:\n  echo: true\n  warning: false\n  message: false\n---\n\n```{r setup}\n#| include: false\nhere::i_am(\"reports/04_IIV_Model_Report.qmd\")\nsource(here::here(\"R\", \"04_iiv_model.R\"))\nlibrary(kableExtra)"
+  },
+  {
+    "objectID": "reports/04_IIV_Model_Report.html#objectives-1",
+    "href": "reports/04_IIV_Model_Report.html#objectives-1",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "8 Objectives",
+    "text": "8 Objectives\nThe base model (Phase 3) allowed only clearance to vary between subjects. Here we add between-subject random effects on V and Ka as well, so each subject has their own clearance, volume, and absorption rate. We then test whether the extra variability is justified — better fit, well-estimated, and plausibly distributed."
+  },
+  {
+    "objectID": "reports/04_IIV_Model_Report.html#what-a-random-effect-is-1",
+    "href": "reports/04_IIV_Model_Report.html#what-a-random-effect-is-1",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "9 What a random effect is",
+    "text": "9 What a random effect is\nFor each parameter we write, e.g., cl = exp(tcl + eta.cl), where eta.cl is a subject-specific deviation drawn from a normal distribution N(0, omega^2). The population shares one typical curve; each subject’s curve is a shifted version of it. The spread of those shifts — the IIV — is summarised as a CV%.\n#| code-fold: false\nprint(iiv_model)"
+  },
+  {
+    "objectID": "reports/04_IIV_Model_Report.html#fit-the-iiv-model-1",
+    "href": "reports/04_IIV_Model_Report.html#fit-the-iiv-model-1",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "10 Fit the IIV model",
+    "text": "10 Fit the IIV model\n#| cache: true\ndat      &lt;- build_nonmem_data()\nbase_fit &lt;- readRDS(fs::path(PATH_MODELS, \"base_fit.rds\"))\niiv_fit  &lt;- fit_iiv_model(dat)\niiv_fit"
+  },
+  {
+    "objectID": "reports/04_IIV_Model_Report.html#parameter-estimates-1",
+    "href": "reports/04_IIV_Model_Report.html#parameter-estimates-1",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "11 Parameter estimates",
+    "text": "11 Parameter estimates\nbase_param_table(iiv_fit) |&gt;\n  kbl(caption = \"IIV model estimates (fixed effects, IIV CV%, and shrinkage)\",\n      digits = 3) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\nRead the BSV(CV%) column for the size of each random effect and the Shrink(SD)% column for how well the data support it. As a rule of thumb, shrinkage under ~30% means the individual estimates are genuinely informed by the data rather than collapsing to the population mean."
+  },
+  {
+    "objectID": "reports/04_IIV_Model_Report.html#is-the-added-variability-justified-1",
+    "href": "reports/04_IIV_Model_Report.html#is-the-added-variability-justified-1",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "12 Is the added variability justified?",
+    "text": "12 Is the added variability justified?\nWe compare the base and IIV models by objective function value (OFV), and by AIC/BIC, which penalise extra parameters. By the likelihood-ratio test, adding two random effects (V and Ka) is significant at p &lt; 0.05 if the OFV drops by more than 5.99 (χ², 2 df).\ncmp &lt;- compare_models(\n  model_metrics(base_fit, \"Base (IIV on CL)\"),\n  model_metrics(iiv_fit,  \"IIV on CL, V, Ka\")\n)\ncmp |&gt;\n  kbl(caption = \"Base vs IIV model comparison\", digits = 2) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n#| include: false\ndofv &lt;- cmp$dOFV[2]\ndaic &lt;- cmp$dAIC[2]\nThe IIV model lowers the OFV by r abs(round(dofv,2)) points relative to base (ΔAIC = r round(daic,2)). A drop well beyond the 5.99 threshold means the between-subject variability on V and Ka is statistically warranted — the model genuinely fits better, not just by added flexibility."
+  },
+  {
+    "objectID": "reports/04_IIV_Model_Report.html#random-effect-distributions-1",
+    "href": "reports/04_IIV_Model_Report.html#random-effect-distributions-1",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "13 Random-effect distributions",
+    "text": "13 Random-effect distributions\nThe empirical-Bayes η estimates should be centred on 0 and roughly symmetric — the model’s normality assumption.\n#| fig-cap: \"Eta distributions for CL, V, and Ka (centred on zero = assumption met).\"\niiv_plot_eta(iiv_fit)"
+  },
+  {
+    "objectID": "reports/04_IIV_Model_Report.html#key-takeaways-1",
+    "href": "reports/04_IIV_Model_Report.html#key-takeaways-1",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "14 Key takeaways",
+    "text": "14 Key takeaways\n\nRandom effects on V and Ka were added to the base (CL-only) model.\nThe OFV fell by r abs(round(dofv,2)) (≫ the 5.99 cut-off for 2 df), so the extra IIV is justified.\nShrinkage and the η distributions indicate the random effects are data-supported, not artefacts.\nThis full-IIV model is now the reference onto which we test a covariate (body weight) next.\n\n\nNext: Phase 5 — Covariate model, testing whether body weight explains part of the between-subject variability in CL and V.\n\n\n:::"
   }
 ]

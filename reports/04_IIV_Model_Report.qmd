@@ -1,12 +1,125 @@
 ---
-title: "Phase 4 – Interindividual Variability (IIV)"
+title: "Phase 4 — Inter-Individual Variability (IIV)"
+subtitle: "Adding random effects on CL, V, and Ka"
 author: "Pramod BR"
 date: today
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-tools: true
+    number-sections: true
+    fig-width: 8
+    fig-height: 6
+execute:
+  echo: true
+  warning: false
+  message: false
 ---
 
-```{r setup, include=FALSE}
-source(here::here("R", "00_setup.R"))
+```{r setup}
+#| include: false
+here::i_am("reports/04_IIV_Model_Report.qmd")
+source(here::here("R", "04_iiv_model.R"))
+library(kableExtra)
 ```
 
-> **Status:** This report will be built in the corresponding phase.
+## Objectives
 
+The base model (Phase 3) allowed only **clearance** to vary between subjects. Here
+we add **between-subject random effects** on **V** and **Ka** as well, so each
+subject has their own clearance, volume, *and* absorption rate. We then test
+whether the extra variability is justified — better fit, well-estimated, and
+plausibly distributed.
+
+## What a random effect is
+
+For each parameter we write, e.g., `cl = exp(tcl + eta.cl)`, where `eta.cl` is a
+subject-specific deviation drawn from a normal distribution `N(0, omega^2)`. The
+population shares one typical curve; each subject's curve is a shifted version of
+it. The spread of those shifts — the IIV — is summarised as a **CV%**.
+
+```{r show-model}
+#| code-fold: false
+print(iiv_model)
+```
+
+## Fit the IIV model
+
+```{r fit-iiv}
+#| cache: true
+dat      <- build_nonmem_data()
+base_fit <- readRDS(fs::path(PATH_MODELS, "base_fit.rds"))
+iiv_fit  <- fit_iiv_model(dat)
+iiv_fit
+```
+
+## Parameter estimates
+
+```{r iiv-params}
+base_param_table(iiv_fit) |>
+  kbl(caption = "IIV model estimates (fixed effects, IIV CV%, and shrinkage)",
+      digits = 3) |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE)
+```
+
+Read the **BSV(CV%)** column for the size of each random effect and the
+**Shrink(SD)%** column for how well the data support it. As a rule of thumb,
+shrinkage under ~30% means the individual estimates are genuinely informed by the
+data rather than collapsing to the population mean.
+
+## Is the added variability justified?
+
+We compare the base and IIV models by objective function value (**OFV**), and by
+**AIC/BIC**, which penalise extra parameters. By the likelihood-ratio test, adding
+two random effects (V and Ka) is significant at p < 0.05 if the OFV drops by more
+than **5.99** (χ², 2 df).
+
+```{r compare}
+cmp <- compare_models(
+  model_metrics(base_fit, "Base (IIV on CL)"),
+  model_metrics(iiv_fit,  "IIV on CL, V, Ka")
+)
+cmp |>
+  kbl(caption = "Base vs IIV model comparison", digits = 2) |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE)
+```
+
+```{r compare-text}
+#| include: false
+dofv <- cmp$dOFV[2]
+daic <- cmp$dAIC[2]
+```
+
+The IIV model lowers the OFV by **`r abs(round(dofv,2))`** points relative to base
+(ΔAIC = `r round(daic,2)`). A drop well beyond the 5.99 threshold means the
+between-subject variability on V and Ka is **statistically warranted** — the model
+genuinely fits better, not just by added flexibility.
+
+## Random-effect distributions
+
+The empirical-Bayes η estimates should be centred on 0 and roughly symmetric — the
+model's normality assumption.
+
+```{r eta-plot}
+#| fig-cap: "Eta distributions for CL, V, and Ka (centred on zero = assumption met)."
+iiv_plot_eta(iiv_fit)
+```
+
+## Key takeaways
+
+- Random effects on **V and Ka** were added to the base (CL-only) model.
+- The OFV fell by **`r abs(round(dofv,2))`** (≫ the 5.99 cut-off for 2 df), so the
+  extra IIV is **justified**.
+- Shrinkage and the η distributions indicate the random effects are
+  data-supported, not artefacts.
+- This full-IIV model is now the reference onto which we test a **covariate**
+  (body weight) next.
+
+> Next: **Phase 5 — Covariate model**, testing whether body weight explains part of
+> the between-subject variability in CL and V.
+```
