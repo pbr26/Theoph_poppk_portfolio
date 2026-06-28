@@ -1,0 +1,92 @@
+---
+title: "Phase 10 — Bootstrap Confidence Intervals"
+subtitle: "Empirical parameter uncertainty by subject resampling"
+author: "Pramod BR"
+date: today
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    number-sections: true
+    fig-width: 8
+    fig-height: 6
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+here::i_am("reports/09_Bootstrap_Report.qmd")
+source(here::here("R", "09_bootstrap.R"))
+library(kableExtra)
+```
+
+## Objectives
+
+The parameter CIs reported so far are **asymptotic** — derived from the covariance
+matrix under large-sample, normal assumptions. With only 12 subjects those
+assumptions are questionable. This phase computes **bootstrap** CIs that make no
+such assumption, and compares the two.
+
+## Method — case (subject) resampling
+
+We repeatedly draw 12 subjects **with replacement** from the original 12, refit the
+IIV model to each resampled dataset, and collect the fixed effects. The 2.5th and
+97.5th percentiles of those estimates form an empirical 95% CI.
+
+```{r run-boot}
+#| cache: true
+dat  <- build_nonmem_data()
+fit  <- load_iiv_fit()
+boot <- run_bootstrap(dat, nboot = 50)
+```
+
+```{r conv}
+#| include: false
+rate <- round(100 * boot$n_success / boot$n_attempt)
+```
+
+**`r boot$n_success` of `r boot$n_attempt`** replicates converged
+(`r rate`%). A convergence rate below 100% is normal — some resamples produce
+awkward datasets (e.g. the same subject drawn several times) — and the rate itself
+is a useful stability check.
+
+## Asymptotic vs bootstrap 95% CI
+
+```{r summary}
+boot_summary(boot, fit) |>
+  kbl(caption = "Point estimate with bootstrap median and 95% percentile interval",
+      digits = 3) |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE)
+```
+
+Read this against the asymptotic CIs from Phase 4. **Agreement** between the two
+reassures us the asymptotic SEs were trustworthy; a **wider or skewed** bootstrap
+interval (most likely for **Ka**, the least precise parameter) reveals uncertainty
+the formula understated.
+
+## Bootstrap distributions
+
+```{r boot-fig}
+#| fig-cap: "Bootstrap sampling distributions of CL, V, and Ka (dashed = 95% percentile interval)."
+boot_plot(boot)
+```
+
+## Key takeaways
+
+- Parameter uncertainty was quantified **empirically** by subject resampling,
+  free of the normality assumption behind asymptotic SEs.
+- The bootstrap and asymptotic CIs can be compared directly; close agreement
+  validates the reported precision, while divergence (typically for Ka) flags
+  small-sample fragility.
+- With n = 12 the bootstrap is itself coarse and presented as a **demonstration of
+  method** — exactly how it would be framed for a small study.
+
+> Next (Phase 11): a **covariate forest plot** summarising the weight effect on
+> CL and V with confidence intervals.
+```

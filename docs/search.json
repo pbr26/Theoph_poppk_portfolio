@@ -439,5 +439,47 @@
     "title": "Phase 9 — One- vs Two-Compartment Comparison",
     "section": "5 Key takeaways",
     "text": "5 Key takeaways\n\nA full two-compartment oral model was fitted and compared head-to-head with the selected one-compartment model.\nDecision by ΔOFV / ΔAIC / BIC: the two-compartment model is rejected in favour of the simpler 1-compartment model.\nFor theophylline, the one-compartment structure is well established, so rejecting the extra compartment is the expected and parsimonious result — confirming the structural choice made back in Phase 3.\n\n\nNext (Phase 10): bootstrap confidence intervals on the final model to quantify parameter uncertainty empirically. ```"
+  },
+  {
+    "objectID": "reports/09_Bootstrap_Report.html",
+    "href": "reports/09_Bootstrap_Report.html",
+    "title": "Phase 10 — Bootstrap Confidence Intervals",
+    "section": "",
+    "text": "The parameter CIs reported so far are asymptotic — derived from the covariance matrix under large-sample, normal assumptions. With only 12 subjects those assumptions are questionable. This phase computes bootstrap CIs that make no such assumption, and compares the two."
+  },
+  {
+    "objectID": "reports/09_Bootstrap_Report.html#objectives",
+    "href": "reports/09_Bootstrap_Report.html#objectives",
+    "title": "Phase 10 — Bootstrap Confidence Intervals",
+    "section": "",
+    "text": "The parameter CIs reported so far are asymptotic — derived from the covariance matrix under large-sample, normal assumptions. With only 12 subjects those assumptions are questionable. This phase computes bootstrap CIs that make no such assumption, and compares the two."
+  },
+  {
+    "objectID": "reports/09_Bootstrap_Report.html#method-case-subject-resampling",
+    "href": "reports/09_Bootstrap_Report.html#method-case-subject-resampling",
+    "title": "Phase 10 — Bootstrap Confidence Intervals",
+    "section": "2 Method — case (subject) resampling",
+    "text": "2 Method — case (subject) resampling\nWe repeatedly draw 12 subjects with replacement from the original 12, refit the IIV model to each resampled dataset, and collect the fixed effects. The 2.5th and 97.5th percentiles of those estimates form an empirical 95% CI.\n\n\nCode\ndat  &lt;- build_nonmem_data()\nfit  &lt;- load_iiv_fit()\nboot &lt;- run_bootstrap(dat, nboot = 50)\n\n\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\n\n\n50 of 50 replicates converged (100%). A convergence rate below 100% is normal — some resamples produce awkward datasets (e.g. the same subject drawn several times) — and the rate itself is a useful stability check."
+  },
+  {
+    "objectID": "reports/09_Bootstrap_Report.html#asymptotic-vs-bootstrap-95-ci",
+    "href": "reports/09_Bootstrap_Report.html#asymptotic-vs-bootstrap-95-ci",
+    "title": "Phase 10 — Bootstrap Confidence Intervals",
+    "section": "3 Asymptotic vs bootstrap 95% CI",
+    "text": "3 Asymptotic vs bootstrap 95% CI\n\n\nCode\nboot_summary(boot, fit) |&gt;\n  kbl(caption = \"Point estimate with bootstrap median and 95% percentile interval\",\n      digits = 3) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nPoint estimate with bootstrap median and 95% percentile interval\n\n\nParameter\nEstimate\nBoot median\nBoot 2.5%\nBoot 97.5%\n\n\n\n\nka\n1.475\n1.441\n1.135\n2.417\n\n\ncl\n2.787\n2.806\n2.399\n3.297\n\n\nv\n32.010\n31.981\n29.248\n35.285\n\n\nadd.sd\n0.261\n0.237\n0.043\n0.476\n\n\nprop.sd\n0.136\n0.141\n0.058\n0.193\n\n\n\n\n\nRead this against the asymptotic CIs from Phase 4. Agreement between the two reassures us the asymptotic SEs were trustworthy; a wider or skewed bootstrap interval (most likely for Ka, the least precise parameter) reveals uncertainty the formula understated."
+  },
+  {
+    "objectID": "reports/09_Bootstrap_Report.html#bootstrap-distributions",
+    "href": "reports/09_Bootstrap_Report.html#bootstrap-distributions",
+    "title": "Phase 10 — Bootstrap Confidence Intervals",
+    "section": "4 Bootstrap distributions",
+    "text": "4 Bootstrap distributions\n\n\nCode\nboot_plot(boot)\n\n\n\n\n\nBootstrap sampling distributions of CL, V, and Ka (dashed = 95% percentile interval)."
+  },
+  {
+    "objectID": "reports/09_Bootstrap_Report.html#key-takeaways",
+    "href": "reports/09_Bootstrap_Report.html#key-takeaways",
+    "title": "Phase 10 — Bootstrap Confidence Intervals",
+    "section": "5 Key takeaways",
+    "text": "5 Key takeaways\n\nParameter uncertainty was quantified empirically by subject resampling, free of the normality assumption behind asymptotic SEs.\nThe bootstrap and asymptotic CIs can be compared directly; close agreement validates the reported precision, while divergence (typically for Ka) flags small-sample fragility.\nWith n = 12 the bootstrap is itself coarse and presented as a demonstration of method — exactly how it would be framed for a small study.\n\n\nNext (Phase 11): a covariate forest plot summarising the weight effect on CL and V with confidence intervals. ```"
   }
 ]

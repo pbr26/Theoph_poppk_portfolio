@@ -11,6 +11,7 @@ project:
     - reports/06_Model_Diagnostics.qmd
     - reports/07_Simulation_Report.qmd
     - reports/08_Two_Compartment_Report.qmd
+    - reports/09_Bootstrap_Report.qmd
 
 website:
   title: "PopPK Portfolio – Theophylline"
@@ -40,6 +41,8 @@ website:
             href: reports/07_Simulation_Report.html
           - text: "9. 1- vs 2-Compartment"
             href: reports/08_Two_Compartment_Report.html
+          - text: "10. Bootstrap CIs"
+            href: reports/09_Bootstrap_Report.html
     tools:
       - icon: github
         href: https://github.com/pbr26/Theoph_poppk_portfolio
