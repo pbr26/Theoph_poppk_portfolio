@@ -68,22 +68,20 @@ forest_plot(fd)
 
 ## Interpretation
 
-```{r interp}
-#| include: false
-crosses_one <- any(fd$lo < 1 & fd$hi > 1)
-```
-
-Every interval **`r if (crosses_one) "crosses 1.0 and sits largely within the 0.8–1.25 band" else "is informative"`**.
-This is the visual confirmation of the Phase 5 conclusion: in this dataset the
-body-weight effect on CL and V is **neither statistically supported nor clinically
-relevant**. No weight-based dose adjustment is warranted by these data.
+The **clearance** intervals comfortably **cross 1.0**, so weight is not
+distinguishable from "no effect" on CL. The **volume** intervals *just* exclude 1.0
+— a small effect, consistent with the marginally non-zero V exponent in Phase 5 —
+but they remain **within the 0.8–1.25 band**, so even where an effect is detectable
+it is **not clinically relevant**. Together with the Phase 5 likelihood-ratio test
+(ΔOFV = −3.65, short of the 5.99 cut-off for the two exponents jointly), the verdict
+is that body weight does **not warrant a dose adjustment** in this dataset.
 
 ## Key takeaways
 
 - The forest plot translates a covariate effect into the question clinicians
   actually care about: *does it change exposure enough to change dosing?*
-- For Theophylline weight here, the answer is **no** — wide CIs spanning 1.0, inside
-  the no-effect band.
+- For Theophylline weight here, the answer is **no** — the intervals sit at or within
+  the no-effect band (CL spans 1.0; V shows only a small, sub-clinical effect).
 - Reporting a covariate honestly as **not clinically relevant**, with a clear
   figure, is sound pharmacometric practice — and a fitting close to the portfolio.
 

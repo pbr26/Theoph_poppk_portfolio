@@ -39,14 +39,14 @@
     "href": "reports/10_Forest_Plot_Report.html#interpretation",
     "title": "Phase 11 — Covariate Forest Plot",
     "section": "5 Interpretation",
-    "text": "5 Interpretation\nEvery interval crosses 1.0 and sits largely within the 0.8–1.25 band. This is the visual confirmation of the Phase 5 conclusion: in this dataset the body-weight effect on CL and V is neither statistically supported nor clinically relevant. No weight-based dose adjustment is warranted by these data."
+    "text": "5 Interpretation\nThe clearance intervals comfortably cross 1.0, so weight is not distinguishable from “no effect” on CL. The volume intervals just exclude 1.0 — a small effect, consistent with the marginally non-zero V exponent in Phase 5 — but they remain within the 0.8–1.25 band, so even where an effect is detectable it is not clinically relevant. Together with the Phase 5 likelihood-ratio test (ΔOFV = −3.65, short of the 5.99 cut-off for the two exponents jointly), the verdict is that body weight does not warrant a dose adjustment in this dataset."
   },
   {
     "objectID": "reports/10_Forest_Plot_Report.html#key-takeaways",
     "href": "reports/10_Forest_Plot_Report.html#key-takeaways",
     "title": "Phase 11 — Covariate Forest Plot",
     "section": "6 Key takeaways",
-    "text": "6 Key takeaways\n\nThe forest plot translates a covariate effect into the question clinicians actually care about: does it change exposure enough to change dosing?\nFor Theophylline weight here, the answer is no — wide CIs spanning 1.0, inside the no-effect band.\nReporting a covariate honestly as not clinically relevant, with a clear figure, is sound pharmacometric practice — and a fitting close to the portfolio.\n\n\nThis completes the extended portfolio: EDA → NCA → base → IIV → covariate → diagnostics → simulation → 2-compartment check → bootstrap → forest plot. ```"
+    "text": "6 Key takeaways\n\nThe forest plot translates a covariate effect into the question clinicians actually care about: does it change exposure enough to change dosing?\nFor Theophylline weight here, the answer is no — the intervals sit at or within the no-effect band (CL spans 1.0; V shows only a small, sub-clinical effect).\nReporting a covariate honestly as not clinically relevant, with a clear figure, is sound pharmacometric practice — and a fitting close to the portfolio.\n\n\nThis completes the extended portfolio: EDA → NCA → base → IIV → covariate → diagnostics → simulation → 2-compartment check → bootstrap → forest plot. ```"
   },
   {
     "objectID": "reports/08_Two_Compartment_Report.html",
