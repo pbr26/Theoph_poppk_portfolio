@@ -1,0 +1,105 @@
+---
+title: "Phase 9 — One- vs Two-Compartment Comparison"
+subtitle: "Structural model selection: is a peripheral compartment justified?"
+author: "Pramod BR"
+date: today
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    number-sections: true
+    fig-width: 8
+    fig-height: 6
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+here::i_am("reports/08_Two_Compartment_Report.qmd")
+source(here::here("R", "08_two_compartment.R"))
+library(kableExtra)
+```
+
+## Objectives
+
+The whole analysis assumed a **one-compartment** structure. Here we test that
+assumption directly by fitting a **two-compartment** model and asking whether the
+extra peripheral compartment is statistically justified. Demonstrating that a more
+complex model can be fitted *and correctly accepted or rejected* is core
+model-selection judgement.
+
+## The two-compartment model
+
+A peripheral compartment lets drug distribute into tissues and return, producing a
+biphasic semilog decline. Two new parameters appear: **Q** (inter-compartmental
+clearance) and **V2** (peripheral volume); the central volume becomes **Vc**.
+
+```{r show-model}
+#| code-fold: false
+print(two_cmt_model)
+```
+
+## Fit and compare
+
+```{r fit}
+#| cache: true
+dat     <- build_nonmem_data()
+iiv_fit <- load_iiv_fit()
+two_fit <- fit_two_cmt_model(dat)
+```
+
+```{r params}
+base_param_table(two_fit) |>
+  kbl(caption = "Two-compartment model estimates", digits = 3) |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE)
+```
+
+The key diagnostic for *worth* is whether **Q** and **V2** are precisely estimated
+(reasonable %RSE) — if their relative standard errors are very large, the data
+cannot support a peripheral compartment.
+
+## Model selection
+
+Adding two parameters is justified (p < 0.05) only if the OFV drops by more than
+**5.99** (χ², 2 df); AIC/BIC additionally penalise complexity.
+
+```{r compare}
+cmp <- compare_models(
+  model_metrics(iiv_fit, "1-compartment (selected)"),
+  model_metrics(two_fit, "2-compartment")
+)
+cmp |>
+  kbl(caption = "1- vs 2-compartment model comparison", digits = 2) |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE)
+```
+
+```{r verdict}
+#| include: false
+dofv <- cmp$dOFV[2]; daic <- cmp$dAIC[2]
+justified <- !is.na(dofv) && dofv < -5.99 && !is.na(daic) && daic < 0
+```
+
+Here ΔOFV = **`r round(dofv, 2)`** and ΔAIC = **`r round(daic, 2)`**. The
+two-compartment model is therefore **`r if (justified) "supported" else "not supported"`**:
+`r if (justified) "the peripheral compartment improves the fit beyond the complexity penalty." else "the extra compartment does not improve the fit enough to justify two more parameters."`
+
+## Key takeaways
+
+- A full **two-compartment** oral model was fitted and compared head-to-head with
+  the selected one-compartment model.
+- Decision by **ΔOFV / ΔAIC / BIC**: the two-compartment model is
+  **`r if (justified) "preferred" else "rejected in favour of the simpler 1-compartment model"`**.
+- For theophylline, the one-compartment structure is well established, so rejecting
+  the extra compartment is the expected and **parsimonious** result — confirming the
+  structural choice made back in Phase 3.
+
+> Next (Phase 10): **bootstrap confidence intervals** on the final model to quantify
+> parameter uncertainty empirically.
+```

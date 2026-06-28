@@ -397,5 +397,47 @@
     "title": "Phase 6 — Model Diagnostics",
     "section": "4 Key takeaways",
     "text": "4 Key takeaways\n\nGOF: observed-vs-predicted should track the identity line, tighter for IPRED.\nCWRES: a flat, ±2 band with no time/PRED trend indicates the structural and error models are adequate.\nVPC: observed percentiles inside the simulated intervals confirm the model captures central tendency and variability.\nPassing these checks is what licenses the model for the clinical simulations in the next phase.\n\n\nNext: Phase 7 — Simulation: use the qualified model to simulate PK profiles for a typical patient and weight-based subgroups. ```"
+  },
+  {
+    "objectID": "reports/08_Two_Compartment_Report.html",
+    "href": "reports/08_Two_Compartment_Report.html",
+    "title": "Phase 9 — One- vs Two-Compartment Comparison",
+    "section": "",
+    "text": "The whole analysis assumed a one-compartment structure. Here we test that assumption directly by fitting a two-compartment model and asking whether the extra peripheral compartment is statistically justified. Demonstrating that a more complex model can be fitted and correctly accepted or rejected is core model-selection judgement."
+  },
+  {
+    "objectID": "reports/08_Two_Compartment_Report.html#objectives",
+    "href": "reports/08_Two_Compartment_Report.html#objectives",
+    "title": "Phase 9 — One- vs Two-Compartment Comparison",
+    "section": "",
+    "text": "The whole analysis assumed a one-compartment structure. Here we test that assumption directly by fitting a two-compartment model and asking whether the extra peripheral compartment is statistically justified. Demonstrating that a more complex model can be fitted and correctly accepted or rejected is core model-selection judgement."
+  },
+  {
+    "objectID": "reports/08_Two_Compartment_Report.html#the-two-compartment-model",
+    "href": "reports/08_Two_Compartment_Report.html#the-two-compartment-model",
+    "title": "Phase 9 — One- vs Two-Compartment Comparison",
+    "section": "2 The two-compartment model",
+    "text": "2 The two-compartment model\nA peripheral compartment lets drug distribute into tissues and return, producing a biphasic semilog decline. Two new parameters appear: Q (inter-compartmental clearance) and V2 (peripheral volume); the central volume becomes Vc.\n\nprint(two_cmt_model)\n\nfunction () \n{\n    ini({\n        tka &lt;- log(1.5)\n        tcl &lt;- log(2.8)\n        tvc &lt;- log(32)\n        tq &lt;- log(2)\n        tvp &lt;- log(10)\n        eta.ka ~ 0.3\n        eta.cl ~ 0.1\n        eta.vc ~ 0.1\n        add.sd &lt;- 0.2\n        prop.sd &lt;- 0.2\n    })\n    model({\n        ka &lt;- exp(tka + eta.ka)\n        cl &lt;- exp(tcl + eta.cl)\n        vc &lt;- exp(tvc + eta.vc)\n        q &lt;- exp(tq)\n        vp &lt;- exp(tvp)\n        d/dt(depot) &lt;- -ka * depot\n        d/dt(center) &lt;- ka * depot - (cl/vc) * center - (q/vc) * \n            center + (q/vp) * periph\n        d/dt(periph) &lt;- (q/vc) * center - (q/vp) * periph\n        cp &lt;- center/vc\n        cp ~ add(add.sd) + prop(prop.sd)\n    })\n}"
+  },
+  {
+    "objectID": "reports/08_Two_Compartment_Report.html#fit-and-compare",
+    "href": "reports/08_Two_Compartment_Report.html#fit-and-compare",
+    "title": "Phase 9 — One- vs Two-Compartment Comparison",
+    "section": "3 Fit and compare",
+    "text": "3 Fit and compare\n\n\nCode\ndat     &lt;- build_nonmem_data()\niiv_fit &lt;- load_iiv_fit()\ntwo_fit &lt;- fit_two_cmt_model(dat)\n\n\ncalculating covariance matrix\ndone\n\n\n\n\nCode\nbase_param_table(two_fit) |&gt;\n  kbl(caption = \"Two-compartment model estimates\", digits = 3) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nTwo-compartment model estimates\n\n\nParameter\nEst.\nSE\n%RSE\nBack-transformed(95%CI)\nBSV(CV%)\nShrink(SD)%\n\n\n\n\ntka\n0.259\n0.214\n82.9\n1.3 (0.851, 1.97)\n67.8\n1.93%&lt;\n\n\ntcl\n1.01\n0.0785\n7.76\n2.75 (2.36, 3.21)\n26.0\n1.52%&lt;\n\n\ntvc\n3.35\n0.118\n3.53\n28.5 (22.6, 36)\n14.8\n15.6%&lt;\n\n\ntq\n0.656\n1.07\n163\n1.93 (0.237, 15.7)\n\n\n\n\ntvp\n1.3\n0.809\n62.1\n3.68 (0.753, 18)\n\n\n\n\nadd.sd\n0.278\n\n\n0.278\n\n\n\n\nprop.sd\n0.131\n\n\n0.131\n\n\n\n\n\n\n\nThe key diagnostic for worth is whether Q and V2 are precisely estimated (reasonable %RSE) — if their relative standard errors are very large, the data cannot support a peripheral compartment."
+  },
+  {
+    "objectID": "reports/08_Two_Compartment_Report.html#model-selection",
+    "href": "reports/08_Two_Compartment_Report.html#model-selection",
+    "title": "Phase 9 — One- vs Two-Compartment Comparison",
+    "section": "4 Model selection",
+    "text": "4 Model selection\nAdding two parameters is justified (p &lt; 0.05) only if the OFV drops by more than 5.99 (χ², 2 df); AIC/BIC additionally penalise complexity.\n\n\nCode\ncmp &lt;- compare_models(\n  model_metrics(iiv_fit, \"1-compartment (selected)\"),\n  model_metrics(two_fit, \"2-compartment\")\n)\ncmp |&gt;\n  kbl(caption = \"1- vs 2-compartment model comparison\", digits = 2) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\n1- vs 2-compartment model comparison\n\n\nModel\nOFV\nAIC\nBIC\nnPar\ndOFV\ndAIC\n\n\n\n\n1-compartment (selected)\n104.36\n362.96\n386.02\n8\n0.00\n0.00\n\n\n2-compartment\n102.75\n365.35\n394.18\n10\n-1.61\n2.39\n\n\n\n\n\nHere ΔOFV = -1.61 and ΔAIC = 2.39. The two-compartment model is therefore not supported: the extra compartment does not improve the fit enough to justify two more parameters."
+  },
+  {
+    "objectID": "reports/08_Two_Compartment_Report.html#key-takeaways",
+    "href": "reports/08_Two_Compartment_Report.html#key-takeaways",
+    "title": "Phase 9 — One- vs Two-Compartment Comparison",
+    "section": "5 Key takeaways",
+    "text": "5 Key takeaways\n\nA full two-compartment oral model was fitted and compared head-to-head with the selected one-compartment model.\nDecision by ΔOFV / ΔAIC / BIC: the two-compartment model is rejected in favour of the simpler 1-compartment model.\nFor theophylline, the one-compartment structure is well established, so rejecting the extra compartment is the expected and parsimonious result — confirming the structural choice made back in Phase 3.\n\n\nNext (Phase 10): bootstrap confidence intervals on the final model to quantify parameter uncertainty empirically. ```"
   }
 ]
