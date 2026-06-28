@@ -70,6 +70,6 @@ execute:
   warning: false
   message: false
   cache: false
-  freeze: auto
+  freeze: false
 
 editor: visual
