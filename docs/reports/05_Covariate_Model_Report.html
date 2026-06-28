@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Pramod BR">
-<meta name="dcterms.date" content="2026-06-27">
+<meta name="dcterms.date" content="2026-06-28">
 
 <title>Phase 5 — Covariate Model (Body Weight) – PopPK Portfolio – Theophylline</title>
 <style>
@@ -4483,14 +4483,6 @@ window.Quarto = {
   <li><a href="#did-the-random-iiv-shrink" id="toc-did-the-random-iiv-shrink" class="nav-link" data-scroll-target="#did-the-random-iiv-shrink"><span class="header-section-number">6</span> Did the random IIV shrink?</a></li>
   <li><a href="#residual-random-effects-vs-weight" id="toc-residual-random-effects-vs-weight" class="nav-link" data-scroll-target="#residual-random-effects-vs-weight"><span class="header-section-number">7</span> Residual random effects vs weight</a></li>
   <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">8</span> Key takeaways</a></li>
-  <li><a href="#objectives-1" id="toc-objectives-1" class="nav-link" data-scroll-target="#objectives-1"><span class="header-section-number">9</span> Objectives</a></li>
-  <li><a href="#how-weight-enters-the-model-1" id="toc-how-weight-enters-the-model-1" class="nav-link" data-scroll-target="#how-weight-enters-the-model-1"><span class="header-section-number">10</span> How weight enters the model</a></li>
-  <li><a href="#fit-the-covariate-model-1" id="toc-fit-the-covariate-model-1" class="nav-link" data-scroll-target="#fit-the-covariate-model-1"><span class="header-section-number">11</span> Fit the covariate model</a></li>
-  <li><a href="#parameter-estimates-1" id="toc-parameter-estimates-1" class="nav-link" data-scroll-target="#parameter-estimates-1"><span class="header-section-number">12</span> Parameter estimates</a></li>
-  <li><a href="#is-the-weight-effect-justified-1" id="toc-is-the-weight-effect-justified-1" class="nav-link" data-scroll-target="#is-the-weight-effect-justified-1"><span class="header-section-number">13</span> Is the weight effect justified?</a></li>
-  <li><a href="#did-the-random-iiv-shrink-1" id="toc-did-the-random-iiv-shrink-1" class="nav-link" data-scroll-target="#did-the-random-iiv-shrink-1"><span class="header-section-number">14</span> Did the random IIV shrink?</a></li>
-  <li><a href="#residual-random-effects-vs-weight-1" id="toc-residual-random-effects-vs-weight-1" class="nav-link" data-scroll-target="#residual-random-effects-vs-weight-1"><span class="header-section-number">15</span> Residual random effects vs weight</a></li>
-  <li><a href="#key-takeaways-1" id="toc-key-takeaways-1" class="nav-link" data-scroll-target="#key-takeaways-1"><span class="header-section-number">16</span> Key takeaways</a></li>
   </ul>
 </nav>
     </div>
@@ -4499,7 +4491,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title">Phase 5 — Covariate Model (Body Weight)</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<h1 class="title">Phase 5 — Covariate Model (Body Weight)</h1>
 <p class="subtitle lead">Allometric weight effect on clearance and volume</p>
 </div>
 
@@ -4517,7 +4509,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 27, 2026</p>
+      <p class="date">June 28, 2026</p>
     </div>
   </div>
   
@@ -4818,160 +4810,10 @@ done</code></pre>
 <li>We reported the change in random CV% and the residual η–weight trend honestly — in a small, weight-dosed dataset like Theoph a strong weight signal is not guaranteed, and recognising that is part of sound covariate analysis.</li>
 </ul>
 <blockquote class="blockquote">
-<p>Next: <strong>Phase 6 — Model diagnostics</strong>: goodness-of-fit plots, CWRES vs TIME/PRED, and a visual predictive check (VPC) on the selected model.</p>
+<p>Next: <strong>Phase 6 — Model diagnostics</strong>: goodness-of-fit plots, CWRES vs TIME/PRED, and a visual predictive check (VPC) on the selected model. ```</p>
 </blockquote>
-<pre><code>
 
 
-
-:::{#quarto-navigation-envelope .hidden}
-[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1zaWRlYmFyLXRpdGxl&quot;}
-[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXItdGl0bGU=&quot;}
-[Home]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6SG9tZQ==&quot;}
-[/index.html]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6L2luZGV4Lmh0bWw=&quot;}
-[Reports]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6UmVwb3J0cw==&quot;}
-[1. Exploratory Data Analysis]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6MS4gRXhwbG9yYXRvcnkgRGF0YSBBbmFseXNpcw==&quot;}
-[/reports/01_EDA_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDFfRURBX1JlcG9ydC5odG1s&quot;}
-[2. Noncompartmental Analysis]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6Mi4gTm9uY29tcGFydG1lbnRhbCBBbmFseXNpcw==&quot;}
-[/reports/02_NCA_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDJfTkNBX1JlcG9ydC5odG1s&quot;}
-[3. Base PopPK Model]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6My4gQmFzZSBQb3BQSyBNb2RlbA==&quot;}
-[/reports/03_Base_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDNfQmFzZV9Nb2RlbF9SZXBvcnQuaHRtbA==&quot;}
-[4. IIV Model]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6NC4gSUlWIE1vZGVs&quot;}
-[/reports/04_IIV_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDRfSUlWX01vZGVsX1JlcG9ydC5odG1s&quot;}
-[5. Covariate Model]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6NS4gQ292YXJpYXRlIE1vZGVs&quot;}
-[/reports/05_Covariate_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDVfQ292YXJpYXRlX01vZGVsX1JlcG9ydC5odG1s&quot;}
-[6. Model Diagnostics]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6Ni4gTW9kZWwgRGlhZ25vc3RpY3M=&quot;}
-[/reports/06_Model_Diagnostics.html]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDZfTW9kZWxfRGlhZ25vc3RpY3MuaHRtbA==&quot;}
-[7. Simulation]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6Ny4gU2ltdWxhdGlvbg==&quot;}
-[/reports/07_Simulation_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDdfU2ltdWxhdGlvbl9SZXBvcnQuaHRtbA==&quot;}
-[https://github.com/pbr26/Theoph_poppk_portfolio]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLW5hdmJhci10b29sczpodHRwczovL2dpdGh1Yi5jb20vcGJyMjYvVGhlb3BoX3BvcHBrX3BvcnRmb2xpbw==&quot;}
-
-:::{.hidden .quarto-markdown-envelope-contents render-id=&quot;Zm9vdGVyLWNlbnRlcg==&quot;}
-Population PK Portfolio · Theophylline · Built in R with nlmixr2, PKNCA &amp; Quarto
-:::
-
-:::
-
-
-
-:::{#quarto-meta-markdown .hidden}
-[Phase 5 — Covariate Model (Body Weight) – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLW1ldGF0aXRsZQ==&quot;}
-[Phase 5 — Covariate Model (Body Weight) – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLXR3aXR0ZXJjYXJkdGl0bGU=&quot;}
-[Phase 5 — Covariate Model (Body Weight) – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLW9nY2FyZHRpdGxl&quot;}
-[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLW1ldGFzaXRlbmFtZQ==&quot;}
-[Allometric weight effect on clearance and volume]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLXR3aXR0ZXJjYXJkZGVzYw==&quot;}
-[Allometric weight effect on clearance and volume]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLW9nY2FyZGRkZXNj&quot;}
-[End-to-end population pharmacokinetics analysis of the Theophylline dataset in R.]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLW1ldGFzaXRlZGVzYw==&quot;}
-:::
-
-
-
-
-&lt;!-- --&gt;
-
-::: {.quarto-embedded-source-code}
-```````````````````{.markdown shortcodes=&quot;false&quot;}
----
-title: &quot;Phase 5 — Covariate Model (Body Weight)&quot;
-subtitle: &quot;Allometric weight effect on clearance and volume&quot;
-author: &quot;Pramod BR&quot;
-date: today
-format:
-  html:
-    theme: cosmo
-    toc: true
-    toc-depth: 3
-    code-fold: true
-    code-tools: true
-    number-sections: true
-    fig-width: 8
-    fig-height: 6
-execute:
-  echo: true
-  warning: false
-  message: false
----
-
-```{r setup}
-#| include: false
-here::i_am(&quot;reports/05_Covariate_Model_Report.qmd&quot;)
-source(here::here(&quot;R&quot;, &quot;05_covariate_model.R&quot;))
-library(kableExtra)</code></pre>
-</section>
-<section id="objectives-1" class="level2" data-number="9">
-<h2 data-number="9" class="anchored" data-anchor-id="objectives-1"><span class="header-section-number">9</span> Objectives</h2>
-<p>The IIV model (Phase 4) left between-subject variability as purely <em>random</em>. Here we test whether <strong>body weight</strong> explains part of it, by adding an <strong>allometric</strong> weight effect on clearance and volume. The questions: does it improve the fit, and does the random IIV on CL/V shrink?</p>
-</section>
-<section id="how-weight-enters-the-model-1" class="level2" data-number="10">
-<h2 data-number="10" class="anchored" data-anchor-id="how-weight-enters-the-model-1"><span class="header-section-number">10</span> How weight enters the model</h2>
-<p>We use the pharmacometric-standard <strong>allometric</strong> form, normalised to a 70 kg reference, with the exponents estimated from the data (started at the theoretical 0.75 for CL and 1.0 for V):</p>
-<p><span class="math display">\[ CL = CL_{typ}\,(WT/70)^{\theta_{CL}}, \qquad V = V_{typ}\,(WT/70)^{\theta_{V}} \]</span></p>
-<pre class="{r show-model}"><code>#| code-fold: false
-print(cov_model)</code></pre>
-</section>
-<section id="fit-the-covariate-model-1" class="level2" data-number="11">
-<h2 data-number="11" class="anchored" data-anchor-id="fit-the-covariate-model-1"><span class="header-section-number">11</span> Fit the covariate model</h2>
-<pre class="{r fit-cov}"><code>#| cache: true
-dat     &lt;- build_nonmem_data()
-iiv_fit &lt;- load_iiv_fit()
-cov_fit &lt;- fit_cov_model(dat)
-cov_fit</code></pre>
-</section>
-<section id="parameter-estimates-1" class="level2" data-number="12">
-<h2 data-number="12" class="anchored" data-anchor-id="parameter-estimates-1"><span class="header-section-number">12</span> Parameter estimates</h2>
-<p>The two new parameters are <strong>dWTCL</strong> and <strong>dWTV</strong> — the weight exponents. Their 95% confidence intervals tell us whether the effect is distinguishable from zero (no effect).</p>
-<pre class="{r cov-params}"><code>base_param_table(cov_fit) |&gt;
-  kbl(caption = &quot;Covariate model estimates (note dWTCL, dWTV exponents)&quot;,
-      digits = 3) |&gt;
-  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;),
-                full_width = FALSE)</code></pre>
-</section>
-<section id="is-the-weight-effect-justified-1" class="level2" data-number="13">
-<h2 data-number="13" class="anchored" data-anchor-id="is-the-weight-effect-justified-1"><span class="header-section-number">13</span> Is the weight effect justified?</h2>
-<pre class="{r compare}"><code>cmp &lt;- compare_models(
-  model_metrics(iiv_fit, &quot;IIV (no covariate)&quot;),
-  model_metrics(cov_fit, &quot;Weight on CL &amp; V&quot;)
-)
-cmp |&gt;
-  kbl(caption = &quot;IIV vs covariate model&quot;, digits = 2) |&gt;
-  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;),
-                full_width = FALSE)</code></pre>
-<pre class="{r verdict}"><code>#| include: false
-dofv &lt;- cmp$dOFV[2]
-justified &lt;- !is.na(dofv) &amp;&amp; dofv &lt; -5.99</code></pre>
-<p>Adding two parameters is significant (p &lt; 0.05) if the OFV drops by more than <strong>5.99</strong>. Here ΔOFV = <strong><code>r round(dofv, 2)</code></strong>, so on the likelihood-ratio test the weight effect is <strong><code>r if (justified) &quot;statistically supported&quot; else &quot;not clearly supported&quot;</code></strong> in this dataset.</p>
-</section>
-<section id="did-the-random-iiv-shrink-1" class="level2" data-number="14">
-<h2 data-number="14" class="anchored" data-anchor-id="did-the-random-iiv-shrink-1"><span class="header-section-number">14</span> Did the random IIV shrink?</h2>
-<p>If weight genuinely drives part of the between-subject variability, the BSV(CV%) on CL and V should be smaller in the covariate model than in the IIV model.</p>
-<pre class="{r cv-change}"><code>dplyr::full_join(
-  iiv_cv(iiv_fit) |&gt; dplyr::rename(`IIV model` = `BSV CV%`),
-  iiv_cv(cov_fit) |&gt; dplyr::rename(`Covariate model` = `BSV CV%`),
-  by = &quot;Parameter&quot;
-) |&gt;
-  kbl(caption = &quot;Between-subject CV% before vs after adding weight&quot;,
-      digits = 1) |&gt;
-  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;),
-                full_width = FALSE)</code></pre>
-</section>
-<section id="residual-random-effects-vs-weight-1" class="level2" data-number="15">
-<h2 data-number="15" class="anchored" data-anchor-id="residual-random-effects-vs-weight-1"><span class="header-section-number">15</span> Residual random effects vs weight</h2>
-<p>After including weight, the random effects on CL and V should show little residual trend with weight — a flat line means the covariate has absorbed the size effect.</p>
-<pre class="{r eta-wt}"><code>#| fig-cap: &quot;Random effects on CL and V vs body weight in the covariate model.&quot;
-cov_plot_eta_wt(cov_fit, dat)</code></pre>
-</section>
-<section id="key-takeaways-1" class="level2" data-number="16">
-<h2 data-number="16" class="anchored" data-anchor-id="key-takeaways-1"><span class="header-section-number">16</span> Key takeaways</h2>
-<ul>
-<li>Body weight was added <strong>allometrically</strong> on CL and V, with estimated exponents.</li>
-<li>On the likelihood-ratio test the effect was <strong><code>r if (justified) &quot;supported&quot; else &quot;not clearly supported&quot;</code></strong> (ΔOFV = <code>r round(dofv, 2)</code>).</li>
-<li>We reported the change in random CV% and the residual η–weight trend honestly — in a small, weight-dosed dataset like Theoph a strong weight signal is not guaranteed, and recognising that is part of sound covariate analysis.</li>
-</ul>
-<blockquote class="blockquote">
-<p>Next: <strong>Phase 6 — Model diagnostics</strong>: goodness-of-fit plots, CWRES vs TIME/PRED, and a visual predictive check (VPC) on the selected model.</p>
-</blockquote>
-<pre><code></code></pre>
-<p>:::</p>
 </section>
 
 </main> <!-- /main -->
@@ -5045,57 +4887,6 @@ cov_plot_eta_wt(cov_fit, dat)</code></pre>
         container: window.document.getElementById('quarto-embedded-source-code-modal')
       });
       clipboardModal.on('success', onCopySuccess);
-    }
-    const viewSource = window.document.getElementById('quarto-view-source') ||
-                       window.document.getElementById('quarto-code-tools-source');
-    if (viewSource) {
-      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
-      viewSource.addEventListener("click", function(e) {
-        if (sourceUrl) {
-          // rstudio viewer pane
-          if (/\bcapabilities=\b/.test(window.location)) {
-            window.open(sourceUrl);
-          } else {
-            window.location.href = sourceUrl;
-          }
-        } else {
-          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
-          modal.show();
-        }
-        return false;
-      });
-    }
-    function toggleCodeHandler(show) {
-      return function(e) {
-        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
-        for (let i=0; i<detailsSrc.length; i++) {
-          const details = detailsSrc[i].parentElement;
-          if (show) {
-            details.open = true;
-          } else {
-            details.removeAttribute("open");
-          }
-        }
-        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
-        const fromCls = show ? "hidden" : "unhidden";
-        const toCls = show ? "unhidden" : "hidden";
-        for (let i=0; i<cellCodeDivs.length; i++) {
-          const codeDiv = cellCodeDivs[i];
-          if (codeDiv.classList.contains(fromCls)) {
-            codeDiv.classList.remove(fromCls);
-            codeDiv.classList.add(toCls);
-          } 
-        }
-        return false;
-      }
-    }
-    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
-    if (hideAllCode) {
-      hideAllCode.addEventListener("click", toggleCodeHandler(false));
-    }
-    const showAllCode = window.document.getElementById("quarto-show-all-code");
-    if (showAllCode) {
-      showAllCode.addEventListener("click", toggleCodeHandler(true));
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
@@ -5433,8 +5224,8 @@ cov_plot_eta_wt(cov_fit, dat)</code></pre>
        
     </div>   
     <div class="nav-footer-center">
-      <div class="footer-contents">Population PK Portfolio · Theophylline · Built in R with nlmixr2, PKNCA &amp; Quarto</div>  
-    </div>
+<p>Population PK Portfolio · Theophylline · Built in R with nlmixr2, PKNCA &amp; Quarto</p>
+</div>
     <div class="nav-footer-right">
        
     </div>

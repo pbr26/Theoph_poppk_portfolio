@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Pramod BR">
-<meta name="dcterms.date" content="2026-06-27">
+<meta name="dcterms.date" content="2026-06-28">
 
 <title>Phase 3 — Base Population PK Model – PopPK Portfolio – Theophylline</title>
 <style>
@@ -4485,16 +4485,6 @@ window.Quarto = {
   </ul></li>
   <li><a href="#quick-predicted-vs-observed-check" id="toc-quick-predicted-vs-observed-check" class="nav-link" data-scroll-target="#quick-predicted-vs-observed-check"><span class="header-section-number">6</span> Quick predicted-vs-observed check</a></li>
   <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">7</span> Key takeaways</a></li>
-  <li><a href="#objectives-1" id="toc-objectives-1" class="nav-link" data-scroll-target="#objectives-1"><span class="header-section-number">8</span> Objectives</a></li>
-  <li><a href="#from-tidy-data-to-nonmem-events-1" id="toc-from-tidy-data-to-nonmem-events-1" class="nav-link" data-scroll-target="#from-tidy-data-to-nonmem-events-1"><span class="header-section-number">9</span> From tidy data to NONMEM events</a></li>
-  <li><a href="#the-structural-model-1" id="toc-the-structural-model-1" class="nav-link" data-scroll-target="#the-structural-model-1"><span class="header-section-number">10</span> The structural model</a></li>
-  <li><a href="#fitting-the-model-focei-1" id="toc-fitting-the-model-focei-1" class="nav-link" data-scroll-target="#fitting-the-model-focei-1"><span class="header-section-number">11</span> Fitting the model (FOCEi)</a></li>
-  <li><a href="#parameter-estimates-1" id="toc-parameter-estimates-1" class="nav-link" data-scroll-target="#parameter-estimates-1"><span class="header-section-number">12</span> Parameter estimates</a>
-  <ul class="collapse">
-  <li><a href="#sanity-check-vs-nca-1" id="toc-sanity-check-vs-nca-1" class="nav-link" data-scroll-target="#sanity-check-vs-nca-1"><span class="header-section-number">12.1</span> Sanity check vs NCA</a></li>
-  </ul></li>
-  <li><a href="#quick-predicted-vs-observed-check-1" id="toc-quick-predicted-vs-observed-check-1" class="nav-link" data-scroll-target="#quick-predicted-vs-observed-check-1"><span class="header-section-number">13</span> Quick predicted-vs-observed check</a></li>
-  <li><a href="#key-takeaways-1" id="toc-key-takeaways-1" class="nav-link" data-scroll-target="#key-takeaways-1"><span class="header-section-number">14</span> Key takeaways</a></li>
   </ul>
 </nav>
     </div>
@@ -4503,7 +4493,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title">Phase 3 — Base Population PK Model</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<h1 class="title">Phase 3 — Base Population PK Model</h1>
 <p class="subtitle lead">One-compartment oral, first-order absorption (nlmixr2 / rxode2)</p>
 </div>
 
@@ -4521,7 +4511,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 27, 2026</p>
+      <p class="date">June 28, 2026</p>
     </div>
   </div>
   
@@ -4897,187 +4887,10 @@ done</code></pre>
 <li>The base model includes IIV on <strong>CL</strong> only; the next phase adds variability on <strong>V and Ka</strong>.</li>
 </ul>
 <blockquote class="blockquote">
-<p>Next: <strong>Phase 4 — IIV model</strong>, extending between-subject variability to V and Ka and examining the random-effect (η) distributions.</p>
+<p>Next: <strong>Phase 4 — IIV model</strong>, extending between-subject variability to V and Ka and examining the random-effect (η) distributions. ```</p>
 </blockquote>
-<pre><code>
 
 
-
-:::{#quarto-navigation-envelope .hidden}
-[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1zaWRlYmFyLXRpdGxl&quot;}
-[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXItdGl0bGU=&quot;}
-[Home]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6SG9tZQ==&quot;}
-[/index.html]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6L2luZGV4Lmh0bWw=&quot;}
-[Reports]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6UmVwb3J0cw==&quot;}
-[1. Exploratory Data Analysis]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6MS4gRXhwbG9yYXRvcnkgRGF0YSBBbmFseXNpcw==&quot;}
-[/reports/01_EDA_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDFfRURBX1JlcG9ydC5odG1s&quot;}
-[2. Noncompartmental Analysis]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6Mi4gTm9uY29tcGFydG1lbnRhbCBBbmFseXNpcw==&quot;}
-[/reports/02_NCA_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDJfTkNBX1JlcG9ydC5odG1s&quot;}
-[3. Base PopPK Model]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6My4gQmFzZSBQb3BQSyBNb2RlbA==&quot;}
-[/reports/03_Base_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDNfQmFzZV9Nb2RlbF9SZXBvcnQuaHRtbA==&quot;}
-[4. IIV Model]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6NC4gSUlWIE1vZGVs&quot;}
-[/reports/04_IIV_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDRfSUlWX01vZGVsX1JlcG9ydC5odG1s&quot;}
-[5. Covariate Model]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6NS4gQ292YXJpYXRlIE1vZGVs&quot;}
-[/reports/05_Covariate_Model_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDVfQ292YXJpYXRlX01vZGVsX1JlcG9ydC5odG1s&quot;}
-[6. Model Diagnostics]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6Ni4gTW9kZWwgRGlhZ25vc3RpY3M=&quot;}
-[/reports/06_Model_Diagnostics.html]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDZfTW9kZWxfRGlhZ25vc3RpY3MuaHRtbA==&quot;}
-[7. Simulation]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6Ny4gU2ltdWxhdGlvbg==&quot;}
-[/reports/07_Simulation_Report.html]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLWludC1uYXZiYXI6L3JlcG9ydHMvMDdfU2ltdWxhdGlvbl9SZXBvcnQuaHRtbA==&quot;}
-[https://github.com/pbr26/Theoph_poppk_portfolio]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLW5hdmJhci10b29sczpodHRwczovL2dpdGh1Yi5jb20vcGJyMjYvVGhlb3BoX3BvcHBrX3BvcnRmb2xpbw==&quot;}
-
-:::{.hidden .quarto-markdown-envelope-contents render-id=&quot;Zm9vdGVyLWNlbnRlcg==&quot;}
-Population PK Portfolio · Theophylline · Built in R with nlmixr2, PKNCA &amp; Quarto
-:::
-
-:::
-
-
-
-:::{#quarto-meta-markdown .hidden}
-[Phase 3 — Base Population PK Model – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLW1ldGF0aXRsZQ==&quot;}
-[Phase 3 — Base Population PK Model – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLXR3aXR0ZXJjYXJkdGl0bGU=&quot;}
-[Phase 3 — Base Population PK Model – PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLW9nY2FyZHRpdGxl&quot;}
-[PopPK Portfolio – Theophylline]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLW1ldGFzaXRlbmFtZQ==&quot;}
-[One-compartment oral, first-order absorption (nlmixr2 / rxode2)]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLXR3aXR0ZXJjYXJkZGVzYw==&quot;}
-[One-compartment oral, first-order absorption (nlmixr2 / rxode2)]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLW9nY2FyZGRkZXNj&quot;}
-[End-to-end population pharmacokinetics analysis of the Theophylline dataset in R.]{.hidden .quarto-markdown-envelope-contents render-id=&quot;cXVhcnRvLW1ldGFzaXRlZGVzYw==&quot;}
-:::
-
-
-
-
-&lt;!-- --&gt;
-
-::: {.quarto-embedded-source-code}
-```````````````````{.markdown shortcodes=&quot;false&quot;}
----
-title: &quot;Phase 3 — Base Population PK Model&quot;
-subtitle: &quot;One-compartment oral, first-order absorption (nlmixr2 / rxode2)&quot;
-author: &quot;Pramod BR&quot;
-date: today
-format:
-  html:
-    theme: cosmo
-    toc: true
-    toc-depth: 3
-    code-fold: true
-    code-tools: true
-    number-sections: true
-    fig-width: 8
-    fig-height: 6
-execute:
-  echo: true
-  warning: false
-  message: false
----
-
-```{r setup}
-#| include: false
-here::i_am(&quot;reports/03_Base_Model_Report.qmd&quot;)
-source(here::here(&quot;R&quot;, &quot;03_base_model.R&quot;))
-library(kableExtra)</code></pre>
-</section>
-<section id="objectives-1" class="level2" data-number="8">
-<h2 data-number="8" class="anchored" data-anchor-id="objectives-1"><span class="header-section-number">8</span> Objectives</h2>
-<p>Having characterised the data (Phase 1) and computed model-free exposure metrics (Phase 2), we now fit a <strong>structural population PK model</strong>: a one-compartment model with first-order oral absorption. This phase establishes the model skeleton and the typical (population-average) parameters; between-subject variability and covariates are layered on in Phases 4–5.</p>
-</section>
-<section id="from-tidy-data-to-nonmem-events-1" class="level2" data-number="9">
-<h2 data-number="9" class="anchored" data-anchor-id="from-tidy-data-to-nonmem-events-1"><span class="header-section-number">9</span> From tidy data to NONMEM events</h2>
-<p>Estimation engines treat every row as an <strong>event</strong> — either a dose or an observation. <code>build_nonmem_data()</code> inserts one dosing row per subject at time 0 and keeps the concentration rows as observations.</p>
-<pre class="{r build-data}"><code>dat &lt;- build_nonmem_data()
-dat |&gt;
-  dplyr::filter(ID == 1) |&gt;
-  kbl(caption = &quot;Subject 1 as an event dataset (dose row first, then observations)&quot;,
-      digits = 2) |&gt;
-  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;),
-                full_width = FALSE)</code></pre>
-<p>Column meanings: <strong>EVID</strong> = 1 marks the dose (with <strong>AMT</strong> in mg) and 0 marks an observation (with <strong>DV</strong>, the concentration); <strong>MDV</strong> = 1 means “no measured DV on this row” (true for dose rows); <strong>CMT</strong> routes the dose to the depot (1) and the observation to the central compartment (2).</p>
-</section>
-<section id="the-structural-model-1" class="level2" data-number="10">
-<h2 data-number="10" class="anchored" data-anchor-id="the-structural-model-1"><span class="header-section-number">10</span> The structural model</h2>
-<p>The model is a function with an <code>ini</code> block (starting values) and a <code>model</code> block (the structure). Fixed effects are estimated on the <strong>log scale</strong>, so the back-transformed CL, V, and Ka are always positive. Initial values are seeded from the Phase 2 NCA, which puts the optimiser close to the solution from the start.</p>
-<pre class="{r show-model}"><code>#| code-fold: false
-print(base_model)</code></pre>
-<p>The two <code>d/dt(...)</code> lines are the compartment mass-balance equations; <code>cp = center/v</code> is the predicted concentration; and <code>cp ~ add(add.sd) + prop(prop.sd)</code> specifies a <strong>combined additive + proportional</strong> residual error model. The base model carries between-subject variability on <strong>CL only</strong> (<code>eta.cl</code>) — variability on V and Ka is added in Phase 4.</p>
-</section>
-<section id="fitting-the-model-focei-1" class="level2" data-number="11">
-<h2 data-number="11" class="anchored" data-anchor-id="fitting-the-model-focei-1"><span class="header-section-number">11</span> Fitting the model (FOCEi)</h2>
-<p><code>fit_base_model()</code> estimates the parameters by <strong>FOCEi</strong> (First-Order Conditional Estimation with interaction), the workhorse algorithm of population PK.</p>
-<pre class="{r fit-model}"><code>#| cache: true
-fit &lt;- fit_base_model(dat)
-fit</code></pre>
-</section>
-<section id="parameter-estimates-1" class="level2" data-number="12">
-<h2 data-number="12" class="anchored" data-anchor-id="parameter-estimates-1"><span class="header-section-number">12</span> Parameter estimates</h2>
-<pre class="{r param-table}"><code>base_param_table(fit) |&gt;
-  kbl(caption = &quot;Base model fixed-effect estimates (back-transformed)&quot;,
-      digits = 3) |&gt;
-  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;),
-                full_width = FALSE)</code></pre>
-<pre class="{r compare-nca}"><code>#| include: false
-# Typical CL/V/Ka from the fixed effects (estimated on the log scale).
-th &lt;- tryCatch(fit$theta, error = function(e) nlmixr2::fixef(fit))
-gp &lt;- function(nm) if (nm %in% names(th)) as.numeric(th[[nm]]) else NA_real_
-cl_hat &lt;- exp(gp(&quot;tcl&quot;)); v_hat &lt;- exp(gp(&quot;tv&quot;)); ka_hat &lt;- exp(gp(&quot;tka&quot;))</code></pre>
-<section id="sanity-check-vs-nca-1" class="level3" data-number="12.1">
-<h3 data-number="12.1" class="anchored" data-anchor-id="sanity-check-vs-nca-1"><span class="header-section-number">12.1</span> Sanity check vs NCA</h3>
-<p>The population model and the model-free NCA should tell a consistent story:</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Parameter</th>
-<th>NCA (geo. mean, Phase 2)</th>
-<th>Base model (typical)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>CL (L/h)</td>
-<td>~2.74</td>
-<td><code>r round(cl_hat, 2)</code></td>
-</tr>
-<tr class="even">
-<td>V (L)</td>
-<td>~31.6</td>
-<td><code>r round(v_hat, 1)</code></td>
-</tr>
-<tr class="odd">
-<td>Ka (1/h)</td>
-<td>~1.5 (from Tmax)</td>
-<td><code>r round(ka_hat, 2)</code></td>
-</tr>
-</tbody>
-</table>
-<p>Close agreement is the key validation that the structural model and dataset are correct — the two independent methods converge on the same physiology.</p>
-</section>
-</section>
-<section id="quick-predicted-vs-observed-check-1" class="level2" data-number="13">
-<h2 data-number="13" class="anchored" data-anchor-id="quick-predicted-vs-observed-check-1"><span class="header-section-number">13</span> Quick predicted-vs-observed check</h2>
-<p>Full diagnostics (GOF, VPC, CWRES) come in Phase 6; here we just confirm the fit is sensible — points should scatter around the line of identity.</p>
-<pre class="{r obs-pred}"><code>#| fig-cap: &quot;Population (PRED) and individual (IPRED) predictions vs observations.&quot;
-fitdf &lt;- as.data.frame(fit)
-
-p &lt;- ggplot2::ggplot(fitdf, ggplot2::aes(PRED, DV)) +
-  ggplot2::geom_abline(slope = 1, intercept = 0, linetype = &quot;dashed&quot;, colour = &quot;grey50&quot;) +
-  ggplot2::geom_point(alpha = 0.6, colour = &quot;#2C3E50&quot;) +
-  ggplot2::labs(x = &quot;Population prediction (mg/L)&quot;, y = &quot;Observed (mg/L)&quot;,
-                title = &quot;Observed vs population prediction (base model)&quot;)
-p
-save_fig(p, &quot;03_base_obs_vs_pred&quot;)</code></pre>
-</section>
-<section id="key-takeaways-1" class="level2" data-number="14">
-<h2 data-number="14" class="anchored" data-anchor-id="key-takeaways-1"><span class="header-section-number">14</span> Key takeaways</h2>
-<ul>
-<li>The data were re-expressed as a NONMEM <strong>event</strong> dataset (dose + observation rows).</li>
-<li>A <strong>one-compartment oral</strong> model with first-order absorption was fitted by <strong>FOCEi</strong>.</li>
-<li>Typical estimates (<strong>CL ≈ <code>r round(cl_hat, 2)</code> L/h</strong>, <strong>V ≈ <code>r round(v_hat, 1)</code> L</strong>, <strong>Ka ≈ <code>r round(ka_hat, 2)</code> /h</strong>) agree with the NCA — the structural model holds.</li>
-<li>The base model includes IIV on <strong>CL</strong> only; the next phase adds variability on <strong>V and Ka</strong>.</li>
-</ul>
-<blockquote class="blockquote">
-<p>Next: <strong>Phase 4 — IIV model</strong>, extending between-subject variability to V and Ka and examining the random-effect (η) distributions.</p>
-</blockquote>
-<pre><code></code></pre>
-<p>:::</p>
 </section>
 
 </main> <!-- /main -->
@@ -5151,57 +4964,6 @@ save_fig(p, &quot;03_base_obs_vs_pred&quot;)</code></pre>
         container: window.document.getElementById('quarto-embedded-source-code-modal')
       });
       clipboardModal.on('success', onCopySuccess);
-    }
-    const viewSource = window.document.getElementById('quarto-view-source') ||
-                       window.document.getElementById('quarto-code-tools-source');
-    if (viewSource) {
-      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
-      viewSource.addEventListener("click", function(e) {
-        if (sourceUrl) {
-          // rstudio viewer pane
-          if (/\bcapabilities=\b/.test(window.location)) {
-            window.open(sourceUrl);
-          } else {
-            window.location.href = sourceUrl;
-          }
-        } else {
-          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
-          modal.show();
-        }
-        return false;
-      });
-    }
-    function toggleCodeHandler(show) {
-      return function(e) {
-        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
-        for (let i=0; i<detailsSrc.length; i++) {
-          const details = detailsSrc[i].parentElement;
-          if (show) {
-            details.open = true;
-          } else {
-            details.removeAttribute("open");
-          }
-        }
-        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
-        const fromCls = show ? "hidden" : "unhidden";
-        const toCls = show ? "unhidden" : "hidden";
-        for (let i=0; i<cellCodeDivs.length; i++) {
-          const codeDiv = cellCodeDivs[i];
-          if (codeDiv.classList.contains(fromCls)) {
-            codeDiv.classList.remove(fromCls);
-            codeDiv.classList.add(toCls);
-          } 
-        }
-        return false;
-      }
-    }
-    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
-    if (hideAllCode) {
-      hideAllCode.addEventListener("click", toggleCodeHandler(false));
-    }
-    const showAllCode = window.document.getElementById("quarto-show-all-code");
-    if (showAllCode) {
-      showAllCode.addEventListener("click", toggleCodeHandler(true));
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
@@ -5539,8 +5301,8 @@ save_fig(p, &quot;03_base_obs_vs_pred&quot;)</code></pre>
        
     </div>   
     <div class="nav-footer-center">
-      <div class="footer-contents">Population PK Portfolio · Theophylline · Built in R with nlmixr2, PKNCA &amp; Quarto</div>  
-    </div>
+<p>Population PK Portfolio · Theophylline · Built in R with nlmixr2, PKNCA &amp; Quarto</p>
+</div>
     <div class="nav-footer-right">
        
     </div>
