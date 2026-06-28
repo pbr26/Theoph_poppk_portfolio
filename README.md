@@ -2,7 +2,7 @@
 
 A complete, reproducible end-to-end **Population Pharmacokinetics (PopPK)** analysis of the classic `Theoph` dataset, built in R with `nlmixr2` / `rxode2`, `PKNCA`, and Quarto.
 
-> **Live site:** published from `docs/` via GitHub Pages once Phase 8 is complete.
+> **🔗 Live site:** <https://pbr26.github.io/Theoph_poppk_portfolio/> — published from `docs/` via GitHub Pages.
 
 ## Why Theophylline?
 
