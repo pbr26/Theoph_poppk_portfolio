@@ -69,7 +69,7 @@ format:
     embed-resources: true
 
 execute:
-  echo: true
+  echo: false
   warning: false
   message: false
   cache: false

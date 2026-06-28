@@ -13,7 +13,7 @@ format:
     fig-width: 9
     fig-height: 8
 execute:
-  echo: true
+  echo: false
   warning: false
   message: false
 ---

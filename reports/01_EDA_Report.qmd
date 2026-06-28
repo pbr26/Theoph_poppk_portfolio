@@ -13,7 +13,7 @@ format:
     fig-width: 8
     fig-height: 6
 execute:
-  echo: true
+  echo: false
   warning: false
   message: false
 ---
@@ -46,8 +46,8 @@ The questions we answer here:
 since the recorded dose is in mg/kg).
 
 ```{r prepare}
+#| output: false
 theoph <- prepare_theoph()
-glimpse(theoph)
 ```
 
 ```{r head-table}
