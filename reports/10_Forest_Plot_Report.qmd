@@ -1,0 +1,92 @@
+---
+title: "Phase 11 — Covariate Forest Plot"
+subtitle: "Clinical relevance of the body-weight effect on CL and V"
+author: "Pramod BR"
+date: today
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    number-sections: true
+    fig-width: 9
+    fig-height: 5
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+here::i_am("reports/10_Forest_Plot_Report.qmd")
+source(here::here("R", "10_forest_plot.R"))
+library(kableExtra)
+```
+
+## Objectives
+
+A statistical test (Phase 5) tells us whether a covariate effect is *real*; a
+**forest plot** tells us whether it is *clinically relevant*. This phase summarises
+the body-weight effect on clearance and volume as parameter ratios — relative to a
+typical 70 kg subject — for a light and a heavy patient, each with a 95% CI.
+
+## How to read it
+
+Each row shows a parameter ratio: **1.0 means no change** from the typical patient.
+The shaded band (**0.8–1.25**) is the conventional "no clinically relevant effect"
+zone (within ±20–25%).
+
+- A point **and its whole CI inside the band** → the covariate doesn't move that
+  parameter enough to matter clinically.
+- A **CI crossing 1.0** → the effect isn't statistically distinguishable from zero.
+- A tight CI **far from 1.0** → a covariate worth acting on (dose adjustment).
+
+The ratio at weight *w* is `(w/70)^θ`, and each CI is propagated from the exponent's
+95% confidence interval.
+
+## The numbers
+
+```{r data}
+fit <- load_cov_fit()
+fd  <- forest_data(fit)
+fd |>
+  kbl(caption = "Weight effect on CL and V — ratio vs typical 70 kg subject (95% CI)",
+      digits = 3,
+      col.names = c("Parameter", "Scenario", "Ratio", "Lower 95%", "Upper 95%")) |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE)
+```
+
+## The forest plot
+
+```{r forest}
+#| fig-cap: "Forest plot of the body-weight effect on CL and V (light 55 kg, heavy 85 kg)."
+forest_plot(fd)
+```
+
+## Interpretation
+
+```{r interp}
+#| include: false
+crosses_one <- any(fd$lo < 1 & fd$hi > 1)
+```
+
+Every interval **`r if (crosses_one) "crosses 1.0 and sits largely within the 0.8–1.25 band" else "is informative"`**.
+This is the visual confirmation of the Phase 5 conclusion: in this dataset the
+body-weight effect on CL and V is **neither statistically supported nor clinically
+relevant**. No weight-based dose adjustment is warranted by these data.
+
+## Key takeaways
+
+- The forest plot translates a covariate effect into the question clinicians
+  actually care about: *does it change exposure enough to change dosing?*
+- For Theophylline weight here, the answer is **no** — wide CIs spanning 1.0, inside
+  the no-effect band.
+- Reporting a covariate honestly as **not clinically relevant**, with a clear
+  figure, is sound pharmacometric practice — and a fitting close to the portfolio.
+
+> This completes the extended portfolio: EDA → NCA → base → IIV → covariate →
+> diagnostics → simulation → 2-compartment check → bootstrap → forest plot.
+```

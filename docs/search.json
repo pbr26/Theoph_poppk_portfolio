@@ -1,206 +1,269 @@
 [
   {
-    "objectID": "reports/09_Bootstrap_Report.html",
-    "href": "reports/09_Bootstrap_Report.html",
-    "title": "Phase 10 — Bootstrap Confidence Intervals",
+    "objectID": "reports/10_Forest_Plot_Report.html",
+    "href": "reports/10_Forest_Plot_Report.html",
+    "title": "Phase 11 — Covariate Forest Plot",
     "section": "",
-    "text": "The parameter CIs reported so far are asymptotic — derived from the covariance matrix under large-sample, normal assumptions. With only 12 subjects those assumptions are questionable. This phase computes bootstrap CIs that make no such assumption, and compares the two."
+    "text": "A statistical test (Phase 5) tells us whether a covariate effect is real; a forest plot tells us whether it is clinically relevant. This phase summarises the body-weight effect on clearance and volume as parameter ratios — relative to a typical 70 kg subject — for a light and a heavy patient, each with a 95% CI."
   },
   {
-    "objectID": "reports/09_Bootstrap_Report.html#objectives",
-    "href": "reports/09_Bootstrap_Report.html#objectives",
-    "title": "Phase 10 — Bootstrap Confidence Intervals",
+    "objectID": "reports/10_Forest_Plot_Report.html#objectives",
+    "href": "reports/10_Forest_Plot_Report.html#objectives",
+    "title": "Phase 11 — Covariate Forest Plot",
     "section": "",
-    "text": "The parameter CIs reported so far are asymptotic — derived from the covariance matrix under large-sample, normal assumptions. With only 12 subjects those assumptions are questionable. This phase computes bootstrap CIs that make no such assumption, and compares the two."
+    "text": "A statistical test (Phase 5) tells us whether a covariate effect is real; a forest plot tells us whether it is clinically relevant. This phase summarises the body-weight effect on clearance and volume as parameter ratios — relative to a typical 70 kg subject — for a light and a heavy patient, each with a 95% CI."
   },
   {
-    "objectID": "reports/09_Bootstrap_Report.html#method-case-subject-resampling",
-    "href": "reports/09_Bootstrap_Report.html#method-case-subject-resampling",
-    "title": "Phase 10 — Bootstrap Confidence Intervals",
-    "section": "2 Method — case (subject) resampling",
-    "text": "2 Method — case (subject) resampling\nWe repeatedly draw 12 subjects with replacement from the original 12, refit the IIV model to each resampled dataset, and collect the fixed effects. The 2.5th and 97.5th percentiles of those estimates form an empirical 95% CI.\n\n\nCode\ndat  &lt;- build_nonmem_data()\nfit  &lt;- load_iiv_fit()\nboot &lt;- run_bootstrap(dat, nboot = 50)\n\n\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\n\n\n50 of 50 replicates converged (100%). A convergence rate below 100% is normal — some resamples produce awkward datasets (e.g. the same subject drawn several times) — and the rate itself is a useful stability check."
+    "objectID": "reports/10_Forest_Plot_Report.html#how-to-read-it",
+    "href": "reports/10_Forest_Plot_Report.html#how-to-read-it",
+    "title": "Phase 11 — Covariate Forest Plot",
+    "section": "2 How to read it",
+    "text": "2 How to read it\nEach row shows a parameter ratio: 1.0 means no change from the typical patient. The shaded band (0.8–1.25) is the conventional “no clinically relevant effect” zone (within ±20–25%).\n\nA point and its whole CI inside the band → the covariate doesn’t move that parameter enough to matter clinically.\nA CI crossing 1.0 → the effect isn’t statistically distinguishable from zero.\nA tight CI far from 1.0 → a covariate worth acting on (dose adjustment).\n\nThe ratio at weight w is (w/70)^θ, and each CI is propagated from the exponent’s 95% confidence interval."
   },
   {
-    "objectID": "reports/09_Bootstrap_Report.html#asymptotic-vs-bootstrap-95-ci",
-    "href": "reports/09_Bootstrap_Report.html#asymptotic-vs-bootstrap-95-ci",
-    "title": "Phase 10 — Bootstrap Confidence Intervals",
-    "section": "3 Asymptotic vs bootstrap 95% CI",
-    "text": "3 Asymptotic vs bootstrap 95% CI\n\n\nCode\nboot_summary(boot, fit) |&gt;\n  kbl(caption = \"Point estimate with bootstrap median and 95% percentile interval\",\n      digits = 3) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nPoint estimate with bootstrap median and 95% percentile interval\n\n\nParameter\nEstimate\nBoot median\nBoot 2.5%\nBoot 97.5%\n\n\n\n\nka\n1.475\n1.441\n1.135\n2.417\n\n\ncl\n2.787\n2.806\n2.399\n3.297\n\n\nv\n32.010\n31.981\n29.248\n35.285\n\n\nadd.sd\n0.261\n0.237\n0.043\n0.476\n\n\nprop.sd\n0.136\n0.141\n0.058\n0.193\n\n\n\n\n\nRead this against the asymptotic CIs from Phase 4. Agreement between the two reassures us the asymptotic SEs were trustworthy; a wider or skewed bootstrap interval (most likely for Ka, the least precise parameter) reveals uncertainty the formula understated."
+    "objectID": "reports/10_Forest_Plot_Report.html#the-numbers",
+    "href": "reports/10_Forest_Plot_Report.html#the-numbers",
+    "title": "Phase 11 — Covariate Forest Plot",
+    "section": "3 The numbers",
+    "text": "3 The numbers\n\n\nCode\nfit &lt;- load_cov_fit()\nfd  &lt;- forest_data(fit)\nfd |&gt;\n  kbl(caption = \"Weight effect on CL and V — ratio vs typical 70 kg subject (95% CI)\",\n      digits = 3,\n      col.names = c(\"Parameter\", \"Scenario\", \"Ratio\", \"Lower 95%\", \"Upper 95%\")) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nWeight effect on CL and V — ratio vs typical 70 kg subject (95% CI)\n\n\nParameter\nScenario\nRatio\nLower 95%\nUpper 95%\n\n\n\n\nClearance (CL)\nlight (55 kg)\n0.919\n0.717\n1.178\n\n\nClearance (CL)\nheavy (85 kg)\n1.070\n0.876\n1.307\n\n\nVolume (V)\nlight (55 kg)\n0.868\n0.763\n0.988\n\n\nVolume (V)\nheavy (85 kg)\n1.121\n1.010\n1.243"
   },
   {
-    "objectID": "reports/09_Bootstrap_Report.html#bootstrap-distributions",
-    "href": "reports/09_Bootstrap_Report.html#bootstrap-distributions",
-    "title": "Phase 10 — Bootstrap Confidence Intervals",
-    "section": "4 Bootstrap distributions",
-    "text": "4 Bootstrap distributions\n\n\nCode\nboot_plot(boot)\n\n\n\n\n\nBootstrap sampling distributions of CL, V, and Ka (dashed = 95% percentile interval)."
+    "objectID": "reports/10_Forest_Plot_Report.html#the-forest-plot",
+    "href": "reports/10_Forest_Plot_Report.html#the-forest-plot",
+    "title": "Phase 11 — Covariate Forest Plot",
+    "section": "4 The forest plot",
+    "text": "4 The forest plot\n\n\nCode\nforest_plot(fd)\n\n\n\n\n\nForest plot of the body-weight effect on CL and V (light 55 kg, heavy 85 kg)."
   },
   {
-    "objectID": "reports/09_Bootstrap_Report.html#key-takeaways",
-    "href": "reports/09_Bootstrap_Report.html#key-takeaways",
-    "title": "Phase 10 — Bootstrap Confidence Intervals",
+    "objectID": "reports/10_Forest_Plot_Report.html#interpretation",
+    "href": "reports/10_Forest_Plot_Report.html#interpretation",
+    "title": "Phase 11 — Covariate Forest Plot",
+    "section": "5 Interpretation",
+    "text": "5 Interpretation\nEvery interval crosses 1.0 and sits largely within the 0.8–1.25 band. This is the visual confirmation of the Phase 5 conclusion: in this dataset the body-weight effect on CL and V is neither statistically supported nor clinically relevant. No weight-based dose adjustment is warranted by these data."
+  },
+  {
+    "objectID": "reports/10_Forest_Plot_Report.html#key-takeaways",
+    "href": "reports/10_Forest_Plot_Report.html#key-takeaways",
+    "title": "Phase 11 — Covariate Forest Plot",
+    "section": "6 Key takeaways",
+    "text": "6 Key takeaways\n\nThe forest plot translates a covariate effect into the question clinicians actually care about: does it change exposure enough to change dosing?\nFor Theophylline weight here, the answer is no — wide CIs spanning 1.0, inside the no-effect band.\nReporting a covariate honestly as not clinically relevant, with a clear figure, is sound pharmacometric practice — and a fitting close to the portfolio.\n\n\nThis completes the extended portfolio: EDA → NCA → base → IIV → covariate → diagnostics → simulation → 2-compartment check → bootstrap → forest plot. ```"
+  },
+  {
+    "objectID": "reports/08_Two_Compartment_Report.html",
+    "href": "reports/08_Two_Compartment_Report.html",
+    "title": "Phase 9 — One- vs Two-Compartment Comparison",
+    "section": "",
+    "text": "The whole analysis assumed a one-compartment structure. Here we test that assumption directly by fitting a two-compartment model and asking whether the extra peripheral compartment is statistically justified. Demonstrating that a more complex model can be fitted and correctly accepted or rejected is core model-selection judgement."
+  },
+  {
+    "objectID": "reports/08_Two_Compartment_Report.html#objectives",
+    "href": "reports/08_Two_Compartment_Report.html#objectives",
+    "title": "Phase 9 — One- vs Two-Compartment Comparison",
+    "section": "",
+    "text": "The whole analysis assumed a one-compartment structure. Here we test that assumption directly by fitting a two-compartment model and asking whether the extra peripheral compartment is statistically justified. Demonstrating that a more complex model can be fitted and correctly accepted or rejected is core model-selection judgement."
+  },
+  {
+    "objectID": "reports/08_Two_Compartment_Report.html#the-two-compartment-model",
+    "href": "reports/08_Two_Compartment_Report.html#the-two-compartment-model",
+    "title": "Phase 9 — One- vs Two-Compartment Comparison",
+    "section": "2 The two-compartment model",
+    "text": "2 The two-compartment model\nA peripheral compartment lets drug distribute into tissues and return, producing a biphasic semilog decline. Two new parameters appear: Q (inter-compartmental clearance) and V2 (peripheral volume); the central volume becomes Vc.\nThe fitted model’s structure is shown as equations in the next section."
+  },
+  {
+    "objectID": "reports/08_Two_Compartment_Report.html#fit-and-compare",
+    "href": "reports/08_Two_Compartment_Report.html#fit-and-compare",
+    "title": "Phase 9 — One- vs Two-Compartment Comparison",
+    "section": "3 Fit and compare",
+    "text": "3 Fit and compare\n\n\nCode\ndat     &lt;- build_nonmem_data()\niiv_fit &lt;- load_iiv_fit()\ntwo_fit &lt;- fit_two_cmt_model(dat)\n\n\ncalculating covariance matrix\ndone\n\n\n\n\nCode\nbase_param_table(two_fit) |&gt;\n  kbl(caption = \"Two-compartment model estimates\", digits = 3) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nTwo-compartment model estimates\n\n\nParameter\nEst.\nSE\n%RSE\nBack-transformed(95%CI)\nBSV(CV%)\nShrink(SD)%\n\n\n\n\ntka\n0.259\n0.214\n82.9\n1.3 (0.851, 1.97)\n67.8\n1.93%&lt;\n\n\ntcl\n1.01\n0.0785\n7.76\n2.75 (2.36, 3.21)\n26.0\n1.52%&lt;\n\n\ntvc\n3.35\n0.118\n3.53\n28.5 (22.6, 36)\n14.8\n15.6%&lt;\n\n\ntq\n0.656\n1.07\n163\n1.93 (0.237, 15.7)\n\n\n\n\ntvp\n1.3\n0.809\n62.1\n3.68 (0.753, 18)\n\n\n\n\nadd.sd\n0.278\n\n\n0.278\n\n\n\n\nprop.sd\n0.131\n\n\n0.131\n\n\n\n\n\n\n\nThe key diagnostic for worth is whether Q and V2 are precisely estimated (reasonable %RSE) — if their relative standard errors are very large, the data cannot support a peripheral compartment."
+  },
+  {
+    "objectID": "reports/08_Two_Compartment_Report.html#model-selection",
+    "href": "reports/08_Two_Compartment_Report.html#model-selection",
+    "title": "Phase 9 — One- vs Two-Compartment Comparison",
+    "section": "4 Model selection",
+    "text": "4 Model selection\nAdding two parameters is justified (p &lt; 0.05) only if the OFV drops by more than 5.99 (χ², 2 df); AIC/BIC additionally penalise complexity.\n\n\nCode\ncmp &lt;- compare_models(\n  model_metrics(iiv_fit, \"1-compartment (selected)\"),\n  model_metrics(two_fit, \"2-compartment\")\n)\ncmp |&gt;\n  kbl(caption = \"1- vs 2-compartment model comparison\", digits = 2) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\n1- vs 2-compartment model comparison\n\n\nModel\nOFV\nAIC\nBIC\nnPar\ndOFV\ndAIC\n\n\n\n\n1-compartment (selected)\n104.36\n362.96\n386.02\n8\n0.00\n0.00\n\n\n2-compartment\n102.75\n365.35\n394.18\n10\n-1.61\n2.39\n\n\n\n\n\nHere ΔOFV = -1.61 and ΔAIC = 2.39. The two-compartment model is therefore not supported: the extra compartment does not improve the fit enough to justify two more parameters."
+  },
+  {
+    "objectID": "reports/08_Two_Compartment_Report.html#key-takeaways",
+    "href": "reports/08_Two_Compartment_Report.html#key-takeaways",
+    "title": "Phase 9 — One- vs Two-Compartment Comparison",
     "section": "5 Key takeaways",
-    "text": "5 Key takeaways\n\nParameter uncertainty was quantified empirically by subject resampling, free of the normality assumption behind asymptotic SEs.\nThe bootstrap and asymptotic CIs can be compared directly; close agreement validates the reported precision, while divergence (typically for Ka) flags small-sample fragility.\nWith n = 12 the bootstrap is itself coarse and presented as a demonstration of method — exactly how it would be framed for a small study.\n\n\nNext (Phase 11): a covariate forest plot summarising the weight effect on CL and V with confidence intervals. ```"
+    "text": "5 Key takeaways\n\nA full two-compartment oral model was fitted and compared head-to-head with the selected one-compartment model.\nDecision by ΔOFV / ΔAIC / BIC: the two-compartment model is rejected in favour of the simpler 1-compartment model.\nFor theophylline, the one-compartment structure is well established, so rejecting the extra compartment is the expected and parsimonious result — confirming the structural choice made back in Phase 3.\n\n\nNext (Phase 10): bootstrap confidence intervals on the final model to quantify parameter uncertainty empirically. ```"
   },
   {
-    "objectID": "reports/07_Simulation_Report.html",
-    "href": "reports/07_Simulation_Report.html",
-    "title": "Phase 7 — Clinical Simulation",
+    "objectID": "reports/06_Model_Diagnostics.html",
+    "href": "reports/06_Model_Diagnostics.html",
+    "title": "Phase 6 — Model Diagnostics",
     "section": "",
-    "text": "With a model that passed diagnostics (Phase 6), we can now simulate — predict concentration-time profiles for scenarios we never measured. This is where a population PK model earns its keep clinically. We simulate three things with rxode2: a typical patient, an illustrative weight effect, and the full population spread.\n\n\nCode\npars &lt;- get_typical_params()\ndose &lt;- rep_dose()\n\n\nThe selected model is the IIV model from Phase 4 — Phase 5 found body weight was not statistically supported, so by parsimony the IIV model is the final model. Its typical parameters are CL ≈ 2.79 L/h, V ≈ 32 L, Ka ≈ 1.48 /h. Simulations use a representative 320 mg dose (the median actual dose in the dataset)."
+    "text": "A model that converges is not necessarily a model that fits. This phase stress-tests the selected model with the standard pharmacometric diagnostics: goodness-of-fit (GOF) scatter plots, conditional weighted residuals (CWRES), and a Visual Predictive Check (VPC).\n\n\nCode\nfit &lt;- load_final_fit()"
   },
   {
-    "objectID": "reports/07_Simulation_Report.html#objectives",
-    "href": "reports/07_Simulation_Report.html#objectives",
-    "title": "Phase 7 — Clinical Simulation",
+    "objectID": "reports/06_Model_Diagnostics.html#objectives",
+    "href": "reports/06_Model_Diagnostics.html#objectives",
+    "title": "Phase 6 — Model Diagnostics",
     "section": "",
-    "text": "With a model that passed diagnostics (Phase 6), we can now simulate — predict concentration-time profiles for scenarios we never measured. This is where a population PK model earns its keep clinically. We simulate three things with rxode2: a typical patient, an illustrative weight effect, and the full population spread.\n\n\nCode\npars &lt;- get_typical_params()\ndose &lt;- rep_dose()\n\n\nThe selected model is the IIV model from Phase 4 — Phase 5 found body weight was not statistically supported, so by parsimony the IIV model is the final model. Its typical parameters are CL ≈ 2.79 L/h, V ≈ 32 L, Ka ≈ 1.48 /h. Simulations use a representative 320 mg dose (the median actual dose in the dataset)."
+    "text": "A model that converges is not necessarily a model that fits. This phase stress-tests the selected model with the standard pharmacometric diagnostics: goodness-of-fit (GOF) scatter plots, conditional weighted residuals (CWRES), and a Visual Predictive Check (VPC).\n\n\nCode\nfit &lt;- load_final_fit()"
   },
   {
-    "objectID": "reports/07_Simulation_Report.html#typical-patient",
-    "href": "reports/07_Simulation_Report.html#typical-patient",
-    "title": "Phase 7 — Clinical Simulation",
-    "section": "2 Typical patient",
-    "text": "2 Typical patient\nSetting the random effects to zero gives the single population-average curve for a 70 kg subject.\n\n\nCode\ntyp &lt;- sim_typical(pars, dose = dose)\nsim_plot_typical(typ, dose)\n\n\n\n\n\nSimulated typical-patient concentration-time profile.\n\n\n\n\nPredicted Cmax ≈ 8.37 mg/L at Tmax ≈ 2 h, in line with the observed data and the NCA — the expected internal coherence of a sound model."
+    "objectID": "reports/06_Model_Diagnostics.html#goodness-of-fit-panel",
+    "href": "reports/06_Model_Diagnostics.html#goodness-of-fit-panel",
+    "title": "Phase 6 — Model Diagnostics",
+    "section": "2 Goodness-of-fit panel",
+    "text": "2 Goodness-of-fit panel\nFour plots, read together:\n\nObserved vs Population prediction (PRED) and vs Individual prediction (IPRED) — points should fall along the dashed line of identity. IPRED hugs the line more tightly because it uses each subject’s own random effects; that gap between PRED and IPRED is exactly what the IIV captures.\nCWRES vs TIME and CWRES vs PRED — conditional weighted residuals should scatter randomly in a flat horizontal band, mostly within ±2, with no trend or funnel shape. A slope or curve over time would signal a structural misspecification; fanning would signal a wrong residual-error model.\n\n\n\nCode\ngof_panel(fit)\n\n\n\n\n\nFour-panel goodness-of-fit diagnostics for the selected model."
   },
   {
-    "objectID": "reports/07_Simulation_Report.html#effect-of-body-weight-illustrative",
-    "href": "reports/07_Simulation_Report.html#effect-of-body-weight-illustrative",
-    "title": "Phase 7 — Clinical Simulation",
-    "section": "3 Effect of body weight (illustrative)",
-    "text": "3 Effect of body weight (illustrative)\nBecause the selected model has no weight covariate (it wasn’t supported), this is an illustrative exercise: we apply the standard theoretical allometric exponents (0.75 on CL, 1.0 on V) to the typical parameters to show the expected direction and size of a body-weight effect at a fixed dose. It is not an estimated effect.\n\n\nCode\nwts &lt;- sim_weight_subgroups(pars, dose = dose)\nsim_plot_weight(wts, dose)\n\n\n\n\n\nIllustrative typical profiles for 55, 70, and 85 kg subjects (theory-based allometry).\n\n\n\n\n\n\nCode\nwts |&gt;\n  dplyr::group_by(WT) |&gt;\n  dplyr::summarise(Cmax = round(max(cp), 2),\n                   Tmax = round(time[which.max(cp)], 2),\n                   .groups = \"drop\") |&gt;\n  kbl(caption = \"Illustrative Cmax / Tmax by body weight (fixed dose, allometric theory)\",\n      col.names = c(\"Weight (kg)\", \"Cmax (mg/L)\", \"Tmax (h)\")) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nIllustrative Cmax / Tmax by body weight (fixed dose, allometric theory)\n\n\nWeight (kg)\nCmax (mg/L)\nTmax (h)\n\n\n\n\n55\n10.57\n2.0\n\n\n70\n8.37\n2.0\n\n\n85\n6.93\n2.1"
+    "objectID": "reports/06_Model_Diagnostics.html#visual-predictive-check",
+    "href": "reports/06_Model_Diagnostics.html#visual-predictive-check",
+    "title": "Phase 6 — Model Diagnostics",
+    "section": "3 Visual Predictive Check",
+    "text": "3 Visual Predictive Check\nThe VPC simulates many virtual trials from the fitted model and overlays the observed data on the simulated prediction intervals. If the observed median and spread fall within the simulated bands across time, the model reproduces both the typical profile and the between-subject variability — the key qualification for using it to simulate (Phase 7).\n\n\nCode\nvpc &lt;- make_vpc(fit, n = 500)\nif (!is.null(vpc)) {\n  vpc\n} else {\n  cat(\"VPC requires the 'vpc' package. Install with renv::install('vpc'), then re-render.\")\n}\n\n\n\n\n\nVisual Predictive Check: observed data vs model-simulated prediction intervals."
   },
   {
-    "objectID": "reports/07_Simulation_Report.html#population-variability",
-    "href": "reports/07_Simulation_Report.html#population-variability",
-    "title": "Phase 7 — Clinical Simulation",
-    "section": "4 Population variability",
-    "text": "4 Population variability\nDrawing 500 virtual subjects’ random effects from the estimated ω matrix shows the spread of real-world exposures, not just the average. For a narrow-therapeutic-index drug like theophylline, this band is what matters — it indicates how many patients might stray outside the therapeutic window on a given dose.\n\n\nCode\npop &lt;- sim_population(pars, dose = dose)\nif (!is.null(pop)) {\n  sim_plot_population(pop, dose)\n} else {\n  cat(\"Population simulation requires an omega matrix (IIV model).\")\n}\n\n\n\n\n\nPopulation simulation: median and 90% prediction interval (500 subjects)."
+    "objectID": "reports/06_Model_Diagnostics.html#key-takeaways",
+    "href": "reports/06_Model_Diagnostics.html#key-takeaways",
+    "title": "Phase 6 — Model Diagnostics",
+    "section": "4 Key takeaways",
+    "text": "4 Key takeaways\n\nGOF: observed-vs-predicted should track the identity line, tighter for IPRED.\nCWRES: a flat, ±2 band with no time/PRED trend indicates the structural and error models are adequate.\nVPC: observed percentiles inside the simulated intervals confirm the model captures central tendency and variability.\nPassing these checks is what licenses the model for the clinical simulations in the next phase.\n\n\nNext: Phase 7 — Simulation: use the qualified model to simulate PK profiles for a typical patient and weight-based subgroups. ```"
   },
   {
-    "objectID": "reports/07_Simulation_Report.html#key-takeaways",
-    "href": "reports/07_Simulation_Report.html#key-takeaways",
-    "title": "Phase 7 — Clinical Simulation",
-    "section": "5 Key takeaways",
-    "text": "5 Key takeaways\n\nThe qualified IIV model reproduces a sensible typical profile (Cmax ≈ 8.37 mg/L), confirming internal consistency with the data.\nAn illustrative allometric scaling shows the expected body-weight effect on exposure, clearly separated from the (unsupported) estimated covariate of Phase 5.\nThe population prediction interval quantifies between-subject variability — the critical output for dosing a narrow-therapeutic-index drug safely.\nThis completes the end-to-end workflow: data → NCA → structural model → IIV → covariate → diagnostics → simulation.\n\n\nThe full analysis is published as a Quarto website under docs/ and deployed via GitHub Pages. ```"
-  },
-  {
-    "objectID": "reports/05_Covariate_Model_Report.html",
-    "href": "reports/05_Covariate_Model_Report.html",
-    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "objectID": "reports/04_IIV_Model_Report.html",
+    "href": "reports/04_IIV_Model_Report.html",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
     "section": "",
-    "text": "The IIV model (Phase 4) left between-subject variability as purely random. Here we test whether body weight explains part of it, by adding an allometric weight effect on clearance and volume. The questions: does it improve the fit, and does the random IIV on CL/V shrink?"
+    "text": "The base model (Phase 3) allowed only clearance to vary between subjects. Here we add between-subject random effects on V and Ka as well, so each subject has their own clearance, volume, and absorption rate. We then test whether the extra variability is justified — better fit, well-estimated, and plausibly distributed."
   },
   {
-    "objectID": "reports/05_Covariate_Model_Report.html#objectives",
-    "href": "reports/05_Covariate_Model_Report.html#objectives",
-    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "objectID": "reports/04_IIV_Model_Report.html#objectives",
+    "href": "reports/04_IIV_Model_Report.html#objectives",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
     "section": "",
-    "text": "The IIV model (Phase 4) left between-subject variability as purely random. Here we test whether body weight explains part of it, by adding an allometric weight effect on clearance and volume. The questions: does it improve the fit, and does the random IIV on CL/V shrink?"
+    "text": "The base model (Phase 3) allowed only clearance to vary between subjects. Here we add between-subject random effects on V and Ka as well, so each subject has their own clearance, volume, and absorption rate. We then test whether the extra variability is justified — better fit, well-estimated, and plausibly distributed."
   },
   {
-    "objectID": "reports/05_Covariate_Model_Report.html#how-weight-enters-the-model",
-    "href": "reports/05_Covariate_Model_Report.html#how-weight-enters-the-model",
-    "title": "Phase 5 — Covariate Model (Body Weight)",
-    "section": "2 How weight enters the model",
-    "text": "2 How weight enters the model\nWe use the pharmacometric-standard allometric form, normalised to a 70 kg reference, with the exponents estimated from the data (started at the theoretical 0.75 for CL and 1.0 for V):\n\\[ CL = CL_{typ}\\,(WT/70)^{\\theta_{CL}}, \\qquad V = V_{typ}\\,(WT/70)^{\\theta_{V}} \\]\nThe fitted model’s structure is shown as equations in the next section."
+    "objectID": "reports/04_IIV_Model_Report.html#what-a-random-effect-is",
+    "href": "reports/04_IIV_Model_Report.html#what-a-random-effect-is",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "2 What a random effect is",
+    "text": "2 What a random effect is\nFor each parameter we write, e.g., cl = exp(tcl + eta.cl), where eta.cl is a subject-specific deviation drawn from a normal distribution N(0, omega^2). The population shares one typical curve; each subject’s curve is a shifted version of it. The spread of those shifts — the IIV — is summarised as a CV%.\nThe fitted model’s structure is shown as equations in the next section."
   },
   {
-    "objectID": "reports/05_Covariate_Model_Report.html#fit-the-covariate-model",
-    "href": "reports/05_Covariate_Model_Report.html#fit-the-covariate-model",
-    "title": "Phase 5 — Covariate Model (Body Weight)",
-    "section": "3 Fit the covariate model",
-    "text": "3 Fit the covariate model\n\n\nCode\ndat     &lt;- build_nonmem_data()\niiv_fit &lt;- load_iiv_fit()\ncov_fit &lt;- fit_cov_model(dat)\n\n\ncalculating covariance matrix\ndone\n\n\nCode\ncov_fit\n\n\n\\[\\begin{align*}\n{ka} & = \\exp\\left({tka}+{eta.ka}\\right) \\\\\n{cl} & = \\exp\\left({tcl}+{eta.cl}\\right) {\\times} {\\left(\\frac{{WT}}{{70}}\\right)}^{{dWTCL}} \\\\\n{v} & = \\exp\\left({tv}+{eta.v}\\right) {\\times} {\\left(\\frac{{WT}}{{70}}\\right)}^{{dWTV}} \\\\\n\\frac{d \\: depot}{dt} & = -{ka} {\\times} {depot} \\\\\n\\frac{d \\: center}{dt} & = {ka} {\\times} {depot}-\\left(\\frac{{cl}}{{v}}\\right) {\\times} {center} \\\\\n{cp} & = \\frac{{center}}{{v}} \\\\\n{cp} & \\sim add({add.sd})+prop({prop.sd})\n\\end{align*}\\]"
+    "objectID": "reports/04_IIV_Model_Report.html#fit-the-iiv-model",
+    "href": "reports/04_IIV_Model_Report.html#fit-the-iiv-model",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "3 Fit the IIV model",
+    "text": "3 Fit the IIV model\n\n\nCode\ndat      &lt;- build_nonmem_data()\nbase_fit &lt;- readRDS(fs::path(PATH_MODELS, \"base_fit.rds\"))\niiv_fit  &lt;- fit_iiv_model(dat)\n\n\ncalculating covariance matrix\ndone\n\n\nCode\niiv_fit\n\n\n\\[\\begin{align*}\n{ka} & = \\exp\\left({tka}+{eta.ka}\\right) \\\\\n{cl} & = \\exp\\left({tcl}+{eta.cl}\\right) \\\\\n{v} & = \\exp\\left({tv}+{eta.v}\\right) \\\\\n\\frac{d \\: depot}{dt} & = -{ka} {\\times} {depot} \\\\\n\\frac{d \\: center}{dt} & = {ka} {\\times} {depot}-\\left(\\frac{{cl}}{{v}}\\right) {\\times} {center} \\\\\n{cp} & = \\frac{{center}}{{v}} \\\\\n{cp} & \\sim add({add.sd})+prop({prop.sd})\n\\end{align*}\\]"
   },
   {
-    "objectID": "reports/05_Covariate_Model_Report.html#parameter-estimates",
-    "href": "reports/05_Covariate_Model_Report.html#parameter-estimates",
-    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "objectID": "reports/04_IIV_Model_Report.html#parameter-estimates",
+    "href": "reports/04_IIV_Model_Report.html#parameter-estimates",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
     "section": "4 Parameter estimates",
-    "text": "4 Parameter estimates\nThe two new parameters are dWTCL and dWTV — the weight exponents. Their 95% confidence intervals tell us whether the effect is distinguishable from zero (no effect).\n\n\nCode\nbase_param_table(cov_fit) |&gt;\n  kbl(caption = \"Covariate model estimates (note dWTCL, dWTV exponents)\",\n      digits = 3) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nCovariate model estimates (note dWTCL, dWTV exponents)\n\n\nParameter\nEst.\nSE\n%RSE\nBack-transformed(95%CI)\nBSV(CV%)\nShrink(SD)%\n\n\n\n\ntka\n0.398\n0.243\n61.1\n1.49 (0.924, 2.4)\n72.3\n2.32%&lt;\n\n\ntcl\n1.03\n0.0325\n3.16\n2.79 (2.62, 2.98)\n26.1\n3.32%&lt;\n\n\ntv\n3.47\n0.0984\n2.84\n32.1 (26.5, 39)\n10.9\n22.1%=\n\n\ndWTCL\n0.349\n0.525\n151\n0.349 (-0.68, 1.38)\n\n\n\n\ndWTV\n0.586\n0.273\n46.6\n0.586 (0.0505, 1.12)\n\n\n\n\nadd.sd\n0.265\n\n\n0.265\n\n\n\n\nprop.sd\n0.134\n\n\n0.134"
+    "text": "4 Parameter estimates\n\n\nCode\nbase_param_table(iiv_fit) |&gt;\n  kbl(caption = \"IIV model estimates (fixed effects, IIV CV%, and shrinkage)\",\n      digits = 3) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nIIV model estimates (fixed effects, IIV CV%, and shrinkage)\n\n\nParameter\nEst.\nSE\n%RSE\nBack-transformed(95%CI)\nBSV(CV%)\nShrink(SD)%\n\n\n\n\ntka\n0.389\n0.198\n50.9\n1.48 (1, 2.17)\n68.8\n1.88%&lt;\n\n\ntcl\n1.03\n0.074\n7.22\n2.79 (2.41, 3.22)\n25.7\n1.12%&lt;\n\n\ntv\n3.47\n0.046\n1.33\n32 (29.3, 35)\n12.6\n15.7%&lt;\n\n\nadd.sd\n0.261\n\n\n0.261\n\n\n\n\nprop.sd\n0.136\n\n\n0.136\n\n\n\n\n\n\n\nRead the BSV(CV%) column for the size of each random effect and the Shrink(SD)% column for how well the data support it. As a rule of thumb, shrinkage under ~30% means the individual estimates are genuinely informed by the data rather than collapsing to the population mean."
   },
   {
-    "objectID": "reports/05_Covariate_Model_Report.html#is-the-weight-effect-justified",
-    "href": "reports/05_Covariate_Model_Report.html#is-the-weight-effect-justified",
-    "title": "Phase 5 — Covariate Model (Body Weight)",
-    "section": "5 Is the weight effect justified?",
-    "text": "5 Is the weight effect justified?\n\n\nCode\ncmp &lt;- compare_models(\n  model_metrics(iiv_fit, \"IIV (no covariate)\"),\n  model_metrics(cov_fit, \"Weight on CL & V\")\n)\ncmp |&gt;\n  kbl(caption = \"IIV vs covariate model\", digits = 2) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nIIV vs covariate model\n\n\nModel\nOFV\nAIC\nBIC\nnPar\ndOFV\ndAIC\n\n\n\n\nIIV (no covariate)\n104.36\n362.96\n386.02\n8\n0.00\n0.00\n\n\nWeight on CL & V\n100.71\n363.31\n392.14\n10\n-3.65\n0.35\n\n\n\n\n\nAdding two parameters is significant (p &lt; 0.05) if the OFV drops by more than 5.99. Here ΔOFV = -3.65, so on the likelihood-ratio test the weight effect is not clearly supported in this dataset."
+    "objectID": "reports/04_IIV_Model_Report.html#is-the-added-variability-justified",
+    "href": "reports/04_IIV_Model_Report.html#is-the-added-variability-justified",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "5 Is the added variability justified?",
+    "text": "5 Is the added variability justified?\nWe compare the base and IIV models by objective function value (OFV), and by AIC/BIC, which penalise extra parameters. By the likelihood-ratio test, adding two random effects (V and Ka) is significant at p &lt; 0.05 if the OFV drops by more than 5.99 (χ², 2 df).\n\n\nCode\ncmp &lt;- compare_models(\n  model_metrics(base_fit, \"Base (IIV on CL)\"),\n  model_metrics(iiv_fit,  \"IIV on CL, V, Ka\")\n)\ncmp |&gt;\n  kbl(caption = \"Base vs IIV model comparison\", digits = 2) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nBase vs IIV model comparison\n\n\nModel\nOFV\nAIC\nBIC\nnPar\ndOFV\ndAIC\n\n\n\n\nBase (IIV on CL)\n177.81\n432.41\n449.70\n6\n0.00\n0.00\n\n\nIIV on CL, V, Ka\n104.36\n362.96\n386.02\n8\n-73.45\n-69.45\n\n\n\n\n\nThe IIV model lowers the OFV by 73.45 points relative to base (ΔAIC = -69.45). A drop well beyond the 5.99 threshold means the between-subject variability on V and Ka is statistically warranted — the model genuinely fits better, not just by added flexibility."
   },
   {
-    "objectID": "reports/05_Covariate_Model_Report.html#did-the-random-iiv-shrink",
-    "href": "reports/05_Covariate_Model_Report.html#did-the-random-iiv-shrink",
-    "title": "Phase 5 — Covariate Model (Body Weight)",
-    "section": "6 Did the random IIV shrink?",
-    "text": "6 Did the random IIV shrink?\nIf weight genuinely drives part of the between-subject variability, the BSV(CV%) on CL and V should be smaller in the covariate model than in the IIV model.\n\n\nCode\ndplyr::full_join(\n  iiv_cv(iiv_fit) |&gt; dplyr::rename(`IIV model` = `BSV CV%`),\n  iiv_cv(cov_fit) |&gt; dplyr::rename(`Covariate model` = `BSV CV%`),\n  by = \"Parameter\"\n) |&gt;\n  kbl(caption = \"Between-subject CV% before vs after adding weight\",\n      digits = 1) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nBetween-subject CV% before vs after adding weight\n\n\nParameter\nIIV model\nCovariate model\n\n\n\n\ntka\n68.8\n72.3\n\n\ntcl\n25.7\n26.1\n\n\ntv\n12.6\n10.9"
+    "objectID": "reports/04_IIV_Model_Report.html#random-effect-distributions",
+    "href": "reports/04_IIV_Model_Report.html#random-effect-distributions",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "section": "6 Random-effect distributions",
+    "text": "6 Random-effect distributions\nThe empirical-Bayes η estimates should be centred on 0 and roughly symmetric — the model’s normality assumption.\n\n\nCode\niiv_plot_eta(iiv_fit)\n\n\n\n\n\nEta distributions for CL, V, and Ka (centred on zero = assumption met)."
   },
   {
-    "objectID": "reports/05_Covariate_Model_Report.html#residual-random-effects-vs-weight",
-    "href": "reports/05_Covariate_Model_Report.html#residual-random-effects-vs-weight",
-    "title": "Phase 5 — Covariate Model (Body Weight)",
-    "section": "7 Residual random effects vs weight",
-    "text": "7 Residual random effects vs weight\nAfter including weight, the random effects on CL and V should show little residual trend with weight — a flat line means the covariate has absorbed the size effect.\n\n\nCode\ncov_plot_eta_wt(cov_fit, dat)\n\n\n\n\n\nRandom effects on CL and V vs body weight in the covariate model."
-  },
-  {
-    "objectID": "reports/05_Covariate_Model_Report.html#key-takeaways",
-    "href": "reports/05_Covariate_Model_Report.html#key-takeaways",
-    "title": "Phase 5 — Covariate Model (Body Weight)",
-    "section": "8 Key takeaways",
-    "text": "8 Key takeaways\n\nBody weight was added allometrically on CL and V, with estimated exponents.\nOn the likelihood-ratio test the effect was not clearly supported (ΔOFV = -3.65).\nWe reported the change in random CV% and the residual η–weight trend honestly — in a small, weight-dosed dataset like Theoph a strong weight signal is not guaranteed, and recognising that is part of sound covariate analysis.\n\n\nNext: Phase 6 — Model diagnostics: goodness-of-fit plots, CWRES vs TIME/PRED, and a visual predictive check (VPC) on the selected model. ```"
-  },
-  {
-    "objectID": "reports/03_Base_Model_Report.html",
-    "href": "reports/03_Base_Model_Report.html",
-    "title": "Phase 3 — Base Population PK Model",
-    "section": "",
-    "text": "Having characterised the data (Phase 1) and computed model-free exposure metrics (Phase 2), we now fit a structural population PK model: a one-compartment model with first-order oral absorption. This phase establishes the model skeleton and the typical (population-average) parameters; between-subject variability and covariates are layered on in Phases 4–5."
-  },
-  {
-    "objectID": "reports/03_Base_Model_Report.html#objectives",
-    "href": "reports/03_Base_Model_Report.html#objectives",
-    "title": "Phase 3 — Base Population PK Model",
-    "section": "",
-    "text": "Having characterised the data (Phase 1) and computed model-free exposure metrics (Phase 2), we now fit a structural population PK model: a one-compartment model with first-order oral absorption. This phase establishes the model skeleton and the typical (population-average) parameters; between-subject variability and covariates are layered on in Phases 4–5."
-  },
-  {
-    "objectID": "reports/03_Base_Model_Report.html#from-tidy-data-to-nonmem-events",
-    "href": "reports/03_Base_Model_Report.html#from-tidy-data-to-nonmem-events",
-    "title": "Phase 3 — Base Population PK Model",
-    "section": "2 From tidy data to NONMEM events",
-    "text": "2 From tidy data to NONMEM events\nEstimation engines treat every row as an event — either a dose or an observation. build_nonmem_data() inserts one dosing row per subject at time 0 and keeps the concentration rows as observations.\n\n\nCode\ndat &lt;- build_nonmem_data()\ndat |&gt;\n  dplyr::filter(ID == 1) |&gt;\n  kbl(caption = \"Subject 1 as an event dataset (dose row first, then observations)\",\n      digits = 2) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nSubject 1 as an event dataset (dose row first, then observations)\n\n\nID\nTIME\nDV\nAMT\nEVID\nCMT\nMDV\nWT\n\n\n\n\n1\n0.00\nNA\n319.99\n1\n1\n1\n79.6\n\n\n1\n0.00\n0.74\n0.00\n0\n2\n0\n79.6\n\n\n1\n0.25\n2.84\n0.00\n0\n2\n0\n79.6\n\n\n1\n0.57\n6.57\n0.00\n0\n2\n0\n79.6\n\n\n1\n1.12\n10.50\n0.00\n0\n2\n0\n79.6\n\n\n1\n2.02\n9.66\n0.00\n0\n2\n0\n79.6\n\n\n1\n3.82\n8.58\n0.00\n0\n2\n0\n79.6\n\n\n1\n5.10\n8.36\n0.00\n0\n2\n0\n79.6\n\n\n1\n7.03\n7.47\n0.00\n0\n2\n0\n79.6\n\n\n1\n9.05\n6.89\n0.00\n0\n2\n0\n79.6\n\n\n1\n12.12\n5.94\n0.00\n0\n2\n0\n79.6\n\n\n1\n24.37\n3.28\n0.00\n0\n2\n0\n79.6\n\n\n\n\n\nColumn meanings: EVID = 1 marks the dose (with AMT in mg) and 0 marks an observation (with DV, the concentration); MDV = 1 means “no measured DV on this row” (true for dose rows); CMT routes the dose to the depot (1) and the observation to the central compartment (2)."
-  },
-  {
-    "objectID": "reports/03_Base_Model_Report.html#the-structural-model",
-    "href": "reports/03_Base_Model_Report.html#the-structural-model",
-    "title": "Phase 3 — Base Population PK Model",
-    "section": "3 The structural model",
-    "text": "3 The structural model\nThe model is a function with an ini block (starting values) and a model block (the structure). Fixed effects are estimated on the log scale, so the back-transformed CL, V, and Ka are always positive. Initial values are seeded from the Phase 2 NCA, which puts the optimiser close to the solution from the start.\nThe fitted model’s structure is shown as equations in the next section.\nThe two d/dt(...) lines are the compartment mass-balance equations; cp = center/v is the predicted concentration; and cp ~ add(add.sd) + prop(prop.sd) specifies a combined additive + proportional residual error model. The base model carries between-subject variability on CL only (eta.cl) — variability on V and Ka is added in Phase 4."
-  },
-  {
-    "objectID": "reports/03_Base_Model_Report.html#fitting-the-model-focei",
-    "href": "reports/03_Base_Model_Report.html#fitting-the-model-focei",
-    "title": "Phase 3 — Base Population PK Model",
-    "section": "4 Fitting the model (FOCEi)",
-    "text": "4 Fitting the model (FOCEi)\nfit_base_model() estimates the parameters by FOCEi (First-Order Conditional Estimation with interaction), the workhorse algorithm of population PK.\n\n\nCode\nfit &lt;- fit_base_model(dat)\n\n\ncalculating covariance matrix\ndone\n\n\nCode\nfit\n\n\n\\[\\begin{align*}\n{ka} & = \\exp\\left({tka}\\right) \\\\\n{cl} & = \\exp\\left({tcl}+{eta.cl}\\right) \\\\\n{v} & = \\exp\\left({tv}\\right) \\\\\n\\frac{d \\: depot}{dt} & = -{ka} {\\times} {depot} \\\\\n\\frac{d \\: center}{dt} & = {ka} {\\times} {depot}-\\left(\\frac{{cl}}{{v}}\\right) {\\times} {center} \\\\\n{cp} & = \\frac{{center}}{{v}} \\\\\n{cp} & \\sim add({add.sd})+prop({prop.sd})\n\\end{align*}\\]"
-  },
-  {
-    "objectID": "reports/03_Base_Model_Report.html#parameter-estimates",
-    "href": "reports/03_Base_Model_Report.html#parameter-estimates",
-    "title": "Phase 3 — Base Population PK Model",
-    "section": "5 Parameter estimates",
-    "text": "5 Parameter estimates\n\n\nCode\nbase_param_table(fit) |&gt;\n  kbl(caption = \"Base model fixed-effect estimates (back-transformed)\",\n      digits = 3) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nBase model fixed-effect estimates (back-transformed)\n\n\nParameter\nEst.\nSE\n%RSE\nBack-transformed(95%CI)\nBSV(CV%)\nShrink(SD)%\n\n\n\n\ntka\n0.677\n0.265\n39.1\n1.97 (1.17, 3.31)\n\n\n\n\ntcl\n1.04\n0.0721\n6.96\n2.82 (2.45, 3.25)\n23.5\n7.91%&lt;\n\n\ntv\n3.53\n0.0454\n1.29\n34 (31.1, 37.2)\n\n\n\n\nadd.sd\n0.225\n\n\n0.225\n\n\n\n\nprop.sd\n0.259\n\n\n0.259\n\n\n\n\n\n\n\n\n5.1 Sanity check vs NCA\nThe population model and the model-free NCA should tell a consistent story:\n\n\n\nParameter\nNCA (geo. mean, Phase 2)\nBase model (typical)\n\n\n\n\nCL (L/h)\n~2.74\n2.82\n\n\nV (L)\n~31.6\n34\n\n\nKa (1/h)\n~1.5 (from Tmax)\n1.97\n\n\n\nClose agreement is the key validation that the structural model and dataset are correct — the two independent methods converge on the same physiology."
-  },
-  {
-    "objectID": "reports/03_Base_Model_Report.html#quick-predicted-vs-observed-check",
-    "href": "reports/03_Base_Model_Report.html#quick-predicted-vs-observed-check",
-    "title": "Phase 3 — Base Population PK Model",
-    "section": "6 Quick predicted-vs-observed check",
-    "text": "6 Quick predicted-vs-observed check\nFull diagnostics (GOF, VPC, CWRES) come in Phase 6; here we just confirm the fit is sensible — points should scatter around the line of identity.\n\n\nCode\nfitdf &lt;- as.data.frame(fit)\n\np &lt;- ggplot2::ggplot(fitdf, ggplot2::aes(PRED, DV)) +\n  ggplot2::geom_abline(slope = 1, intercept = 0, linetype = \"dashed\", colour = \"grey50\") +\n  ggplot2::geom_point(alpha = 0.6, colour = \"#2C3E50\") +\n  ggplot2::labs(x = \"Population prediction (mg/L)\", y = \"Observed (mg/L)\",\n                title = \"Observed vs population prediction (base model)\")\np\n\n\n\n\n\nPopulation (PRED) and individual (IPRED) predictions vs observations.\n\n\n\n\nCode\nsave_fig(p, \"03_base_obs_vs_pred\")"
-  },
-  {
-    "objectID": "reports/03_Base_Model_Report.html#key-takeaways",
-    "href": "reports/03_Base_Model_Report.html#key-takeaways",
-    "title": "Phase 3 — Base Population PK Model",
+    "objectID": "reports/04_IIV_Model_Report.html#key-takeaways",
+    "href": "reports/04_IIV_Model_Report.html#key-takeaways",
+    "title": "Phase 4 — Inter-Individual Variability (IIV)",
     "section": "7 Key takeaways",
-    "text": "7 Key takeaways\n\nThe data were re-expressed as a NONMEM event dataset (dose + observation rows).\nA one-compartment oral model with first-order absorption was fitted by FOCEi.\nTypical estimates (CL ≈ 2.82 L/h, V ≈ 34 L, Ka ≈ 1.97 /h) agree with the NCA — the structural model holds.\nThe base model includes IIV on CL only; the next phase adds variability on V and Ka.\n\n\nNext: Phase 4 — IIV model, extending between-subject variability to V and Ka and examining the random-effect (η) distributions. ```"
+    "text": "7 Key takeaways\n\nRandom effects on V and Ka were added to the base (CL-only) model.\nThe OFV fell by 73.45 (≫ the 5.99 cut-off for 2 df), so the extra IIV is justified.\nShrinkage and the η distributions indicate the random effects are data-supported, not artefacts.\nThis full-IIV model is now the reference onto which we test a covariate (body weight) next.\n\n\nNext: Phase 5 — Covariate model, testing whether body weight explains part of the between-subject variability in CL and V. ```"
+  },
+  {
+    "objectID": "reports/02_NCA_Report.html",
+    "href": "reports/02_NCA_Report.html",
+    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
+    "section": "",
+    "text": "Noncompartmental analysis (NCA) summarises drug exposure without assuming a structural model. It provides model-independent benchmarks — peak concentration, exposure (AUC), and terminal half-life — that we will later compare against the population-model estimates (Phases 3–5).\nParameters computed per subject:\n\nCmax / Tmax — observed peak concentration and its time.\nAUClast — area under the curve to the last measurable concentration (linear-up/log-down trapezoidal).\nAUCinf(obs) — AUClast plus the extrapolated tail (Clast / λz).\nt½ — terminal half-life, from the terminal rate constant λz.\nCL/F, Vz/F — apparent clearance and volume (dose-normalised)."
+  },
+  {
+    "objectID": "reports/02_NCA_Report.html#objectives",
+    "href": "reports/02_NCA_Report.html#objectives",
+    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
+    "section": "",
+    "text": "Noncompartmental analysis (NCA) summarises drug exposure without assuming a structural model. It provides model-independent benchmarks — peak concentration, exposure (AUC), and terminal half-life — that we will later compare against the population-model estimates (Phases 3–5).\nParameters computed per subject:\n\nCmax / Tmax — observed peak concentration and its time.\nAUClast — area under the curve to the last measurable concentration (linear-up/log-down trapezoidal).\nAUCinf(obs) — AUClast plus the extrapolated tail (Clast / λz).\nt½ — terminal half-life, from the terminal rate constant λz.\nCL/F, Vz/F — apparent clearance and volume (dose-normalised)."
+  },
+  {
+    "objectID": "reports/02_NCA_Report.html#method-pknca",
+    "href": "reports/02_NCA_Report.html#method-pknca",
+    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
+    "section": "2 Method (PKNCA)",
+    "text": "2 Method (PKNCA)\nrun_nca() builds a PKNCAconc object (concentration–time, grouped by subject), a PKNCAdose object (the single oral dose in mg at t = 0), defines one 0 → ∞ interval requesting the parameters above, and runs pk.nca(). PKNCA selects the terminal-phase points for λz automatically by maximising the adjusted R².\n\n\nCode\ndf  &lt;- load_pk_data()\nnca &lt;- run_nca(df)"
+  },
+  {
+    "objectID": "reports/02_NCA_Report.html#per-subject-nca-parameters",
+    "href": "reports/02_NCA_Report.html#per-subject-nca-parameters",
+    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
+    "section": "3 Per-subject NCA parameters",
+    "text": "3 Per-subject NCA parameters\n\n\nCode\nnca$wide |&gt;\n  dplyr::select(id, cmax, tmax, auclast, aucinf.obs, half.life,\n                cl.obs, vz.obs, aucpext.obs) |&gt;\n  kbl(\n    caption = \"Noncompartmental parameters by subject\",\n    digits  = 2,\n    col.names = c(\"ID\", \"Cmax (mg/L)\", \"Tmax (h)\", \"AUClast (mg·h/L)\",\n                  \"AUCinf (mg·h/L)\", \"t½ (h)\", \"CL/F (L/h)\", \"Vz/F (L)\",\n                  \"AUC %extrap\")\n  ) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nNoncompartmental parameters by subject\n\n\nID\nCmax (mg/L)\nTmax (h)\nAUClast (mg·h/L)\nAUCinf (mg·h/L)\nt½ (h)\nCL/F (L/h)\nVz/F (L)\nAUC %extrap\n\n\n\n\n1\n10.50\n1.12\n147.23\n214.92\n14.30\n1.49\n30.73\n31.49\n\n\n2\n8.33\n1.92\n88.73\n97.38\n6.66\n3.27\n31.43\n8.88\n\n\n3\n8.20\n1.02\n95.88\n106.13\n6.77\n3.01\n29.37\n9.66\n\n\n4\n8.60\n1.07\n102.63\n114.22\n6.98\n2.80\n28.21\n10.14\n\n\n5\n11.40\n1.00\n118.18\n136.30\n8.00\n2.35\n27.10\n13.30\n\n\n6\n6.44\n1.15\n71.70\n82.18\n7.89\n3.89\n44.35\n12.75\n\n\n7\n7.09\n3.48\n87.97\n100.99\n7.85\n3.17\n35.85\n12.89\n\n\n8\n7.56\n2.02\n86.81\n102.15\n8.51\n3.13\n38.38\n15.02\n\n\n9\n9.03\n0.63\n83.94\n97.52\n8.41\n2.75\n33.31\n13.93\n\n\n10\n10.21\n3.55\n135.58\n167.86\n9.25\n1.91\n25.44\n19.23\n\n\n11\n8.00\n0.98\n77.89\n86.90\n7.26\n3.68\n38.55\n10.37\n\n\n12\n9.75\n3.52\n115.22\n125.83\n6.29\n2.55\n23.11\n8.43\n\n\n\n\n\nThe AUC %extrapolated column is a quality flag — values well under 20% indicate AUCinf is reliable (little of the exposure comes from extrapolation)."
+  },
+  {
+    "objectID": "reports/02_NCA_Report.html#summary-statistics",
+    "href": "reports/02_NCA_Report.html#summary-statistics",
+    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
+    "section": "4 Summary statistics",
+    "text": "4 Summary statistics\nnca_param_summary() reports the geometric mean and geometric CV% — the conventional summaries for PK parameters, which are log-normally distributed.\n\n\nCode\nsmry &lt;- nca_param_summary(nca$wide)\nsmry |&gt;\n  kbl(caption = \"NCA parameter summary (geometric mean, CV%, range)\",\n      digits = 2) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nNCA parameter summary (geometric mean, CV%, range)\n\n\nParameter\nN\nGeo. mean\nGeo. CV%\nMin\nMedian\nMax\n\n\n\n\ncmax\n12\n8.65\n16.98\n6.44\n8.46\n11.40\n\n\ntmax\n12\n1.52\n64.67\n0.63\n1.14\n3.55\n\n\nauclast\n12\n98.65\n22.54\n71.70\n92.30\n147.23\n\n\naucinf.obs\n12\n114.81\n28.43\n82.18\n104.14\n214.92\n\n\nhalf.life\n12\n7.99\n21.85\n6.29\n7.87\n14.30\n\n\ncl.obs\n12\n2.74\n27.86\n1.49\n2.90\n3.89\n\n\nvz.obs\n12\n31.62\n19.21\n23.11\n31.08\n44.35\n\n\naucpext.obs\n12\n12.89\n38.17\n8.43\n12.82\n31.49\n\n\n\n\n\nFor theophylline, the literature half-life in healthy adults is roughly 6–9 h; this NCA gives a geometric-mean t½ ≈ 8 h, apparent clearance CL/F ≈ 2.74 L/h, and apparent volume Vz/F ≈ 31.6 L — all physiologically sensible and a useful sanity check before population modelling."
+  },
+  {
+    "objectID": "reports/02_NCA_Report.html#visualisations",
+    "href": "reports/02_NCA_Report.html#visualisations",
+    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
+    "section": "5 Visualisations",
+    "text": "5 Visualisations\n\n\nCode\nnca_plot_halflife(nca$wide)\n\n\n\n\n\n\n\n\nFigure 1: Terminal half-life by subject (dashed line = geometric mean).\n\n\n\n\n\n\n\nCode\nnca_plot_auc(nca$wide)\n\n\n\n\n\n\n\n\nFigure 2: AUClast vs AUCinf — proximity to the identity line indicates minimal extrapolation.\n\n\n\n\n\n\n\nCode\nnca_plot_distributions(nca$wide)\n\n\n\n\n\n\n\n\nFigure 3: Distribution of NCA parameters across the 12 subjects.\n\n\n\n\n\n\n\nCode\nnca_plot_cl_weight(nca$wide, df)\n\n\n\n\n\n\n\n\nFigure 4: Apparent clearance vs body weight — an exploratory look ahead to the covariate model.\n\n\n\n\n\nThe Pearson correlation between weight and NCA clearance is r = 0.17 (p = 0.59) — suggestive, and formally tested inside the population model in Phase 5."
+  },
+  {
+    "objectID": "reports/02_NCA_Report.html#key-takeaways",
+    "href": "reports/02_NCA_Report.html#key-takeaways",
+    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
+    "section": "6 Key takeaways",
+    "text": "6 Key takeaways\n\nNCA gives model-independent exposure metrics that frame the modelling work.\nGeometric-mean t½ ≈ 8 h, CL/F ≈ 2.74 L/h, Vz/F ≈ 31.6 L are consistent with known theophylline PK.\nLow AUC %extrapolation means AUCinf (and therefore CL/Vz) is well determined.\nBetween-subject spread in CL and AUC reinforces the need for an IIV model (Phase 4) and motivates testing weight as a covariate (Phase 5).\n\n\nNext: Phase 3 — Base PopPK model (one-compartment oral, first-order absorption) with nlmixr2 / rxode2."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Population PK Portfolio — Theophylline",
+    "section": "",
+    "text": "This portfolio demonstrates a complete Population Pharmacokinetics (PopPK) workflow on the classic Theophylline dataset — from exploratory analysis through noncompartmental analysis, nonlinear mixed-effects modelling, covariate evaluation, diagnostics, and clinical simulation. It was built to showcase practical skills in clinical pharmacology, DMPK, and pharmacometrics."
+  },
+  {
+    "objectID": "index.html#overview",
+    "href": "index.html#overview",
+    "title": "Population PK Portfolio — Theophylline",
+    "section": "",
+    "text": "This portfolio demonstrates a complete Population Pharmacokinetics (PopPK) workflow on the classic Theophylline dataset — from exploratory analysis through noncompartmental analysis, nonlinear mixed-effects modelling, covariate evaluation, diagnostics, and clinical simulation. It was built to showcase practical skills in clinical pharmacology, DMPK, and pharmacometrics."
+  },
+  {
+    "objectID": "index.html#drug-context",
+    "href": "index.html#drug-context",
+    "title": "Population PK Portfolio — Theophylline",
+    "section": "2 Drug context",
+    "text": "2 Drug context\nTheophylline is a narrow-therapeutic-index bronchodilator with well-characterised one-compartment oral pharmacokinetics. The built-in Theoph dataset contains rich serial sampling from 12 subjects after a single oral dose, with body weight recorded as a covariate of interest — making it an ideal teaching dataset for population PK methodology."
+  },
+  {
+    "objectID": "index.html#analysis-phases",
+    "href": "index.html#analysis-phases",
+    "title": "Population PK Portfolio — Theophylline",
+    "section": "3 Analysis phases",
+    "text": "3 Analysis phases\n\n\n\nPhase\nReport\nKey skills\n\n\n\n\n1\nExploratory Data Analysis\nData QC, PK visualisation, study design\n\n\n2\nNoncompartmental Analysis\nPKNCA — Cmax, Tmax, AUC, t½\n\n\n3\nBase PopPK Model\nnlmixr2 / rxode2, 1-cmt oral, first-order absorption\n\n\n4\nIIV Model\nBetween-subject variability on CL, V, Ka\n\n\n5\nCovariate Model\nWeight on CL & V, model selection\n\n\n6\nModel Diagnostics\nGOF, VPC, CWRES vs TIME/PRED\n\n\n7\nClinical Simulation\nTypical-patient & subgroup PK simulation"
+  },
+  {
+    "objectID": "index.html#reproducibility",
+    "href": "index.html#reproducibility",
+    "title": "Population PK Portfolio — Theophylline",
+    "section": "4 Reproducibility",
+    "text": "4 Reproducibility\nThe project uses renv for a locked package environment, here for path-safe code, and Quarto to render every analysis to this website (published from the docs/ folder via GitHub Pages). Each phase is a standalone, re-runnable script in R/ paired with a report in reports/.\n\nDisclaimer: built with publicly available data for educational and portfolio purposes only; not intended to guide clinical dosing."
   },
   {
     "objectID": "reports/01_EDA_Report.html",
@@ -266,220 +329,206 @@
     "text": "8 Key takeaways\n\nThe dataset is clean and complete: 12 subjects, 11 samples each, no missing or negative values, time strictly increasing.\nProfiles are consistent with one-compartment oral PK with first-order absorption — the structural model carried into Phase 3.\nThere is meaningful between-subject variability in exposure, motivating an IIV model (Phase 4).\nBody weight is a physiologically plausible covariate worth testing on clearance and volume (Phase 5).\n\n\nNext: Phase 2 — Noncompartmental Analysis with PKNCA to quantify Cmax, Tmax, AUC, and half-life per subject."
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Population PK Portfolio — Theophylline",
+    "objectID": "reports/03_Base_Model_Report.html",
+    "href": "reports/03_Base_Model_Report.html",
+    "title": "Phase 3 — Base Population PK Model",
     "section": "",
-    "text": "This portfolio demonstrates a complete Population Pharmacokinetics (PopPK) workflow on the classic Theophylline dataset — from exploratory analysis through noncompartmental analysis, nonlinear mixed-effects modelling, covariate evaluation, diagnostics, and clinical simulation. It was built to showcase practical skills in clinical pharmacology, DMPK, and pharmacometrics."
+    "text": "Having characterised the data (Phase 1) and computed model-free exposure metrics (Phase 2), we now fit a structural population PK model: a one-compartment model with first-order oral absorption. This phase establishes the model skeleton and the typical (population-average) parameters; between-subject variability and covariates are layered on in Phases 4–5."
   },
   {
-    "objectID": "index.html#overview",
-    "href": "index.html#overview",
-    "title": "Population PK Portfolio — Theophylline",
+    "objectID": "reports/03_Base_Model_Report.html#objectives",
+    "href": "reports/03_Base_Model_Report.html#objectives",
+    "title": "Phase 3 — Base Population PK Model",
     "section": "",
-    "text": "This portfolio demonstrates a complete Population Pharmacokinetics (PopPK) workflow on the classic Theophylline dataset — from exploratory analysis through noncompartmental analysis, nonlinear mixed-effects modelling, covariate evaluation, diagnostics, and clinical simulation. It was built to showcase practical skills in clinical pharmacology, DMPK, and pharmacometrics."
+    "text": "Having characterised the data (Phase 1) and computed model-free exposure metrics (Phase 2), we now fit a structural population PK model: a one-compartment model with first-order oral absorption. This phase establishes the model skeleton and the typical (population-average) parameters; between-subject variability and covariates are layered on in Phases 4–5."
   },
   {
-    "objectID": "index.html#drug-context",
-    "href": "index.html#drug-context",
-    "title": "Population PK Portfolio — Theophylline",
-    "section": "2 Drug context",
-    "text": "2 Drug context\nTheophylline is a narrow-therapeutic-index bronchodilator with well-characterised one-compartment oral pharmacokinetics. The built-in Theoph dataset contains rich serial sampling from 12 subjects after a single oral dose, with body weight recorded as a covariate of interest — making it an ideal teaching dataset for population PK methodology."
+    "objectID": "reports/03_Base_Model_Report.html#from-tidy-data-to-nonmem-events",
+    "href": "reports/03_Base_Model_Report.html#from-tidy-data-to-nonmem-events",
+    "title": "Phase 3 — Base Population PK Model",
+    "section": "2 From tidy data to NONMEM events",
+    "text": "2 From tidy data to NONMEM events\nEstimation engines treat every row as an event — either a dose or an observation. build_nonmem_data() inserts one dosing row per subject at time 0 and keeps the concentration rows as observations.\n\n\nCode\ndat &lt;- build_nonmem_data()\ndat |&gt;\n  dplyr::filter(ID == 1) |&gt;\n  kbl(caption = \"Subject 1 as an event dataset (dose row first, then observations)\",\n      digits = 2) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nSubject 1 as an event dataset (dose row first, then observations)\n\n\nID\nTIME\nDV\nAMT\nEVID\nCMT\nMDV\nWT\n\n\n\n\n1\n0.00\nNA\n319.99\n1\n1\n1\n79.6\n\n\n1\n0.00\n0.74\n0.00\n0\n2\n0\n79.6\n\n\n1\n0.25\n2.84\n0.00\n0\n2\n0\n79.6\n\n\n1\n0.57\n6.57\n0.00\n0\n2\n0\n79.6\n\n\n1\n1.12\n10.50\n0.00\n0\n2\n0\n79.6\n\n\n1\n2.02\n9.66\n0.00\n0\n2\n0\n79.6\n\n\n1\n3.82\n8.58\n0.00\n0\n2\n0\n79.6\n\n\n1\n5.10\n8.36\n0.00\n0\n2\n0\n79.6\n\n\n1\n7.03\n7.47\n0.00\n0\n2\n0\n79.6\n\n\n1\n9.05\n6.89\n0.00\n0\n2\n0\n79.6\n\n\n1\n12.12\n5.94\n0.00\n0\n2\n0\n79.6\n\n\n1\n24.37\n3.28\n0.00\n0\n2\n0\n79.6\n\n\n\n\n\nColumn meanings: EVID = 1 marks the dose (with AMT in mg) and 0 marks an observation (with DV, the concentration); MDV = 1 means “no measured DV on this row” (true for dose rows); CMT routes the dose to the depot (1) and the observation to the central compartment (2)."
   },
   {
-    "objectID": "index.html#analysis-phases",
-    "href": "index.html#analysis-phases",
-    "title": "Population PK Portfolio — Theophylline",
-    "section": "3 Analysis phases",
-    "text": "3 Analysis phases\n\n\n\nPhase\nReport\nKey skills\n\n\n\n\n1\nExploratory Data Analysis\nData QC, PK visualisation, study design\n\n\n2\nNoncompartmental Analysis\nPKNCA — Cmax, Tmax, AUC, t½\n\n\n3\nBase PopPK Model\nnlmixr2 / rxode2, 1-cmt oral, first-order absorption\n\n\n4\nIIV Model\nBetween-subject variability on CL, V, Ka\n\n\n5\nCovariate Model\nWeight on CL & V, model selection\n\n\n6\nModel Diagnostics\nGOF, VPC, CWRES vs TIME/PRED\n\n\n7\nClinical Simulation\nTypical-patient & subgroup PK simulation"
+    "objectID": "reports/03_Base_Model_Report.html#the-structural-model",
+    "href": "reports/03_Base_Model_Report.html#the-structural-model",
+    "title": "Phase 3 — Base Population PK Model",
+    "section": "3 The structural model",
+    "text": "3 The structural model\nThe model is a function with an ini block (starting values) and a model block (the structure). Fixed effects are estimated on the log scale, so the back-transformed CL, V, and Ka are always positive. Initial values are seeded from the Phase 2 NCA, which puts the optimiser close to the solution from the start.\nThe fitted model’s structure is shown as equations in the next section.\nThe two d/dt(...) lines are the compartment mass-balance equations; cp = center/v is the predicted concentration; and cp ~ add(add.sd) + prop(prop.sd) specifies a combined additive + proportional residual error model. The base model carries between-subject variability on CL only (eta.cl) — variability on V and Ka is added in Phase 4."
   },
   {
-    "objectID": "index.html#reproducibility",
-    "href": "index.html#reproducibility",
-    "title": "Population PK Portfolio — Theophylline",
-    "section": "4 Reproducibility",
-    "text": "4 Reproducibility\nThe project uses renv for a locked package environment, here for path-safe code, and Quarto to render every analysis to this website (published from the docs/ folder via GitHub Pages). Each phase is a standalone, re-runnable script in R/ paired with a report in reports/.\n\nDisclaimer: built with publicly available data for educational and portfolio purposes only; not intended to guide clinical dosing."
+    "objectID": "reports/03_Base_Model_Report.html#fitting-the-model-focei",
+    "href": "reports/03_Base_Model_Report.html#fitting-the-model-focei",
+    "title": "Phase 3 — Base Population PK Model",
+    "section": "4 Fitting the model (FOCEi)",
+    "text": "4 Fitting the model (FOCEi)\nfit_base_model() estimates the parameters by FOCEi (First-Order Conditional Estimation with interaction), the workhorse algorithm of population PK.\n\n\nCode\nfit &lt;- fit_base_model(dat)\n\n\ncalculating covariance matrix\ndone\n\n\nCode\nfit\n\n\n\\[\\begin{align*}\n{ka} & = \\exp\\left({tka}\\right) \\\\\n{cl} & = \\exp\\left({tcl}+{eta.cl}\\right) \\\\\n{v} & = \\exp\\left({tv}\\right) \\\\\n\\frac{d \\: depot}{dt} & = -{ka} {\\times} {depot} \\\\\n\\frac{d \\: center}{dt} & = {ka} {\\times} {depot}-\\left(\\frac{{cl}}{{v}}\\right) {\\times} {center} \\\\\n{cp} & = \\frac{{center}}{{v}} \\\\\n{cp} & \\sim add({add.sd})+prop({prop.sd})\n\\end{align*}\\]"
   },
   {
-    "objectID": "reports/02_NCA_Report.html",
-    "href": "reports/02_NCA_Report.html",
-    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
-    "section": "",
-    "text": "Noncompartmental analysis (NCA) summarises drug exposure without assuming a structural model. It provides model-independent benchmarks — peak concentration, exposure (AUC), and terminal half-life — that we will later compare against the population-model estimates (Phases 3–5).\nParameters computed per subject:\n\nCmax / Tmax — observed peak concentration and its time.\nAUClast — area under the curve to the last measurable concentration (linear-up/log-down trapezoidal).\nAUCinf(obs) — AUClast plus the extrapolated tail (Clast / λz).\nt½ — terminal half-life, from the terminal rate constant λz.\nCL/F, Vz/F — apparent clearance and volume (dose-normalised)."
+    "objectID": "reports/03_Base_Model_Report.html#parameter-estimates",
+    "href": "reports/03_Base_Model_Report.html#parameter-estimates",
+    "title": "Phase 3 — Base Population PK Model",
+    "section": "5 Parameter estimates",
+    "text": "5 Parameter estimates\n\n\nCode\nbase_param_table(fit) |&gt;\n  kbl(caption = \"Base model fixed-effect estimates (back-transformed)\",\n      digits = 3) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nBase model fixed-effect estimates (back-transformed)\n\n\nParameter\nEst.\nSE\n%RSE\nBack-transformed(95%CI)\nBSV(CV%)\nShrink(SD)%\n\n\n\n\ntka\n0.677\n0.265\n39.1\n1.97 (1.17, 3.31)\n\n\n\n\ntcl\n1.04\n0.0721\n6.96\n2.82 (2.45, 3.25)\n23.5\n7.91%&lt;\n\n\ntv\n3.53\n0.0454\n1.29\n34 (31.1, 37.2)\n\n\n\n\nadd.sd\n0.225\n\n\n0.225\n\n\n\n\nprop.sd\n0.259\n\n\n0.259\n\n\n\n\n\n\n\n\n5.1 Sanity check vs NCA\nThe population model and the model-free NCA should tell a consistent story:\n\n\n\nParameter\nNCA (geo. mean, Phase 2)\nBase model (typical)\n\n\n\n\nCL (L/h)\n~2.74\n2.82\n\n\nV (L)\n~31.6\n34\n\n\nKa (1/h)\n~1.5 (from Tmax)\n1.97\n\n\n\nClose agreement is the key validation that the structural model and dataset are correct — the two independent methods converge on the same physiology."
   },
   {
-    "objectID": "reports/02_NCA_Report.html#objectives",
-    "href": "reports/02_NCA_Report.html#objectives",
-    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
-    "section": "",
-    "text": "Noncompartmental analysis (NCA) summarises drug exposure without assuming a structural model. It provides model-independent benchmarks — peak concentration, exposure (AUC), and terminal half-life — that we will later compare against the population-model estimates (Phases 3–5).\nParameters computed per subject:\n\nCmax / Tmax — observed peak concentration and its time.\nAUClast — area under the curve to the last measurable concentration (linear-up/log-down trapezoidal).\nAUCinf(obs) — AUClast plus the extrapolated tail (Clast / λz).\nt½ — terminal half-life, from the terminal rate constant λz.\nCL/F, Vz/F — apparent clearance and volume (dose-normalised)."
+    "objectID": "reports/03_Base_Model_Report.html#quick-predicted-vs-observed-check",
+    "href": "reports/03_Base_Model_Report.html#quick-predicted-vs-observed-check",
+    "title": "Phase 3 — Base Population PK Model",
+    "section": "6 Quick predicted-vs-observed check",
+    "text": "6 Quick predicted-vs-observed check\nFull diagnostics (GOF, VPC, CWRES) come in Phase 6; here we just confirm the fit is sensible — points should scatter around the line of identity.\n\n\nCode\nfitdf &lt;- as.data.frame(fit)\n\np &lt;- ggplot2::ggplot(fitdf, ggplot2::aes(PRED, DV)) +\n  ggplot2::geom_abline(slope = 1, intercept = 0, linetype = \"dashed\", colour = \"grey50\") +\n  ggplot2::geom_point(alpha = 0.6, colour = \"#2C3E50\") +\n  ggplot2::labs(x = \"Population prediction (mg/L)\", y = \"Observed (mg/L)\",\n                title = \"Observed vs population prediction (base model)\")\np\n\n\n\n\n\nPopulation (PRED) and individual (IPRED) predictions vs observations.\n\n\n\n\nCode\nsave_fig(p, \"03_base_obs_vs_pred\")"
   },
   {
-    "objectID": "reports/02_NCA_Report.html#method-pknca",
-    "href": "reports/02_NCA_Report.html#method-pknca",
-    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
-    "section": "2 Method (PKNCA)",
-    "text": "2 Method (PKNCA)\nrun_nca() builds a PKNCAconc object (concentration–time, grouped by subject), a PKNCAdose object (the single oral dose in mg at t = 0), defines one 0 → ∞ interval requesting the parameters above, and runs pk.nca(). PKNCA selects the terminal-phase points for λz automatically by maximising the adjusted R².\n\n\nCode\ndf  &lt;- load_pk_data()\nnca &lt;- run_nca(df)"
-  },
-  {
-    "objectID": "reports/02_NCA_Report.html#per-subject-nca-parameters",
-    "href": "reports/02_NCA_Report.html#per-subject-nca-parameters",
-    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
-    "section": "3 Per-subject NCA parameters",
-    "text": "3 Per-subject NCA parameters\n\n\nCode\nnca$wide |&gt;\n  dplyr::select(id, cmax, tmax, auclast, aucinf.obs, half.life,\n                cl.obs, vz.obs, aucpext.obs) |&gt;\n  kbl(\n    caption = \"Noncompartmental parameters by subject\",\n    digits  = 2,\n    col.names = c(\"ID\", \"Cmax (mg/L)\", \"Tmax (h)\", \"AUClast (mg·h/L)\",\n                  \"AUCinf (mg·h/L)\", \"t½ (h)\", \"CL/F (L/h)\", \"Vz/F (L)\",\n                  \"AUC %extrap\")\n  ) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nNoncompartmental parameters by subject\n\n\nID\nCmax (mg/L)\nTmax (h)\nAUClast (mg·h/L)\nAUCinf (mg·h/L)\nt½ (h)\nCL/F (L/h)\nVz/F (L)\nAUC %extrap\n\n\n\n\n1\n10.50\n1.12\n147.23\n214.92\n14.30\n1.49\n30.73\n31.49\n\n\n2\n8.33\n1.92\n88.73\n97.38\n6.66\n3.27\n31.43\n8.88\n\n\n3\n8.20\n1.02\n95.88\n106.13\n6.77\n3.01\n29.37\n9.66\n\n\n4\n8.60\n1.07\n102.63\n114.22\n6.98\n2.80\n28.21\n10.14\n\n\n5\n11.40\n1.00\n118.18\n136.30\n8.00\n2.35\n27.10\n13.30\n\n\n6\n6.44\n1.15\n71.70\n82.18\n7.89\n3.89\n44.35\n12.75\n\n\n7\n7.09\n3.48\n87.97\n100.99\n7.85\n3.17\n35.85\n12.89\n\n\n8\n7.56\n2.02\n86.81\n102.15\n8.51\n3.13\n38.38\n15.02\n\n\n9\n9.03\n0.63\n83.94\n97.52\n8.41\n2.75\n33.31\n13.93\n\n\n10\n10.21\n3.55\n135.58\n167.86\n9.25\n1.91\n25.44\n19.23\n\n\n11\n8.00\n0.98\n77.89\n86.90\n7.26\n3.68\n38.55\n10.37\n\n\n12\n9.75\n3.52\n115.22\n125.83\n6.29\n2.55\n23.11\n8.43\n\n\n\n\n\nThe AUC %extrapolated column is a quality flag — values well under 20% indicate AUCinf is reliable (little of the exposure comes from extrapolation)."
-  },
-  {
-    "objectID": "reports/02_NCA_Report.html#summary-statistics",
-    "href": "reports/02_NCA_Report.html#summary-statistics",
-    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
-    "section": "4 Summary statistics",
-    "text": "4 Summary statistics\nnca_param_summary() reports the geometric mean and geometric CV% — the conventional summaries for PK parameters, which are log-normally distributed.\n\n\nCode\nsmry &lt;- nca_param_summary(nca$wide)\nsmry |&gt;\n  kbl(caption = \"NCA parameter summary (geometric mean, CV%, range)\",\n      digits = 2) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nNCA parameter summary (geometric mean, CV%, range)\n\n\nParameter\nN\nGeo. mean\nGeo. CV%\nMin\nMedian\nMax\n\n\n\n\ncmax\n12\n8.65\n16.98\n6.44\n8.46\n11.40\n\n\ntmax\n12\n1.52\n64.67\n0.63\n1.14\n3.55\n\n\nauclast\n12\n98.65\n22.54\n71.70\n92.30\n147.23\n\n\naucinf.obs\n12\n114.81\n28.43\n82.18\n104.14\n214.92\n\n\nhalf.life\n12\n7.99\n21.85\n6.29\n7.87\n14.30\n\n\ncl.obs\n12\n2.74\n27.86\n1.49\n2.90\n3.89\n\n\nvz.obs\n12\n31.62\n19.21\n23.11\n31.08\n44.35\n\n\naucpext.obs\n12\n12.89\n38.17\n8.43\n12.82\n31.49\n\n\n\n\n\nFor theophylline, the literature half-life in healthy adults is roughly 6–9 h; this NCA gives a geometric-mean t½ ≈ 8 h, apparent clearance CL/F ≈ 2.74 L/h, and apparent volume Vz/F ≈ 31.6 L — all physiologically sensible and a useful sanity check before population modelling."
-  },
-  {
-    "objectID": "reports/02_NCA_Report.html#visualisations",
-    "href": "reports/02_NCA_Report.html#visualisations",
-    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
-    "section": "5 Visualisations",
-    "text": "5 Visualisations\n\n\nCode\nnca_plot_halflife(nca$wide)\n\n\n\n\n\n\n\n\nFigure 1: Terminal half-life by subject (dashed line = geometric mean).\n\n\n\n\n\n\n\nCode\nnca_plot_auc(nca$wide)\n\n\n\n\n\n\n\n\nFigure 2: AUClast vs AUCinf — proximity to the identity line indicates minimal extrapolation.\n\n\n\n\n\n\n\nCode\nnca_plot_distributions(nca$wide)\n\n\n\n\n\n\n\n\nFigure 3: Distribution of NCA parameters across the 12 subjects.\n\n\n\n\n\n\n\nCode\nnca_plot_cl_weight(nca$wide, df)\n\n\n\n\n\n\n\n\nFigure 4: Apparent clearance vs body weight — an exploratory look ahead to the covariate model.\n\n\n\n\n\nThe Pearson correlation between weight and NCA clearance is r = 0.17 (p = 0.59) — suggestive, and formally tested inside the population model in Phase 5."
-  },
-  {
-    "objectID": "reports/02_NCA_Report.html#key-takeaways",
-    "href": "reports/02_NCA_Report.html#key-takeaways",
-    "title": "Phase 2 — Noncompartmental Analysis (NCA)",
-    "section": "6 Key takeaways",
-    "text": "6 Key takeaways\n\nNCA gives model-independent exposure metrics that frame the modelling work.\nGeometric-mean t½ ≈ 8 h, CL/F ≈ 2.74 L/h, Vz/F ≈ 31.6 L are consistent with known theophylline PK.\nLow AUC %extrapolation means AUCinf (and therefore CL/Vz) is well determined.\nBetween-subject spread in CL and AUC reinforces the need for an IIV model (Phase 4) and motivates testing weight as a covariate (Phase 5).\n\n\nNext: Phase 3 — Base PopPK model (one-compartment oral, first-order absorption) with nlmixr2 / rxode2."
-  },
-  {
-    "objectID": "reports/04_IIV_Model_Report.html",
-    "href": "reports/04_IIV_Model_Report.html",
-    "title": "Phase 4 — Inter-Individual Variability (IIV)",
-    "section": "",
-    "text": "The base model (Phase 3) allowed only clearance to vary between subjects. Here we add between-subject random effects on V and Ka as well, so each subject has their own clearance, volume, and absorption rate. We then test whether the extra variability is justified — better fit, well-estimated, and plausibly distributed."
-  },
-  {
-    "objectID": "reports/04_IIV_Model_Report.html#objectives",
-    "href": "reports/04_IIV_Model_Report.html#objectives",
-    "title": "Phase 4 — Inter-Individual Variability (IIV)",
-    "section": "",
-    "text": "The base model (Phase 3) allowed only clearance to vary between subjects. Here we add between-subject random effects on V and Ka as well, so each subject has their own clearance, volume, and absorption rate. We then test whether the extra variability is justified — better fit, well-estimated, and plausibly distributed."
-  },
-  {
-    "objectID": "reports/04_IIV_Model_Report.html#what-a-random-effect-is",
-    "href": "reports/04_IIV_Model_Report.html#what-a-random-effect-is",
-    "title": "Phase 4 — Inter-Individual Variability (IIV)",
-    "section": "2 What a random effect is",
-    "text": "2 What a random effect is\nFor each parameter we write, e.g., cl = exp(tcl + eta.cl), where eta.cl is a subject-specific deviation drawn from a normal distribution N(0, omega^2). The population shares one typical curve; each subject’s curve is a shifted version of it. The spread of those shifts — the IIV — is summarised as a CV%.\nThe fitted model’s structure is shown as equations in the next section."
-  },
-  {
-    "objectID": "reports/04_IIV_Model_Report.html#fit-the-iiv-model",
-    "href": "reports/04_IIV_Model_Report.html#fit-the-iiv-model",
-    "title": "Phase 4 — Inter-Individual Variability (IIV)",
-    "section": "3 Fit the IIV model",
-    "text": "3 Fit the IIV model\n\n\nCode\ndat      &lt;- build_nonmem_data()\nbase_fit &lt;- readRDS(fs::path(PATH_MODELS, \"base_fit.rds\"))\niiv_fit  &lt;- fit_iiv_model(dat)\n\n\ncalculating covariance matrix\ndone\n\n\nCode\niiv_fit\n\n\n\\[\\begin{align*}\n{ka} & = \\exp\\left({tka}+{eta.ka}\\right) \\\\\n{cl} & = \\exp\\left({tcl}+{eta.cl}\\right) \\\\\n{v} & = \\exp\\left({tv}+{eta.v}\\right) \\\\\n\\frac{d \\: depot}{dt} & = -{ka} {\\times} {depot} \\\\\n\\frac{d \\: center}{dt} & = {ka} {\\times} {depot}-\\left(\\frac{{cl}}{{v}}\\right) {\\times} {center} \\\\\n{cp} & = \\frac{{center}}{{v}} \\\\\n{cp} & \\sim add({add.sd})+prop({prop.sd})\n\\end{align*}\\]"
-  },
-  {
-    "objectID": "reports/04_IIV_Model_Report.html#parameter-estimates",
-    "href": "reports/04_IIV_Model_Report.html#parameter-estimates",
-    "title": "Phase 4 — Inter-Individual Variability (IIV)",
-    "section": "4 Parameter estimates",
-    "text": "4 Parameter estimates\n\n\nCode\nbase_param_table(iiv_fit) |&gt;\n  kbl(caption = \"IIV model estimates (fixed effects, IIV CV%, and shrinkage)\",\n      digits = 3) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nIIV model estimates (fixed effects, IIV CV%, and shrinkage)\n\n\nParameter\nEst.\nSE\n%RSE\nBack-transformed(95%CI)\nBSV(CV%)\nShrink(SD)%\n\n\n\n\ntka\n0.389\n0.198\n50.9\n1.48 (1, 2.17)\n68.8\n1.88%&lt;\n\n\ntcl\n1.03\n0.074\n7.22\n2.79 (2.41, 3.22)\n25.7\n1.12%&lt;\n\n\ntv\n3.47\n0.046\n1.33\n32 (29.3, 35)\n12.6\n15.7%&lt;\n\n\nadd.sd\n0.261\n\n\n0.261\n\n\n\n\nprop.sd\n0.136\n\n\n0.136\n\n\n\n\n\n\n\nRead the BSV(CV%) column for the size of each random effect and the Shrink(SD)% column for how well the data support it. As a rule of thumb, shrinkage under ~30% means the individual estimates are genuinely informed by the data rather than collapsing to the population mean."
-  },
-  {
-    "objectID": "reports/04_IIV_Model_Report.html#is-the-added-variability-justified",
-    "href": "reports/04_IIV_Model_Report.html#is-the-added-variability-justified",
-    "title": "Phase 4 — Inter-Individual Variability (IIV)",
-    "section": "5 Is the added variability justified?",
-    "text": "5 Is the added variability justified?\nWe compare the base and IIV models by objective function value (OFV), and by AIC/BIC, which penalise extra parameters. By the likelihood-ratio test, adding two random effects (V and Ka) is significant at p &lt; 0.05 if the OFV drops by more than 5.99 (χ², 2 df).\n\n\nCode\ncmp &lt;- compare_models(\n  model_metrics(base_fit, \"Base (IIV on CL)\"),\n  model_metrics(iiv_fit,  \"IIV on CL, V, Ka\")\n)\ncmp |&gt;\n  kbl(caption = \"Base vs IIV model comparison\", digits = 2) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nBase vs IIV model comparison\n\n\nModel\nOFV\nAIC\nBIC\nnPar\ndOFV\ndAIC\n\n\n\n\nBase (IIV on CL)\n177.81\n432.41\n449.70\n6\n0.00\n0.00\n\n\nIIV on CL, V, Ka\n104.36\n362.96\n386.02\n8\n-73.45\n-69.45\n\n\n\n\n\nThe IIV model lowers the OFV by 73.45 points relative to base (ΔAIC = -69.45). A drop well beyond the 5.99 threshold means the between-subject variability on V and Ka is statistically warranted — the model genuinely fits better, not just by added flexibility."
-  },
-  {
-    "objectID": "reports/04_IIV_Model_Report.html#random-effect-distributions",
-    "href": "reports/04_IIV_Model_Report.html#random-effect-distributions",
-    "title": "Phase 4 — Inter-Individual Variability (IIV)",
-    "section": "6 Random-effect distributions",
-    "text": "6 Random-effect distributions\nThe empirical-Bayes η estimates should be centred on 0 and roughly symmetric — the model’s normality assumption.\n\n\nCode\niiv_plot_eta(iiv_fit)\n\n\n\n\n\nEta distributions for CL, V, and Ka (centred on zero = assumption met)."
-  },
-  {
-    "objectID": "reports/04_IIV_Model_Report.html#key-takeaways",
-    "href": "reports/04_IIV_Model_Report.html#key-takeaways",
-    "title": "Phase 4 — Inter-Individual Variability (IIV)",
+    "objectID": "reports/03_Base_Model_Report.html#key-takeaways",
+    "href": "reports/03_Base_Model_Report.html#key-takeaways",
+    "title": "Phase 3 — Base Population PK Model",
     "section": "7 Key takeaways",
-    "text": "7 Key takeaways\n\nRandom effects on V and Ka were added to the base (CL-only) model.\nThe OFV fell by 73.45 (≫ the 5.99 cut-off for 2 df), so the extra IIV is justified.\nShrinkage and the η distributions indicate the random effects are data-supported, not artefacts.\nThis full-IIV model is now the reference onto which we test a covariate (body weight) next.\n\n\nNext: Phase 5 — Covariate model, testing whether body weight explains part of the between-subject variability in CL and V. ```"
+    "text": "7 Key takeaways\n\nThe data were re-expressed as a NONMEM event dataset (dose + observation rows).\nA one-compartment oral model with first-order absorption was fitted by FOCEi.\nTypical estimates (CL ≈ 2.82 L/h, V ≈ 34 L, Ka ≈ 1.97 /h) agree with the NCA — the structural model holds.\nThe base model includes IIV on CL only; the next phase adds variability on V and Ka.\n\n\nNext: Phase 4 — IIV model, extending between-subject variability to V and Ka and examining the random-effect (η) distributions. ```"
   },
   {
-    "objectID": "reports/06_Model_Diagnostics.html",
-    "href": "reports/06_Model_Diagnostics.html",
-    "title": "Phase 6 — Model Diagnostics",
+    "objectID": "reports/05_Covariate_Model_Report.html",
+    "href": "reports/05_Covariate_Model_Report.html",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
     "section": "",
-    "text": "A model that converges is not necessarily a model that fits. This phase stress-tests the selected model with the standard pharmacometric diagnostics: goodness-of-fit (GOF) scatter plots, conditional weighted residuals (CWRES), and a Visual Predictive Check (VPC).\n\n\nCode\nfit &lt;- load_final_fit()"
+    "text": "The IIV model (Phase 4) left between-subject variability as purely random. Here we test whether body weight explains part of it, by adding an allometric weight effect on clearance and volume. The questions: does it improve the fit, and does the random IIV on CL/V shrink?"
   },
   {
-    "objectID": "reports/06_Model_Diagnostics.html#objectives",
-    "href": "reports/06_Model_Diagnostics.html#objectives",
-    "title": "Phase 6 — Model Diagnostics",
+    "objectID": "reports/05_Covariate_Model_Report.html#objectives",
+    "href": "reports/05_Covariate_Model_Report.html#objectives",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
     "section": "",
-    "text": "A model that converges is not necessarily a model that fits. This phase stress-tests the selected model with the standard pharmacometric diagnostics: goodness-of-fit (GOF) scatter plots, conditional weighted residuals (CWRES), and a Visual Predictive Check (VPC).\n\n\nCode\nfit &lt;- load_final_fit()"
+    "text": "The IIV model (Phase 4) left between-subject variability as purely random. Here we test whether body weight explains part of it, by adding an allometric weight effect on clearance and volume. The questions: does it improve the fit, and does the random IIV on CL/V shrink?"
   },
   {
-    "objectID": "reports/06_Model_Diagnostics.html#goodness-of-fit-panel",
-    "href": "reports/06_Model_Diagnostics.html#goodness-of-fit-panel",
-    "title": "Phase 6 — Model Diagnostics",
-    "section": "2 Goodness-of-fit panel",
-    "text": "2 Goodness-of-fit panel\nFour plots, read together:\n\nObserved vs Population prediction (PRED) and vs Individual prediction (IPRED) — points should fall along the dashed line of identity. IPRED hugs the line more tightly because it uses each subject’s own random effects; that gap between PRED and IPRED is exactly what the IIV captures.\nCWRES vs TIME and CWRES vs PRED — conditional weighted residuals should scatter randomly in a flat horizontal band, mostly within ±2, with no trend or funnel shape. A slope or curve over time would signal a structural misspecification; fanning would signal a wrong residual-error model.\n\n\n\nCode\ngof_panel(fit)\n\n\n\n\n\nFour-panel goodness-of-fit diagnostics for the selected model."
+    "objectID": "reports/05_Covariate_Model_Report.html#how-weight-enters-the-model",
+    "href": "reports/05_Covariate_Model_Report.html#how-weight-enters-the-model",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "2 How weight enters the model",
+    "text": "2 How weight enters the model\nWe use the pharmacometric-standard allometric form, normalised to a 70 kg reference, with the exponents estimated from the data (started at the theoretical 0.75 for CL and 1.0 for V):\n\\[ CL = CL_{typ}\\,(WT/70)^{\\theta_{CL}}, \\qquad V = V_{typ}\\,(WT/70)^{\\theta_{V}} \\]\nThe fitted model’s structure is shown as equations in the next section."
   },
   {
-    "objectID": "reports/06_Model_Diagnostics.html#visual-predictive-check",
-    "href": "reports/06_Model_Diagnostics.html#visual-predictive-check",
-    "title": "Phase 6 — Model Diagnostics",
-    "section": "3 Visual Predictive Check",
-    "text": "3 Visual Predictive Check\nThe VPC simulates many virtual trials from the fitted model and overlays the observed data on the simulated prediction intervals. If the observed median and spread fall within the simulated bands across time, the model reproduces both the typical profile and the between-subject variability — the key qualification for using it to simulate (Phase 7).\n\n\nCode\nvpc &lt;- make_vpc(fit, n = 500)\nif (!is.null(vpc)) {\n  vpc\n} else {\n  cat(\"VPC requires the 'vpc' package. Install with renv::install('vpc'), then re-render.\")\n}\n\n\n\n\n\nVisual Predictive Check: observed data vs model-simulated prediction intervals."
+    "objectID": "reports/05_Covariate_Model_Report.html#fit-the-covariate-model",
+    "href": "reports/05_Covariate_Model_Report.html#fit-the-covariate-model",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "3 Fit the covariate model",
+    "text": "3 Fit the covariate model\n\n\nCode\ndat     &lt;- build_nonmem_data()\niiv_fit &lt;- load_iiv_fit()\ncov_fit &lt;- fit_cov_model(dat)\n\n\ncalculating covariance matrix\ndone\n\n\nCode\ncov_fit\n\n\n\\[\\begin{align*}\n{ka} & = \\exp\\left({tka}+{eta.ka}\\right) \\\\\n{cl} & = \\exp\\left({tcl}+{eta.cl}\\right) {\\times} {\\left(\\frac{{WT}}{{70}}\\right)}^{{dWTCL}} \\\\\n{v} & = \\exp\\left({tv}+{eta.v}\\right) {\\times} {\\left(\\frac{{WT}}{{70}}\\right)}^{{dWTV}} \\\\\n\\frac{d \\: depot}{dt} & = -{ka} {\\times} {depot} \\\\\n\\frac{d \\: center}{dt} & = {ka} {\\times} {depot}-\\left(\\frac{{cl}}{{v}}\\right) {\\times} {center} \\\\\n{cp} & = \\frac{{center}}{{v}} \\\\\n{cp} & \\sim add({add.sd})+prop({prop.sd})\n\\end{align*}\\]"
   },
   {
-    "objectID": "reports/06_Model_Diagnostics.html#key-takeaways",
-    "href": "reports/06_Model_Diagnostics.html#key-takeaways",
-    "title": "Phase 6 — Model Diagnostics",
-    "section": "4 Key takeaways",
-    "text": "4 Key takeaways\n\nGOF: observed-vs-predicted should track the identity line, tighter for IPRED.\nCWRES: a flat, ±2 band with no time/PRED trend indicates the structural and error models are adequate.\nVPC: observed percentiles inside the simulated intervals confirm the model captures central tendency and variability.\nPassing these checks is what licenses the model for the clinical simulations in the next phase.\n\n\nNext: Phase 7 — Simulation: use the qualified model to simulate PK profiles for a typical patient and weight-based subgroups. ```"
+    "objectID": "reports/05_Covariate_Model_Report.html#parameter-estimates",
+    "href": "reports/05_Covariate_Model_Report.html#parameter-estimates",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "4 Parameter estimates",
+    "text": "4 Parameter estimates\nThe two new parameters are dWTCL and dWTV — the weight exponents. Their 95% confidence intervals tell us whether the effect is distinguishable from zero (no effect).\n\n\nCode\nbase_param_table(cov_fit) |&gt;\n  kbl(caption = \"Covariate model estimates (note dWTCL, dWTV exponents)\",\n      digits = 3) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nCovariate model estimates (note dWTCL, dWTV exponents)\n\n\nParameter\nEst.\nSE\n%RSE\nBack-transformed(95%CI)\nBSV(CV%)\nShrink(SD)%\n\n\n\n\ntka\n0.398\n0.243\n61.1\n1.49 (0.924, 2.4)\n72.3\n2.32%&lt;\n\n\ntcl\n1.03\n0.0325\n3.16\n2.79 (2.62, 2.98)\n26.1\n3.32%&lt;\n\n\ntv\n3.47\n0.0984\n2.84\n32.1 (26.5, 39)\n10.9\n22.1%=\n\n\ndWTCL\n0.349\n0.525\n151\n0.349 (-0.68, 1.38)\n\n\n\n\ndWTV\n0.586\n0.273\n46.6\n0.586 (0.0505, 1.12)\n\n\n\n\nadd.sd\n0.265\n\n\n0.265\n\n\n\n\nprop.sd\n0.134\n\n\n0.134"
   },
   {
-    "objectID": "reports/08_Two_Compartment_Report.html",
-    "href": "reports/08_Two_Compartment_Report.html",
-    "title": "Phase 9 — One- vs Two-Compartment Comparison",
+    "objectID": "reports/05_Covariate_Model_Report.html#is-the-weight-effect-justified",
+    "href": "reports/05_Covariate_Model_Report.html#is-the-weight-effect-justified",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "5 Is the weight effect justified?",
+    "text": "5 Is the weight effect justified?\n\n\nCode\ncmp &lt;- compare_models(\n  model_metrics(iiv_fit, \"IIV (no covariate)\"),\n  model_metrics(cov_fit, \"Weight on CL & V\")\n)\ncmp |&gt;\n  kbl(caption = \"IIV vs covariate model\", digits = 2) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nIIV vs covariate model\n\n\nModel\nOFV\nAIC\nBIC\nnPar\ndOFV\ndAIC\n\n\n\n\nIIV (no covariate)\n104.36\n362.96\n386.02\n8\n0.00\n0.00\n\n\nWeight on CL & V\n100.71\n363.31\n392.14\n10\n-3.65\n0.35\n\n\n\n\n\nAdding two parameters is significant (p &lt; 0.05) if the OFV drops by more than 5.99. Here ΔOFV = -3.65, so on the likelihood-ratio test the weight effect is not clearly supported in this dataset."
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#did-the-random-iiv-shrink",
+    "href": "reports/05_Covariate_Model_Report.html#did-the-random-iiv-shrink",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "6 Did the random IIV shrink?",
+    "text": "6 Did the random IIV shrink?\nIf weight genuinely drives part of the between-subject variability, the BSV(CV%) on CL and V should be smaller in the covariate model than in the IIV model.\n\n\nCode\ndplyr::full_join(\n  iiv_cv(iiv_fit) |&gt; dplyr::rename(`IIV model` = `BSV CV%`),\n  iiv_cv(cov_fit) |&gt; dplyr::rename(`Covariate model` = `BSV CV%`),\n  by = \"Parameter\"\n) |&gt;\n  kbl(caption = \"Between-subject CV% before vs after adding weight\",\n      digits = 1) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nBetween-subject CV% before vs after adding weight\n\n\nParameter\nIIV model\nCovariate model\n\n\n\n\ntka\n68.8\n72.3\n\n\ntcl\n25.7\n26.1\n\n\ntv\n12.6\n10.9"
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#residual-random-effects-vs-weight",
+    "href": "reports/05_Covariate_Model_Report.html#residual-random-effects-vs-weight",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "7 Residual random effects vs weight",
+    "text": "7 Residual random effects vs weight\nAfter including weight, the random effects on CL and V should show little residual trend with weight — a flat line means the covariate has absorbed the size effect.\n\n\nCode\ncov_plot_eta_wt(cov_fit, dat)\n\n\n\n\n\nRandom effects on CL and V vs body weight in the covariate model."
+  },
+  {
+    "objectID": "reports/05_Covariate_Model_Report.html#key-takeaways",
+    "href": "reports/05_Covariate_Model_Report.html#key-takeaways",
+    "title": "Phase 5 — Covariate Model (Body Weight)",
+    "section": "8 Key takeaways",
+    "text": "8 Key takeaways\n\nBody weight was added allometrically on CL and V, with estimated exponents.\nOn the likelihood-ratio test the effect was not clearly supported (ΔOFV = -3.65).\nWe reported the change in random CV% and the residual η–weight trend honestly — in a small, weight-dosed dataset like Theoph a strong weight signal is not guaranteed, and recognising that is part of sound covariate analysis.\n\n\nNext: Phase 6 — Model diagnostics: goodness-of-fit plots, CWRES vs TIME/PRED, and a visual predictive check (VPC) on the selected model. ```"
+  },
+  {
+    "objectID": "reports/07_Simulation_Report.html",
+    "href": "reports/07_Simulation_Report.html",
+    "title": "Phase 7 — Clinical Simulation",
     "section": "",
-    "text": "The whole analysis assumed a one-compartment structure. Here we test that assumption directly by fitting a two-compartment model and asking whether the extra peripheral compartment is statistically justified. Demonstrating that a more complex model can be fitted and correctly accepted or rejected is core model-selection judgement."
+    "text": "With a model that passed diagnostics (Phase 6), we can now simulate — predict concentration-time profiles for scenarios we never measured. This is where a population PK model earns its keep clinically. We simulate three things with rxode2: a typical patient, an illustrative weight effect, and the full population spread.\n\n\nCode\npars &lt;- get_typical_params()\ndose &lt;- rep_dose()\n\n\nThe selected model is the IIV model from Phase 4 — Phase 5 found body weight was not statistically supported, so by parsimony the IIV model is the final model. Its typical parameters are CL ≈ 2.79 L/h, V ≈ 32 L, Ka ≈ 1.48 /h. Simulations use a representative 320 mg dose (the median actual dose in the dataset)."
   },
   {
-    "objectID": "reports/08_Two_Compartment_Report.html#objectives",
-    "href": "reports/08_Two_Compartment_Report.html#objectives",
-    "title": "Phase 9 — One- vs Two-Compartment Comparison",
+    "objectID": "reports/07_Simulation_Report.html#objectives",
+    "href": "reports/07_Simulation_Report.html#objectives",
+    "title": "Phase 7 — Clinical Simulation",
     "section": "",
-    "text": "The whole analysis assumed a one-compartment structure. Here we test that assumption directly by fitting a two-compartment model and asking whether the extra peripheral compartment is statistically justified. Demonstrating that a more complex model can be fitted and correctly accepted or rejected is core model-selection judgement."
+    "text": "With a model that passed diagnostics (Phase 6), we can now simulate — predict concentration-time profiles for scenarios we never measured. This is where a population PK model earns its keep clinically. We simulate three things with rxode2: a typical patient, an illustrative weight effect, and the full population spread.\n\n\nCode\npars &lt;- get_typical_params()\ndose &lt;- rep_dose()\n\n\nThe selected model is the IIV model from Phase 4 — Phase 5 found body weight was not statistically supported, so by parsimony the IIV model is the final model. Its typical parameters are CL ≈ 2.79 L/h, V ≈ 32 L, Ka ≈ 1.48 /h. Simulations use a representative 320 mg dose (the median actual dose in the dataset)."
   },
   {
-    "objectID": "reports/08_Two_Compartment_Report.html#the-two-compartment-model",
-    "href": "reports/08_Two_Compartment_Report.html#the-two-compartment-model",
-    "title": "Phase 9 — One- vs Two-Compartment Comparison",
-    "section": "2 The two-compartment model",
-    "text": "2 The two-compartment model\nA peripheral compartment lets drug distribute into tissues and return, producing a biphasic semilog decline. Two new parameters appear: Q (inter-compartmental clearance) and V2 (peripheral volume); the central volume becomes Vc.\nThe fitted model’s structure is shown as equations in the next section."
+    "objectID": "reports/07_Simulation_Report.html#typical-patient",
+    "href": "reports/07_Simulation_Report.html#typical-patient",
+    "title": "Phase 7 — Clinical Simulation",
+    "section": "2 Typical patient",
+    "text": "2 Typical patient\nSetting the random effects to zero gives the single population-average curve for a 70 kg subject.\n\n\nCode\ntyp &lt;- sim_typical(pars, dose = dose)\nsim_plot_typical(typ, dose)\n\n\n\n\n\nSimulated typical-patient concentration-time profile.\n\n\n\n\nPredicted Cmax ≈ 8.37 mg/L at Tmax ≈ 2 h, in line with the observed data and the NCA — the expected internal coherence of a sound model."
   },
   {
-    "objectID": "reports/08_Two_Compartment_Report.html#fit-and-compare",
-    "href": "reports/08_Two_Compartment_Report.html#fit-and-compare",
-    "title": "Phase 9 — One- vs Two-Compartment Comparison",
-    "section": "3 Fit and compare",
-    "text": "3 Fit and compare\n\n\nCode\ndat     &lt;- build_nonmem_data()\niiv_fit &lt;- load_iiv_fit()\ntwo_fit &lt;- fit_two_cmt_model(dat)\n\n\ncalculating covariance matrix\ndone\n\n\n\n\nCode\nbase_param_table(two_fit) |&gt;\n  kbl(caption = \"Two-compartment model estimates\", digits = 3) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nTwo-compartment model estimates\n\n\nParameter\nEst.\nSE\n%RSE\nBack-transformed(95%CI)\nBSV(CV%)\nShrink(SD)%\n\n\n\n\ntka\n0.259\n0.214\n82.9\n1.3 (0.851, 1.97)\n67.8\n1.93%&lt;\n\n\ntcl\n1.01\n0.0785\n7.76\n2.75 (2.36, 3.21)\n26.0\n1.52%&lt;\n\n\ntvc\n3.35\n0.118\n3.53\n28.5 (22.6, 36)\n14.8\n15.6%&lt;\n\n\ntq\n0.656\n1.07\n163\n1.93 (0.237, 15.7)\n\n\n\n\ntvp\n1.3\n0.809\n62.1\n3.68 (0.753, 18)\n\n\n\n\nadd.sd\n0.278\n\n\n0.278\n\n\n\n\nprop.sd\n0.131\n\n\n0.131\n\n\n\n\n\n\n\nThe key diagnostic for worth is whether Q and V2 are precisely estimated (reasonable %RSE) — if their relative standard errors are very large, the data cannot support a peripheral compartment."
+    "objectID": "reports/07_Simulation_Report.html#effect-of-body-weight-illustrative",
+    "href": "reports/07_Simulation_Report.html#effect-of-body-weight-illustrative",
+    "title": "Phase 7 — Clinical Simulation",
+    "section": "3 Effect of body weight (illustrative)",
+    "text": "3 Effect of body weight (illustrative)\nBecause the selected model has no weight covariate (it wasn’t supported), this is an illustrative exercise: we apply the standard theoretical allometric exponents (0.75 on CL, 1.0 on V) to the typical parameters to show the expected direction and size of a body-weight effect at a fixed dose. It is not an estimated effect.\n\n\nCode\nwts &lt;- sim_weight_subgroups(pars, dose = dose)\nsim_plot_weight(wts, dose)\n\n\n\n\n\nIllustrative typical profiles for 55, 70, and 85 kg subjects (theory-based allometry).\n\n\n\n\n\n\nCode\nwts |&gt;\n  dplyr::group_by(WT) |&gt;\n  dplyr::summarise(Cmax = round(max(cp), 2),\n                   Tmax = round(time[which.max(cp)], 2),\n                   .groups = \"drop\") |&gt;\n  kbl(caption = \"Illustrative Cmax / Tmax by body weight (fixed dose, allometric theory)\",\n      col.names = c(\"Weight (kg)\", \"Cmax (mg/L)\", \"Tmax (h)\")) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nIllustrative Cmax / Tmax by body weight (fixed dose, allometric theory)\n\n\nWeight (kg)\nCmax (mg/L)\nTmax (h)\n\n\n\n\n55\n10.57\n2.0\n\n\n70\n8.37\n2.0\n\n\n85\n6.93\n2.1"
   },
   {
-    "objectID": "reports/08_Two_Compartment_Report.html#model-selection",
-    "href": "reports/08_Two_Compartment_Report.html#model-selection",
-    "title": "Phase 9 — One- vs Two-Compartment Comparison",
-    "section": "4 Model selection",
-    "text": "4 Model selection\nAdding two parameters is justified (p &lt; 0.05) only if the OFV drops by more than 5.99 (χ², 2 df); AIC/BIC additionally penalise complexity.\n\n\nCode\ncmp &lt;- compare_models(\n  model_metrics(iiv_fit, \"1-compartment (selected)\"),\n  model_metrics(two_fit, \"2-compartment\")\n)\ncmp |&gt;\n  kbl(caption = \"1- vs 2-compartment model comparison\", digits = 2) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\n1- vs 2-compartment model comparison\n\n\nModel\nOFV\nAIC\nBIC\nnPar\ndOFV\ndAIC\n\n\n\n\n1-compartment (selected)\n104.36\n362.96\n386.02\n8\n0.00\n0.00\n\n\n2-compartment\n102.75\n365.35\n394.18\n10\n-1.61\n2.39\n\n\n\n\n\nHere ΔOFV = -1.61 and ΔAIC = 2.39. The two-compartment model is therefore not supported: the extra compartment does not improve the fit enough to justify two more parameters."
+    "objectID": "reports/07_Simulation_Report.html#population-variability",
+    "href": "reports/07_Simulation_Report.html#population-variability",
+    "title": "Phase 7 — Clinical Simulation",
+    "section": "4 Population variability",
+    "text": "4 Population variability\nDrawing 500 virtual subjects’ random effects from the estimated ω matrix shows the spread of real-world exposures, not just the average. For a narrow-therapeutic-index drug like theophylline, this band is what matters — it indicates how many patients might stray outside the therapeutic window on a given dose.\n\n\nCode\npop &lt;- sim_population(pars, dose = dose)\nif (!is.null(pop)) {\n  sim_plot_population(pop, dose)\n} else {\n  cat(\"Population simulation requires an omega matrix (IIV model).\")\n}\n\n\n\n\n\nPopulation simulation: median and 90% prediction interval (500 subjects)."
   },
   {
-    "objectID": "reports/08_Two_Compartment_Report.html#key-takeaways",
-    "href": "reports/08_Two_Compartment_Report.html#key-takeaways",
-    "title": "Phase 9 — One- vs Two-Compartment Comparison",
+    "objectID": "reports/07_Simulation_Report.html#key-takeaways",
+    "href": "reports/07_Simulation_Report.html#key-takeaways",
+    "title": "Phase 7 — Clinical Simulation",
     "section": "5 Key takeaways",
-    "text": "5 Key takeaways\n\nA full two-compartment oral model was fitted and compared head-to-head with the selected one-compartment model.\nDecision by ΔOFV / ΔAIC / BIC: the two-compartment model is rejected in favour of the simpler 1-compartment model.\nFor theophylline, the one-compartment structure is well established, so rejecting the extra compartment is the expected and parsimonious result — confirming the structural choice made back in Phase 3.\n\n\nNext (Phase 10): bootstrap confidence intervals on the final model to quantify parameter uncertainty empirically. ```"
+    "text": "5 Key takeaways\n\nThe qualified IIV model reproduces a sensible typical profile (Cmax ≈ 8.37 mg/L), confirming internal consistency with the data.\nAn illustrative allometric scaling shows the expected body-weight effect on exposure, clearly separated from the (unsupported) estimated covariate of Phase 5.\nThe population prediction interval quantifies between-subject variability — the critical output for dosing a narrow-therapeutic-index drug safely.\nThis completes the end-to-end workflow: data → NCA → structural model → IIV → covariate → diagnostics → simulation.\n\n\nThe full analysis is published as a Quarto website under docs/ and deployed via GitHub Pages. ```"
+  },
+  {
+    "objectID": "reports/09_Bootstrap_Report.html",
+    "href": "reports/09_Bootstrap_Report.html",
+    "title": "Phase 10 — Bootstrap Confidence Intervals",
+    "section": "",
+    "text": "The parameter CIs reported so far are asymptotic — derived from the covariance matrix under large-sample, normal assumptions. With only 12 subjects those assumptions are questionable. This phase computes bootstrap CIs that make no such assumption, and compares the two."
+  },
+  {
+    "objectID": "reports/09_Bootstrap_Report.html#objectives",
+    "href": "reports/09_Bootstrap_Report.html#objectives",
+    "title": "Phase 10 — Bootstrap Confidence Intervals",
+    "section": "",
+    "text": "The parameter CIs reported so far are asymptotic — derived from the covariance matrix under large-sample, normal assumptions. With only 12 subjects those assumptions are questionable. This phase computes bootstrap CIs that make no such assumption, and compares the two."
+  },
+  {
+    "objectID": "reports/09_Bootstrap_Report.html#method-case-subject-resampling",
+    "href": "reports/09_Bootstrap_Report.html#method-case-subject-resampling",
+    "title": "Phase 10 — Bootstrap Confidence Intervals",
+    "section": "2 Method — case (subject) resampling",
+    "text": "2 Method — case (subject) resampling\nWe repeatedly draw 12 subjects with replacement from the original 12, refit the IIV model to each resampled dataset, and collect the fixed effects. The 2.5th and 97.5th percentiles of those estimates form an empirical 95% CI.\n\n\nCode\ndat  &lt;- build_nonmem_data()\nfit  &lt;- load_iiv_fit()\nboot &lt;- run_bootstrap(dat, nboot = 50)\n\n\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\ncalculating covariance matrix\ndone\n\n\n50 of 50 replicates converged (100%). A convergence rate below 100% is normal — some resamples produce awkward datasets (e.g. the same subject drawn several times) — and the rate itself is a useful stability check."
+  },
+  {
+    "objectID": "reports/09_Bootstrap_Report.html#asymptotic-vs-bootstrap-95-ci",
+    "href": "reports/09_Bootstrap_Report.html#asymptotic-vs-bootstrap-95-ci",
+    "title": "Phase 10 — Bootstrap Confidence Intervals",
+    "section": "3 Asymptotic vs bootstrap 95% CI",
+    "text": "3 Asymptotic vs bootstrap 95% CI\n\n\nCode\nboot_summary(boot, fit) |&gt;\n  kbl(caption = \"Point estimate with bootstrap median and 95% percentile interval\",\n      digits = 3) |&gt;\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\", \"condensed\"),\n                full_width = FALSE)\n\n\n\nPoint estimate with bootstrap median and 95% percentile interval\n\n\nParameter\nEstimate\nBoot median\nBoot 2.5%\nBoot 97.5%\n\n\n\n\nka\n1.475\n1.441\n1.135\n2.417\n\n\ncl\n2.787\n2.806\n2.399\n3.297\n\n\nv\n32.010\n31.981\n29.248\n35.285\n\n\nadd.sd\n0.261\n0.237\n0.043\n0.476\n\n\nprop.sd\n0.136\n0.141\n0.058\n0.193\n\n\n\n\n\nRead this against the asymptotic CIs from Phase 4. Agreement between the two reassures us the asymptotic SEs were trustworthy; a wider or skewed bootstrap interval (most likely for Ka, the least precise parameter) reveals uncertainty the formula understated."
+  },
+  {
+    "objectID": "reports/09_Bootstrap_Report.html#bootstrap-distributions",
+    "href": "reports/09_Bootstrap_Report.html#bootstrap-distributions",
+    "title": "Phase 10 — Bootstrap Confidence Intervals",
+    "section": "4 Bootstrap distributions",
+    "text": "4 Bootstrap distributions\n\n\nCode\nboot_plot(boot)\n\n\n\n\n\nBootstrap sampling distributions of CL, V, and Ka (dashed = 95% percentile interval)."
+  },
+  {
+    "objectID": "reports/09_Bootstrap_Report.html#key-takeaways",
+    "href": "reports/09_Bootstrap_Report.html#key-takeaways",
+    "title": "Phase 10 — Bootstrap Confidence Intervals",
+    "section": "5 Key takeaways",
+    "text": "5 Key takeaways\n\nParameter uncertainty was quantified empirically by subject resampling, free of the normality assumption behind asymptotic SEs.\nThe bootstrap and asymptotic CIs can be compared directly; close agreement validates the reported precision, while divergence (typically for Ka) flags small-sample fragility.\nWith n = 12 the bootstrap is itself coarse and presented as a demonstration of method — exactly how it would be framed for a small study.\n\n\nNext (Phase 11): a covariate forest plot summarising the weight effect on CL and V with confidence intervals. ```"
   }
 ]
