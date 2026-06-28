@@ -40,10 +40,7 @@ reference, with the exponents estimated from the data (started at the theoretica
 
 $$ CL = CL_{typ}\,(WT/70)^{\theta_{CL}}, \qquad V = V_{typ}\,(WT/70)^{\theta_{V}} $$
 
-```{r show-model}
-#| code-fold: false
-print(cov_model)
-```
+The fitted model's structure is shown as equations in the next section.
 
 ## Fit the covariate model
 

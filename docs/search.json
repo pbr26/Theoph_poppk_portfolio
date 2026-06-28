@@ -102,7 +102,7 @@
     "href": "reports/05_Covariate_Model_Report.html#how-weight-enters-the-model",
     "title": "Phase 5 — Covariate Model (Body Weight)",
     "section": "2 How weight enters the model",
-    "text": "2 How weight enters the model\nWe use the pharmacometric-standard allometric form, normalised to a 70 kg reference, with the exponents estimated from the data (started at the theoretical 0.75 for CL and 1.0 for V):\n\\[ CL = CL_{typ}\\,(WT/70)^{\\theta_{CL}}, \\qquad V = V_{typ}\\,(WT/70)^{\\theta_{V}} \\]\n\nprint(cov_model)\n\nfunction () \n{\n    ini({\n        tka &lt;- log(1.5)\n        tcl &lt;- log(2.8)\n        tv &lt;- log(32)\n        dWTCL &lt;- 0.75\n        dWTV &lt;- 1\n        eta.ka ~ 0.3\n        eta.cl ~ 0.1\n        eta.v ~ 0.1\n        add.sd &lt;- 0.2\n        prop.sd &lt;- 0.2\n    })\n    model({\n        ka &lt;- exp(tka + eta.ka)\n        cl &lt;- exp(tcl + eta.cl) * (WT/70)^dWTCL\n        v &lt;- exp(tv + eta.v) * (WT/70)^dWTV\n        d/dt(depot) &lt;- -ka * depot\n        d/dt(center) &lt;- ka * depot - (cl/v) * center\n        cp &lt;- center/v\n        cp ~ add(add.sd) + prop(prop.sd)\n    })\n}"
+    "text": "2 How weight enters the model\nWe use the pharmacometric-standard allometric form, normalised to a 70 kg reference, with the exponents estimated from the data (started at the theoretical 0.75 for CL and 1.0 for V):\n\\[ CL = CL_{typ}\\,(WT/70)^{\\theta_{CL}}, \\qquad V = V_{typ}\\,(WT/70)^{\\theta_{V}} \\]\nThe fitted model’s structure is shown as equations in the next section."
   },
   {
     "objectID": "reports/05_Covariate_Model_Report.html#fit-the-covariate-model",
@@ -172,7 +172,7 @@
     "href": "reports/03_Base_Model_Report.html#the-structural-model",
     "title": "Phase 3 — Base Population PK Model",
     "section": "3 The structural model",
-    "text": "3 The structural model\nThe model is a function with an ini block (starting values) and a model block (the structure). Fixed effects are estimated on the log scale, so the back-transformed CL, V, and Ka are always positive. Initial values are seeded from the Phase 2 NCA, which puts the optimiser close to the solution from the start.\n\nprint(base_model)\n\nfunction () \n{\n    ini({\n        tka &lt;- log(1.5)\n        tcl &lt;- log(2.8)\n        tv &lt;- log(32)\n        eta.cl ~ 0.1\n        add.sd &lt;- 0.3\n        prop.sd &lt;- 0.1\n    })\n    model({\n        ka &lt;- exp(tka)\n        cl &lt;- exp(tcl + eta.cl)\n        v &lt;- exp(tv)\n        d/dt(depot) &lt;- -ka * depot\n        d/dt(center) &lt;- ka * depot - (cl/v) * center\n        cp &lt;- center/v\n        cp ~ add(add.sd) + prop(prop.sd)\n    })\n}\n\n\nThe two d/dt(...) lines are the compartment mass-balance equations; cp = center/v is the predicted concentration; and cp ~ add(add.sd) + prop(prop.sd) specifies a combined additive + proportional residual error model. The base model carries between-subject variability on CL only (eta.cl) — variability on V and Ka is added in Phase 4."
+    "text": "3 The structural model\nThe model is a function with an ini block (starting values) and a model block (the structure). Fixed effects are estimated on the log scale, so the back-transformed CL, V, and Ka are always positive. Initial values are seeded from the Phase 2 NCA, which puts the optimiser close to the solution from the start.\nThe fitted model’s structure is shown as equations in the next section.\nThe two d/dt(...) lines are the compartment mass-balance equations; cp = center/v is the predicted concentration; and cp ~ add(add.sd) + prop(prop.sd) specifies a combined additive + proportional residual error model. The base model carries between-subject variability on CL only (eta.cl) — variability on V and Ka is added in Phase 4."
   },
   {
     "objectID": "reports/03_Base_Model_Report.html#fitting-the-model-focei",
@@ -368,7 +368,7 @@
     "href": "reports/04_IIV_Model_Report.html#what-a-random-effect-is",
     "title": "Phase 4 — Inter-Individual Variability (IIV)",
     "section": "2 What a random effect is",
-    "text": "2 What a random effect is\nFor each parameter we write, e.g., cl = exp(tcl + eta.cl), where eta.cl is a subject-specific deviation drawn from a normal distribution N(0, omega^2). The population shares one typical curve; each subject’s curve is a shifted version of it. The spread of those shifts — the IIV — is summarised as a CV%.\n\nprint(iiv_model)\n\nfunction () \n{\n    ini({\n        tka &lt;- log(1.5)\n        tcl &lt;- log(2.8)\n        tv &lt;- log(32)\n        eta.ka ~ 0.3\n        eta.cl ~ 0.1\n        eta.v ~ 0.1\n        add.sd &lt;- 0.2\n        prop.sd &lt;- 0.2\n    })\n    model({\n        ka &lt;- exp(tka + eta.ka)\n        cl &lt;- exp(tcl + eta.cl)\n        v &lt;- exp(tv + eta.v)\n        d/dt(depot) &lt;- -ka * depot\n        d/dt(center) &lt;- ka * depot - (cl/v) * center\n        cp &lt;- center/v\n        cp ~ add(add.sd) + prop(prop.sd)\n    })\n}"
+    "text": "2 What a random effect is\nFor each parameter we write, e.g., cl = exp(tcl + eta.cl), where eta.cl is a subject-specific deviation drawn from a normal distribution N(0, omega^2). The population shares one typical curve; each subject’s curve is a shifted version of it. The spread of those shifts — the IIV — is summarised as a CV%.\nThe fitted model’s structure is shown as equations in the next section."
   },
   {
     "objectID": "reports/04_IIV_Model_Report.html#fit-the-iiv-model",
@@ -459,7 +459,7 @@
     "href": "reports/08_Two_Compartment_Report.html#the-two-compartment-model",
     "title": "Phase 9 — One- vs Two-Compartment Comparison",
     "section": "2 The two-compartment model",
-    "text": "2 The two-compartment model\nA peripheral compartment lets drug distribute into tissues and return, producing a biphasic semilog decline. Two new parameters appear: Q (inter-compartmental clearance) and V2 (peripheral volume); the central volume becomes Vc.\n\nprint(two_cmt_model)\n\nfunction () \n{\n    ini({\n        tka &lt;- log(1.5)\n        tcl &lt;- log(2.8)\n        tvc &lt;- log(32)\n        tq &lt;- log(2)\n        tvp &lt;- log(10)\n        eta.ka ~ 0.3\n        eta.cl ~ 0.1\n        eta.vc ~ 0.1\n        add.sd &lt;- 0.2\n        prop.sd &lt;- 0.2\n    })\n    model({\n        ka &lt;- exp(tka + eta.ka)\n        cl &lt;- exp(tcl + eta.cl)\n        vc &lt;- exp(tvc + eta.vc)\n        q &lt;- exp(tq)\n        vp &lt;- exp(tvp)\n        d/dt(depot) &lt;- -ka * depot\n        d/dt(center) &lt;- ka * depot - (cl/vc) * center - (q/vc) * \n            center + (q/vp) * periph\n        d/dt(periph) &lt;- (q/vc) * center - (q/vp) * periph\n        cp &lt;- center/vc\n        cp ~ add(add.sd) + prop(prop.sd)\n    })\n}"
+    "text": "2 The two-compartment model\nA peripheral compartment lets drug distribute into tissues and return, producing a biphasic semilog decline. Two new parameters appear: Q (inter-compartmental clearance) and V2 (peripheral volume); the central volume becomes Vc.\nThe fitted model’s structure is shown as equations in the next section."
   },
   {
     "objectID": "reports/08_Two_Compartment_Report.html#fit-and-compare",

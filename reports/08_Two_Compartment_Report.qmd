@@ -39,10 +39,7 @@ A peripheral compartment lets drug distribute into tissues and return, producing
 biphasic semilog decline. Two new parameters appear: **Q** (inter-compartmental
 clearance) and **V2** (peripheral volume); the central volume becomes **Vc**.
 
-```{r show-model}
-#| code-fold: false
-print(two_cmt_model)
-```
+The fitted model's structure is shown as equations in the next section.
 
 ## Fit and compare
 

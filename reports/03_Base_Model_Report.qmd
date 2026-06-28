@@ -61,10 +61,7 @@ The model is a function with an `ini` block (starting values) and a `model` bloc
 back-transformed CL, V, and Ka are always positive. Initial values are seeded from
 the Phase 2 NCA, which puts the optimiser close to the solution from the start.
 
-```{r show-model}
-#| code-fold: false
-print(base_model)
-```
+The fitted model's structure is shown as equations in the next section.
 
 The two `d/dt(...)` lines are the compartment mass-balance equations; `cp = center/v`
 is the predicted concentration; and `cp ~ add(add.sd) + prop(prop.sd)` specifies a

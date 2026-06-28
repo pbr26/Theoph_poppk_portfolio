@@ -40,10 +40,7 @@ subject-specific deviation drawn from a normal distribution `N(0, omega^2)`. The
 population shares one typical curve; each subject's curve is a shifted version of
 it. The spread of those shifts — the IIV — is summarised as a **CV%**.
 
-```{r show-model}
-#| code-fold: false
-print(iiv_model)
-```
+The fitted model's structure is shown as equations in the next section.
 
 ## Fit the IIV model
 
