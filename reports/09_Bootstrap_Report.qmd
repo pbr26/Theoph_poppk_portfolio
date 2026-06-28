@@ -40,6 +40,7 @@ IIV model to each resampled dataset, and collect the fixed effects. The 2.5th an
 
 ```{r run-boot}
 #| cache: true
+#| output: false
 dat  <- build_nonmem_data()
 fit  <- load_iiv_fit()
 boot <- run_bootstrap(dat, nboot = 50)

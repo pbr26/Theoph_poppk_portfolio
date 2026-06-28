@@ -46,9 +46,14 @@ The fitted model's structure is shown as equations in the next section.
 
 ```{r fit-iiv}
 #| cache: true
+#| output: false
 dat      <- build_nonmem_data()
 base_fit <- readRDS(fs::path(PATH_MODELS, "base_fit.rds"))
 iiv_fit  <- fit_iiv_model(dat)
+```
+
+```{r}
+#| echo: false
 iiv_fit
 ```
 

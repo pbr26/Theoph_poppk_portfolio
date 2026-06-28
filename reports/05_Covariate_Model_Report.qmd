@@ -46,9 +46,14 @@ The fitted model's structure is shown as equations in the next section.
 
 ```{r fit-cov}
 #| cache: true
+#| output: false
 dat     <- build_nonmem_data()
 iiv_fit <- load_iiv_fit()
 cov_fit <- fit_cov_model(dat)
+```
+
+```{r}
+#| echo: false
 cov_fit
 ```
 

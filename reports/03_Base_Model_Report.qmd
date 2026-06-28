@@ -76,7 +76,12 @@ Estimation with interaction), the workhorse algorithm of population PK.
 
 ```{r fit-model}
 #| cache: true
+#| output: false
 fit <- fit_base_model(dat)
+```
+
+```{r}
+#| echo: false
 fit
 ```
 
