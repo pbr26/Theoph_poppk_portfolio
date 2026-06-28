@@ -256,7 +256,7 @@
     "href": "index.html#analysis-phases",
     "title": "Population PK Portfolio — Theophylline",
     "section": "3 Analysis phases",
-    "text": "3 Analysis phases\n\n\n\nPhase\nReport\nKey skills\n\n\n\n\n1\nExploratory Data Analysis\nData QC, PK visualisation, study design\n\n\n2\nNoncompartmental Analysis\nPKNCA — Cmax, Tmax, AUC, t½\n\n\n3\nBase PopPK Model\nnlmixr2 / rxode2, 1-cmt oral, first-order absorption\n\n\n4\nIIV Model\nBetween-subject variability on CL, V, Ka\n\n\n5\nCovariate Model\nWeight on CL & V, model selection\n\n\n6\nModel Diagnostics\nGOF, VPC, CWRES vs TIME/PRED\n\n\n7\nClinical Simulation\nTypical-patient & subgroup PK simulation"
+    "text": "3 Analysis phases\n\n\n\nPhase\nReport\nKey skills\n\n\n\n\n1\nExploratory Data Analysis\nData QC, PK visualisation, study design\n\n\n2\nNoncompartmental Analysis\nPKNCA — Cmax, Tmax, AUC, t½\n\n\n3\nBase PopPK Model\nnlmixr2 / rxode2, 1-cmt oral, first-order absorption\n\n\n4\nIIV Model\nBetween-subject variability on CL, V, Ka\n\n\n5\nCovariate Model\nWeight on CL & V, model selection\n\n\n6\nModel Diagnostics\nGOF, VPC, CWRES vs TIME/PRED\n\n\n7\nClinical Simulation\nTypical-patient & subgroup PK simulation\n\n\n9\n1- vs 2-Compartment\nStructural model selection (OFV/AIC/BIC)\n\n\n10\nBootstrap CIs\nEmpirical parameter uncertainty\n\n\n11\nCovariate Forest Plot\nClinical relevance of the weight effect"
   },
   {
     "objectID": "index.html#reproducibility",

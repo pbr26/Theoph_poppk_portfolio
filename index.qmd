@@ -30,6 +30,9 @@ covariate of interest — making it an ideal teaching dataset for population PK 
 | 5 | [Covariate Model](reports/05_Covariate_Model_Report.html) | Weight on CL & V, model selection |
 | 6 | [Model Diagnostics](reports/06_Model_Diagnostics.html) | GOF, VPC, CWRES vs TIME/PRED |
 | 7 | [Clinical Simulation](reports/07_Simulation_Report.html) | Typical-patient & subgroup PK simulation |
+| 9 | [1- vs 2-Compartment](reports/08_Two_Compartment_Report.html) | Structural model selection (OFV/AIC/BIC) |
+| 10 | [Bootstrap CIs](reports/09_Bootstrap_Report.html) | Empirical parameter uncertainty |
+| 11 | [Covariate Forest Plot](reports/10_Forest_Plot_Report.html) | Clinical relevance of the weight effect |
 
 ## Reproducibility
 
